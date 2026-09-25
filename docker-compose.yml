@@ -1,0 +1,25 @@
+# docker-compose dev — PostgreSQL 16 برای توسعه محلی (بخش ۲۲ سند معماری)
+# استفاده: docker compose up -d
+# نکته: در sandbox بدون docker از scripts/pg.sh (باینری پرتابل) استفاده می‌شود؛
+# این فایل برای ماشین توسعه‌ای است که docker دارد و همان رشته اتصال را می‌دهد.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: prima-db
+    environment:
+      POSTGRES_USER: prima
+      POSTGRES_PASSWORD: prima_dev_only
+      POSTGRES_DB: prima
+      LANG: C
+    ports:
+      - "5432:5432"
+    volumes:
+      - prima-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U prima -d prima"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  prima-pgdata:

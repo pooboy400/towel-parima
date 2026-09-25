@@ -1,0 +1,168 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ------------------------------------------------------------------
+   Design System — Warm Minimalism
+   برند: حوله پریمیوم | مرجع: MASTER PROMPT بخش 11-18
+   Background #F8F6F2 · Primary #303A35 · Secondary #B7A48C · Accent #C88F72
+   ------------------------------------------------------------------ */
+
+@theme inline {
+  /* shadcn tokens */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+
+  /* Brand tokens (دسترسی مستقیم در کلاس‌ها: bg-cream, text-terracotta, ...) */
+  --color-cream: #f8f6f2;
+  --color-surface: #ffffff;
+  --color-deep: #303a35;
+  --color-sand: #b7a48c;
+  --color-sand-soft: #efe9df;
+  --color-terracotta: #c88f72;
+  --color-terracotta-deep: #a9714f;
+  --color-ink: #242424;
+  --color-stone-muted: #77736d;
+  --color-line: #e5e1da;
+  --color-sage: #56745f;
+
+  /* Dashboard charts — پالت برند (M2) */
+  --color-chart-1: #303a35;
+  --color-chart-2: #b7a48c;
+  --color-chart-3: #c88f72;
+  --color-chart-4: #56745f;
+  --color-chart-5: #a9714f;
+
+  /* Typography */
+  --font-sans: var(--font-vazirmatn), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+
+  /* Radius — Card 12 · Input/Button 8 · Modal 16 */
+  --radius-sm: calc(var(--radius) - 4px);   /* 8px  */
+  --radius-md: calc(var(--radius) - 2px);   /* 10px */
+  --radius-lg: var(--radius);               /* 12px */
+  --radius-xl: calc(var(--radius) + 4px);   /* 16px */
+
+  /* Subtle shadows — پرامپت: Border > Background contrast > Shadow */
+  --shadow-xs: 0 1px 2px 0 oklch(0 0 0 / 0.04);
+  --shadow-sm: 0 1px 3px 0 oklch(0 0 0 / 0.05), 0 1px 2px -1px oklch(0 0 0 / 0.04);
+  --shadow-md: 0 4px 12px -2px oklch(0 0 0 / 0.07), 0 2px 4px -2px oklch(0 0 0 / 0.04);
+
+  /* Container */
+  --spacing-container: 80rem; /* 1280px */
+  --spacing-container-wide: 90rem; /* 1440px */
+}
+
+:root {
+  --radius: 0.75rem;
+
+  --background: #f8f6f2;
+  --foreground: #242424;
+  --card: #ffffff;
+  --card-foreground: #242424;
+  --popover: #ffffff;
+  --popover-foreground: #242424;
+  --primary: #303a35;
+  --primary-foreground: #f8f6f2;
+  --secondary: #efe9df;
+  --secondary-foreground: #303a35;
+  --muted: #f1eee8;
+  --muted-foreground: #77736d;
+  --accent: #efe9df;
+  --accent-foreground: #303a35;
+  --destructive: #b65d57;
+  --destructive-foreground: #ffffff;
+  --success: #56745f;
+  --border: #e5e1da;
+  --input: #e5e1da;
+  --ring: #b7a48c;
+}
+
+.dark {
+  --background: #1c201e;
+  --foreground: #f0ede7;
+  --card: #242926;
+  --card-foreground: #f0ede7;
+  --popover: #242926;
+  --popover-foreground: #f0ede7;
+  --primary: #f0ede7;
+  --primary-foreground: #1c201e;
+  --secondary: #2c312e;
+  --secondary-foreground: #f0ede7;
+  --muted: #2c312e;
+  --muted-foreground: #a3a09a;
+  --accent: #2c312e;
+  --accent-foreground: #f0ede7;
+  --destructive: #b65d57;
+  --destructive-foreground: #ffffff;
+  --success: #6e8f77;
+  --border: okch(0 0 0 / 12%);
+  --input: okch(0 0 0 / 16%);
+  --ring: #b7a48c;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01";
+    text-rendering: optimizeLegibility;
+  }
+  /* Focus visible — پرامپت 139: focus state هرگز حذف نشود */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  /* Reduced motion — پرامپت 82 */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  .container-brand {
+    width: 100%;
+    max-width: var(--spacing-container);
+    margin-inline: auto;
+    padding-inline: 1rem;
+    @media (width >= 40rem) {
+      padding-inline: 1.5rem;
+    }
+    @media (width >= 64rem) {
+      padding-inline: 2.5rem;
+    }
+  }
+}
