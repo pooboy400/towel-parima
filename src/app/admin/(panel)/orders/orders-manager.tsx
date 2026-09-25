@@ -114,17 +114,17 @@ export function OrdersManager({ orders }: { orders: AdminOrderRow[] }) {
         />
       </div>
 
-      {/* جدول */}
-      <div className="overflow-hidden rounded-lg border border-line bg-surface">
+      {/* جدول — اسکرول افقی در موبایل (مطابق جدول محصولات) + ستون‌های کم‌اهمیت مخفی در sm */}
+      <div className="overflow-x-auto rounded-lg border border-line bg-surface">
         <table className="w-full text-[13px]">
           <thead>
             <tr className="border-b border-line bg-cream/60 text-muted-foreground">
               <th className="px-4 py-3 text-start font-medium">کد</th>
-              <th className="px-4 py-3 text-start font-medium">تاریخ</th>
+              <th className="hidden px-4 py-3 text-start font-medium md:table-cell">تاریخ</th>
               <th className="px-4 py-3 text-start font-medium">موبایل</th>
-              <th className="px-4 py-3 text-start font-medium">اقلام</th>
+              <th className="hidden px-4 py-3 text-start font-medium sm:table-cell">اقلام</th>
               <th className="px-4 py-3 text-start font-medium">مبلغ</th>
-              <th className="px-4 py-3 text-start font-medium">پرداخت</th>
+              <th className="hidden px-4 py-3 text-start font-medium md:table-cell">پرداخت</th>
               <th className="px-4 py-3 text-start font-medium">وضعیت</th>
               <th className="px-4 py-3 text-start font-medium">عملیات</th>
             </tr>
@@ -133,13 +133,13 @@ export function OrdersManager({ orders }: { orders: AdminOrderRow[] }) {
             {filtered.map((o) => (
               <tr key={o.id} className="border-b border-line/60 last:border-0">
                 <td className="px-4 py-3 font-mono" dir="ltr">{faDigits(o.code)}</td>
-                <td className="px-4 py-3 text-muted-foreground">
+                <td className="hidden px-4 py-3 text-muted-foreground md:table-cell">
                   {faDigits(new Date(o.placedAt).toLocaleDateString("fa-IR"))}
                 </td>
                 <td className="px-4 py-3" dir="ltr">{faDigits(o.phone)}</td>
-                <td className="px-4 py-3">{faDigits(o.itemCount)}</td>
+                <td className="hidden px-4 py-3 sm:table-cell">{faDigits(o.itemCount)}</td>
                 <td className="px-4 py-3 font-medium">{formatPrice(o.grandTotal, false)}</td>
-                <td className="px-4 py-3">
+                <td className="hidden px-4 py-3 md:table-cell">
                   {o.paymentStatus === "PAID" ? (
                     <span className="text-sage">پرداخت شده</span>
                   ) : o.paymentStatus === "FAILED" ? (
