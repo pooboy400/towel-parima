@@ -58,6 +58,11 @@ export default async function CollectionPage({
       filters={filters}
       titleOverride={`کالکشن ${collection.name}`}
       descriptionOverride={collection.description}
+      breadcrumbOverride={[
+        { label: "خانه", href: "/" },
+        { label: "کالکشن‌ها", href: "/collections" },
+        { label: `کالکشن ${collection.name}` },
+      ]}
     />
   );
 }

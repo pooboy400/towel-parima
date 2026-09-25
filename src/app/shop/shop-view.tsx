@@ -21,6 +21,7 @@ export function ShopView({
   titleOverride,
   descriptionOverride,
   facets,
+  breadcrumbOverride,
 }: {
   products: Product[];
   total: number;
@@ -32,6 +33,8 @@ export function ShopView({
   titleOverride?: string;
   descriptionOverride?: string;
   facets?: FilterFacets;
+  /** مسیر کامل breadcrumb — پیش‌فرض خانه>فروشگاه (رفع گمراه‌کنندگی کالکشن‌ها، 47-e) */
+  breadcrumbOverride?: { label: string; href?: string }[];
 }) {
   const title = titleOverride ?? (searchQuery ? `نتایج جستجوی «${searchQuery}»` : (activeCategory?.name ?? "فروشگاه حوله"));
   const description =
@@ -42,12 +45,14 @@ export function ShopView({
   return (
     <div className="container-brand py-8 lg:py-10">
       <Breadcrumb
-        items={[
-          { label: "خانه", href: "/" },
-          { label: "فروشگاه", href: "/shop" },
-          ...(activeCategory ? [{ label: activeCategory.name }] : []),
-          ...(searchQuery ? [{ label: `«${searchQuery}»` }] : []),
-        ]}
+        items={
+          breadcrumbOverride ?? [
+            { label: "خانه", href: "/" },
+            { label: "فروشگاه", href: "/shop" },
+            ...(activeCategory ? [{ label: activeCategory.name }] : []),
+            ...(searchQuery ? [{ label: `«${searchQuery}»` }] : []),
+          ]
+        }
       />
 
       <header className="mt-6 flex flex-col gap-2.5">
