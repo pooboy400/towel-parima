@@ -204,6 +204,15 @@ async function main() {
       p.id,
     ]),
   );
+  // پخش تاریخ نظرات: از ۹ روز تا ~۱۰ ماه پیش — «ماه پیش»های واقعی
+  function* reviewDaysAgoGen(): Generator<number> {
+    let i = 0;
+    while (true) {
+      yield 9 + (i % 20) * 15;
+      i += 1;
+    }
+  }
+  const reviewDaysAgo = reviewDaysAgoGen();
   for (const r of reviews) {
     const productId = productBySlug.get(r.productSlug);
     if (!productId) continue;
@@ -214,7 +223,8 @@ async function main() {
         rating: r.rating,
         body: r.comment,
         status: "APPROVED",
-        publishedAt: new Date(r.date),
+        // تاریخ نسبی — نظرها همیشه تازه (الگوی daysAgo، درس Task 42)
+        publishedAt: new Date(Date.now() - reviewDaysAgo.next().value * 24 * 60 * 60 * 1000),
         verifiedPurchase: r.verifiedPurchase,
       },
     });
@@ -222,6 +232,12 @@ async function main() {
   console.log(`نظرات: ${reviews.length}`);
 
   /* ---------- ۷) ژورنال + FAQ ---------- */
+  // تاریخ نسبی ژورنال (الگوی daysAgo محصولات — درس Task 42: نصب تازه نباید تاریخ کهنه نشان دهد)
+  // جدیدترین مقاله ~۳ هفته پیش؛ هر مقاله قدیمی‌تر ۱۲ روز عقب‌تر — ترتیب seed حفظ می‌شود
+  const journalByDate = [...journalPosts].sort((a, b) => a.date.localeCompare(b.date));
+  const journalDaysAgo = new Map(
+    journalByDate.map((j, i) => [j.slug, 20 + (journalByDate.length - 1 - i) * 12]),
+  );
   for (const j of journalPosts) {
     await db.journalPost.create({
       data: {
@@ -233,7 +249,7 @@ async function main() {
         topic: j.category,
         readingMinutes: j.readingTime,
         status: "PUBLISHED",
-        publishedAt: new Date(j.date),
+        publishedAt: new Date(Date.now() - (journalDaysAgo.get(j.slug) ?? 30) * 24 * 60 * 60 * 1000),
       },
     });
   }
