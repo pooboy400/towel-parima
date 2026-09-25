@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Search } from "lucide-react";
@@ -44,6 +45,7 @@ export function SearchDialog({
   const [items, setItems] = useState<SearchItem[]>([]);
   const [status, setStatus] = useState<SearchStatus>("idle");
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const trimmed = query.trim();
   const hasQuery = trimmed.length >= 2;
@@ -80,9 +82,10 @@ export function SearchDialog({
 
   const submit = () => {
     if (!hasQuery) return;
+    const q = trimmed;
     reset();
     onOpenChange(false);
-    window.location.assign(`/shop?query=${encodeURIComponent(trimmed)}`);
+    router.push(`/shop?query=${encodeURIComponent(q)}`);
   };
 
   return (

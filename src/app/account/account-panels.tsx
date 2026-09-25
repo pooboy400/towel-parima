@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { LogOut, MapPin, Package, Pencil, Phone, Plus, Star, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -331,13 +332,16 @@ export function ProfilePanel({
   customer: { name: string | null; phone: string | null; passwordSet: boolean };
 }) {
   const [pending, startTransition] = useTransition();
+  const router = useRouter();
 
   const logout = () => {
     startTransition(async () => {
       const res = await logoutAction();
       if (res.ok) {
         useCartStore.getState().setCustomer(null);
-        window.location.href = "/";
+        router.push("/");
+        // کش سمت کلاینت کاملاً تازه شود — سبد/نشست قبلی پاک بماند
+        router.refresh();
       }
     });
   };
