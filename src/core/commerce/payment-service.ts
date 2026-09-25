@@ -90,7 +90,7 @@ export async function startPayment(input: {
 
 export interface ConfirmResult {
   ok: boolean;
-  status: "PAID" | "FAILED" | "ALREADY_PAID";
+  status: "PAID" | "FAILED" | "ALREADY_PAID" | "REFUNDED";
   orderCode: string;
   message?: string;
 }
@@ -186,11 +186,14 @@ export async function confirmPayment(authority: string): Promise<ConfirmResult> 
   }
 
   // ── tx نهایی: Order PROCESSING + رزرو CONVERTED + Outbox
-  await db.$transaction(async (tx) => {
-    await tx.order.update({
+  // گارد race لغو×تأیید (MEDIUM-1 گزارش 47-a): سفارش با updateMany شرطی پیش می‌رود؛
+  // اگر همزمان لغو شده بود → مسیر بازپرداخت خودکار به‌جای کرش P2025.
+  const orderAdvanced = await db.$transaction(async (tx): Promise<boolean> => {
+    const advanced = await tx.order.updateMany({
       where: { id: order.id, status: "PENDING" },
       data: { status: "PROCESSING" },
     });
+    if (advanced.count === 0) return false;
 
     for (const reservation of activeReservations) {
       await convertReservation(tx, reservation.id);
@@ -206,12 +209,90 @@ export async function confirmPayment(authority: string): Promise<ConfirmResult> 
         transactionId: verify.transactionId ?? null,
       },
     });
+    return true;
   });
 
-  // فروش جدید ثبت شد — برچسب‌ها/موجودی ویترین تازه شود (ISR)
-  await invalidateStorefrontForOrder(order.id);
+  if (orderAdvanced) {
+    // فروش جدید ثبت شد — برچسب‌ها/موجودی ویترین تازه شود (ISR)
+    await invalidateStorefrontForOrder(order.id);
+    return { ok: true, status: "PAID", orderCode: order.code };
+  }
 
-  return { ok: true, status: "PAID", orderCode: order.code };
+  // ── race لغو×تأیید: پول گرفته شد (claim PAID) ولی سفارش همزمان لغو شده است.
+  // بازپرداخت خودکار + پیامک RefundSucceeded — پول بدون مسیر نمی‌ماند.
+  return await refundRacedPayment({
+    paymentId: payment.id,
+    orderId: order.id,
+    orderCode: order.code,
+    amount: payment.amount,
+    transactionId: verify.transactionId ?? null,
+  });
+}
+
+/**
+ * بازپرداخت پرداختِ رقابتی — سفارش همزمان با تأیید پرداخت لغو شده است.
+ * قانون طلایی §۱۰.۳: فراخوانی درگاه خارج از tx؛ نتیجه در tx جدا ثبت می‌شود.
+ * اگر درگاه استرداد نکرد: رکورد Refund FAILED می‌ماند تا ادمین پیگیری کند (Payment=PAID صادقانه می‌ماند).
+ */
+async function refundRacedPayment(input: {
+  paymentId: string;
+  orderId: string;
+  orderCode: string;
+  amount: number;
+  transactionId: string | null;
+}): Promise<ConfirmResult> {
+  const reason = "لغو همزمان سفارش با پرداخت — استرداد خودکار";
+
+  let refundOk = false;
+  let providerRef: string | null = null;
+  let refundError: string | null = null;
+  try {
+    const refund = await paymentProvider.refundPayment({
+      transactionId: input.transactionId ?? "",
+      amountIrt: input.amount,
+    });
+    refundOk = refund.ok;
+    providerRef = refund.providerRef ?? null;
+    refundError = refund.ok ? null : refund.message?.slice(0, 300) ?? "استرداد درگاه ناموفق بود.";
+  } catch (err) {
+    refundError =
+      err instanceof DomainError ? err.message : "خطای غیرمنتظره در استرداد درگاه.";
+  }
+
+  await db.$transaction(async (tx) => {
+    await tx.refund.create({
+      data: {
+        paymentId: input.paymentId,
+        orderId: input.orderId,
+        amount: input.amount,
+        reason,
+        status: refundOk ? "SUCCEEDED" : "FAILED",
+        providerRef,
+        error: refundError,
+        actorId: null, // سیستم — نه انسان
+        ...(refundOk ? { succeededAt: new Date() } : {}),
+      },
+    });
+    if (refundOk) {
+      await tx.payment.update({
+        where: { id: input.paymentId },
+        data: { status: "REFUNDED" },
+      });
+      await enqueueOutbox(tx, {
+        type: "RefundSucceeded",
+        payload: { orderId: input.orderId, code: input.orderCode, amount: input.amount },
+      });
+    }
+  });
+
+  return {
+    ok: false,
+    status: refundOk ? "REFUNDED" : "FAILED",
+    orderCode: input.orderCode,
+    message: refundOk
+      ? "سفارش در لحظهٔ پرداخت لغو شد؛ مبلغ شما به‌صورت خودکار برگشت داده شد."
+      : "سفارش لغو شد؛ استرداد مبلغ در حال پیگیری است — پشتیبانی با شما تماس می‌گیرد.",
+  };
 }
 
 /** شکست پرداخت — Payment FAILED · سفارش CANCELLED · رزرو RELEASED */

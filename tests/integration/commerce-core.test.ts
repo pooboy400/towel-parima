@@ -437,6 +437,60 @@ describe("PaymentService — تأیید idempotent (§10.2)", () => {
     const v = await db.variant.findUnique({ where: { id: variant.id } });
     expect(v!.reserved).toBe(0);
   });
+
+  // ─── رگرسیون race لغو×تأیید پرداخت (MEDIUM-1 گزارش 47-a) ───
+
+  it("رقابت لغو×تأیید: سفارش لحظهٔ پرداخت لغو شد → بازپرداخت خودکار نه کرش P2025", async () => {
+    const variant = await makeVariantWithStock(5);
+    const placed = await placeOrder({
+      userId: null,
+      lines: [{ productId: variant.productId, colorId: null, sizeId: null, quantity: 1 }],
+      address: {
+        fullName: "تست تست",
+        phone: "09121112233",
+        province: "تهران",
+        city: "تهران",
+        postalCode: "1965843111",
+        line: "خیابان تست پلاک ۱",
+      },
+      shippingMethod: "standard",
+    });
+    created.orderIds.push(placed.orderId);
+
+    const { paymentId } = await startPayment({ orderId: placed.orderId, userId: null });
+    const payment = await db.payment.findUnique({ where: { id: paymentId } });
+
+    // شبیه‌سازی درهم‌تنیدگی: سفارش بین «خواندن confirm» و «tx نهایی» لغو می‌شود.
+    // رزروها عمداً ACTIVE می‌مانند تا دقیقاً پنجرهٔ race (خوانده‌شدن ACTIVE قبل از commit لغو) بازسازی شود.
+    await db.order.update({ where: { id: placed.orderId }, data: { status: "CANCELLED" } });
+
+    // قبلاً: claim PAID موفق → order.update P2025 → کرش؛ پول PAID گیر می‌کرد
+    const result = await confirmPayment(payment!.authority);
+    expect(result.ok).toBe(false);
+    expect(result.status).toBe("REFUNDED"); // با mock درگاه، استرداد خودکار موفق است
+
+    const after = await db.payment.findUnique({ where: { id: paymentId } });
+    expect(after!.status).toBe("REFUNDED");
+
+    // رکورد Refund SUCCEEDED با دلیل خودکار
+    const refund = await db.refund.findFirst({ where: { paymentId } });
+    expect(refund!.status).toBe("SUCCEEDED");
+    expect(refund!.reason).toContain("استرداد خودکار");
+
+    // پیامک/رخداد RefundSucceeded صف شد
+    const events = await db.outboxEvent.findMany({
+      where: { type: "RefundSucceeded", payload: { path: ["orderId"], equals: placed.orderId } },
+    });
+    expect(events).toHaveLength(1);
+
+    // سفارش CANCELLED ماند؛ PaymentSucceeded ساخته نشد
+    const order = await db.order.findUnique({ where: { id: placed.orderId } });
+    expect(order!.status).toBe("CANCELLED");
+    const paid = await db.outboxEvent.findMany({
+      where: { type: "PaymentSucceeded", payload: { path: ["orderId"], equals: placed.orderId } },
+    });
+    expect(paid).toHaveLength(0);
+  });
 });
 
 describe("OrderService — ماشین وضعیت (§5.1)", () => {
