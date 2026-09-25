@@ -44,3 +44,6 @@ tool-results/
 .pg/
 .data/
 
+
+# CI گیت‌هاب به‌دلیل محدودیت scope توکن، لوکال می‌ماند
+.github/workflows/
