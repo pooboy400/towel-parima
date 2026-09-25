@@ -26,6 +26,16 @@ bun run dev                       # http://localhost:3000
 
 پنل مدیریت: `/admin` — ورود با حساب ادمین (`bun scripts/create-admin.ts --show`)
 
+## 🔄 بازگردانی در محیط کاملاً تازه (سرور دیگر)
+
+```bash
+git clone "https://x-access-token:<TOKEN>@github.com/<USER>/<REPO>.git" project
+cd project && bash scripts/restore-from-github.sh <TOKEN> <REPO_URL>
+```
+
+اسکریپت خودش پکیج‌ها، دیتابیس پرتابل، مهاجرت‌ها و دادهٔ اولیه را برمی‌گرداند.
+مخزن خصوصی فقط با توکن (کلید ghp_...) باز می‌شود — توکن را امن نگه دارید.
+
 ## 📌 راهنمای چت جدید (برای دستیار هوشمند)
 
 اگر این پروژه در گفتگوی جدید ادامه داده می‌شود، **قبل از هر کاری** این دو فایل را بخوان:
