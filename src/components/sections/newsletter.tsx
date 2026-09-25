@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 import { newsletterSchema } from "@/lib/validations";
 import { subscribeNewsletterAction } from "@/app/contact/actions";
 
@@ -13,7 +14,9 @@ import { subscribeNewsletterAction } from "@/app/contact/actions";
 export function NewsletterSection() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [done, setDone] = useState(false);
+  // پیام بنر نهایی — برای عضویت تکراری متن صادقانه «از قبل عضو» (رفع 47-e MEDIUM)
+  const [doneMessage, setDoneMessage] = useState<string | null>(null);
+  const [isAlready, setIsAlready] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const submit = (e: React.FormEvent) => {
@@ -28,8 +31,13 @@ export function NewsletterSection() {
       try {
         const res = await subscribeNewsletterAction(result.data);
         if (res.ok) {
-          setDone(true);
-          toast.success(res.message);
+          setIsAlready(res.alreadySubscribed ?? false);
+          setDoneMessage(res.message);
+          if (res.alreadySubscribed) {
+            toast.info(res.message);
+          } else {
+            toast.success(res.message);
+          }
         } else {
           setError(res.message);
         }
@@ -57,9 +65,14 @@ export function NewsletterSection() {
               </p>
             </div>
 
-            {done ? (
-              <p className="rounded-md bg-secondary px-5 py-3 text-sm font-medium text-sage">
-                عضویت شما ثبت شد؛ ممنون که همراه ما هستید.
+            {doneMessage ? (
+              <p
+                className={cn(
+                  "rounded-md px-5 py-3 text-sm font-medium",
+                  isAlready ? "bg-secondary text-muted-foreground" : "bg-secondary text-sage",
+                )}
+              >
+                {doneMessage}
               </p>
             ) : (
               <form
