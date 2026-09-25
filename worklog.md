@@ -512,3 +512,24 @@ Stage Summary:
 - پشتیبان گیت‌هاب = آینهٔ کامل محیط کاری (کد + حافظهٔ دستیار + ابزارها)
 - انتقال به چت جدید: clone → README → worklog.md → ARCHITECTURE.md
 - منتظر توکن ghp_ مالک برای اجرای scripts/github-init.sh
+
+---
+Task ID: 45
+Agent: main (Super Z)
+Task: آپلود کامل پروژه به گیت‌هاب (مخزن خصوصی pooboy400/towel-parima)
+
+Work Log:
+- توکن classic ghp_... (scope: repo) از کاربر دریافت شد — حساب: pooboy400
+- «towel parima» → نام معتبر towel-parima (گیت‌هاب فاصله قبول نمی‌کند)
+- پوش اول rejected: ci.yml زیر .github/workflows بدون scope «workflow» مجاز نیست
+- راه‌حل: ci.yml از track خارج + .gitignore + commit توضیحی (روی دیسک ماند)
+- پوش دوم موفق: main → main (~66MB شامل skills)
+- امن‌سازی: remote set-url بدون توکن؛ تأیید نبود ghp_ در .git/config
+- تأیید نهایی: API private=true؛ SHA لوکال 0140075 == SHA گیت‌هاب
+- scripts/restore-from-github.sh + README بخش «بازگردانی محیط تازه» قبلاً در 92d1f5b (auto-commit محیط) ثبت شده بود
+
+Stage Summary:
+- پشتیبان کامل روی https://github.com/pooboy400/towel-parima (private)
+- فقط ci.yml لوکال ماند (بازگشتش با توکن workflow-scope)
+- توکن نزد کاربر می‌ماند = کلید بازگردانی در چت/سرور جدید؛ بعد از پوش از config پاک شد
+- فلو چت جدید: clone با توکن → scripts/restore-from-github.sh → خواندن worklog + ARCHITECTURE
