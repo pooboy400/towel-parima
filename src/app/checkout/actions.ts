@@ -12,6 +12,7 @@ import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { DomainError } from "@/core/errors";
 import { getCustomerContext } from "@/core/auth/customer-session";
+import { rateLimiter, RATE_RULES, rateKey } from "@/core/rate-limit";
 import { placeOrder } from "@/core/commerce/checkout-service";
 import { evaluateCoupon } from "@/core/commerce/coupon-service";
 import { startPayment } from "@/core/commerce/payment-service";
@@ -96,15 +97,27 @@ async function priceResolvedLines(lines: TripleLine[]): Promise<number> {
   return subtotal;
 }
 
-/** پیش‌نمایش کوپن — با ساب‌توتالِ قیمتِ سروری */
+/** پیش‌نمایش کوپن — با ساب‌توتالِ قیمتِ سروری
+ * rate-limit: couponApply (10/10min per IP+user) — توقف brute-force کد تخفیف (HIGH-2 گزارش 47-a)
+ */
 export async function validateCouponAction(input: {
   code: string;
   lines: ClientLineInput[];
 }): Promise<{ ok: true; discount: number } | { ok: false; message: string }> {
   try {
+    const customer = await getCustomerContext();
+    const hdrs = await headers();
+    const ip = hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const rl = await rateLimiter.hit(
+      rateKey("coupon-apply", ip, customer?.userId ?? "guest"),
+      RATE_RULES.couponApply,
+    );
+    if (!rl.ok) {
+      return { ok: false, message: "تلاش‌های بررسی کد تخفیف زیاد بوده؛ چند دقیقه بعد دوباره امتحان کنید." };
+    }
+
     const lines = toCheckoutLines(input.lines);
     const subtotal = await priceResolvedLines(lines);
-    const customer = await getCustomerContext();
     const evaluation = await evaluateCoupon(input.code, subtotal, customer?.userId ?? null);
     return { ok: true, discount: evaluation.discount };
   } catch (error) {
@@ -126,8 +139,17 @@ export async function placeOrderAction(
     const customer = await getCustomerContext();
 
     const hdrs = await headers();
-    const ip = hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+    const ip = hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
     const userAgent = hdrs.get("user-agent");
+
+    // rate-limit: paymentStart (5/10min per IP+user) — اسپم سفارش PENDING/رزرو/درگاه (HIGH-2)
+    const rl = await rateLimiter.hit(
+      rateKey("payment-start", ip, customer?.userId ?? "guest"),
+      RATE_RULES.paymentStart,
+    );
+    if (!rl.ok) {
+      return { ok: false, message: "تعداد ثبت سفارش زیاد است؛ چند دقیقه بعد دوباره تلاش کنید." };
+    }
 
     const result = await placeOrder({
       userId: customer?.userId ?? null,
