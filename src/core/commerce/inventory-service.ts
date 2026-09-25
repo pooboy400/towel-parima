@@ -90,19 +90,24 @@ export async function getAvailableQty(tx: Tx, variantId: string): Promise<number
 
 /**
  * آزادسازی رزرو (لغو سفارش / خطای پرداخت) — فقط reserved−=qty.
- * اتمیک: فقط رزرو ACTIVE هدف را می‌گیرد؛ بقیه حالت‌ها no-op.
+ * اتمیک: claim با updateMany و قید status — رقابت پرداخت×لغو×انقضا فقط یک‌بار
+ * decrement می‌زند (رفع TOCTOU double-decrement)؛ بقیه حالت‌ها no-op.
  */
 export async function releaseReservation(tx: Tx, reservationId: string): Promise<void> {
-  const reservation = await tx.inventoryReservation.findUnique({
-    where: { id: reservationId },
-    select: { variantId: true, qty: true, status: true },
-  });
-  if (!reservation || reservation.status !== "ACTIVE") return;
-
-  await tx.inventoryReservation.update({
-    where: { id: reservationId },
+  // claim اتمیک — اگر رزرو ACTIVE نباشد (RELEASED/CONVERTED/EXPIRED) هیچ کاری نکن
+  const claimed = await tx.inventoryReservation.updateMany({
+    where: { id: reservationId, status: "ACTIVE" },
     data: { status: "RELEASED", releasedAt: new Date() },
   });
+  if (claimed.count === 0) return;
+
+  // فیلدهای qty/variantId تغییرناپذیرند — خواندن بعد از claim امن است
+  const reservation = await tx.inventoryReservation.findUnique({
+    where: { id: reservationId },
+    select: { variantId: true, qty: true },
+  });
+  if (!reservation) return;
+
   await tx.variant.update({
     where: { id: reservation.variantId },
     data: { reserved: { decrement: reservation.qty } },
@@ -111,18 +116,21 @@ export async function releaseReservation(tx: Tx, reservationId: string): Promise
 
 /**
  * تبدیل رزرو به فروش قطعی (پرداخت موفق): stock−=qty و reserved−=qty همزمان.
+ * claim اتمیک مثل releaseReservation — رقابت با انقضا/لغو فقط یک‌بار اعمال می‌شود.
  */
 export async function convertReservation(tx: Tx, reservationId: string): Promise<void> {
-  const reservation = await tx.inventoryReservation.findUnique({
-    where: { id: reservationId },
-    select: { variantId: true, qty: true, status: true },
-  });
-  if (!reservation || reservation.status !== "ACTIVE") return;
-
-  await tx.inventoryReservation.update({
-    where: { id: reservationId },
+  const claimed = await tx.inventoryReservation.updateMany({
+    where: { id: reservationId, status: "ACTIVE" },
     data: { status: "CONVERTED" },
   });
+  if (claimed.count === 0) return;
+
+  const reservation = await tx.inventoryReservation.findUnique({
+    where: { id: reservationId },
+    select: { variantId: true, qty: true },
+  });
+  if (!reservation) return;
+
   await tx.variant.update({
     where: { id: reservation.variantId },
     data: {
@@ -147,19 +155,22 @@ export async function expireStaleReservations(now = new Date()): Promise<number>
 
   const freedVariantIds: string[] = [];
   let expired = 0;
-  for (const { id, variantId } of stale) {
+  for (const { id } of stale) {
     try {
       await db.$transaction(async (tx) => {
-        const reservation = await tx.inventoryReservation.findFirst({
+        // claim اتمیک با همان قید انتخاب — رقابت با convert/release از اول حل است
+        const claimed = await tx.inventoryReservation.updateMany({
           where: { id, status: "ACTIVE", expiresAt: { lt: now } },
+          data: { status: "EXPIRED" },
+        });
+        if (claimed.count === 0) return;
+
+        const reservation = await tx.inventoryReservation.findUnique({
+          where: { id },
           select: { variantId: true, qty: true },
         });
         if (!reservation) return;
 
-        await tx.inventoryReservation.update({
-          where: { id },
-          data: { status: "EXPIRED" },
-        });
         await tx.variant.update({
           where: { id: reservation.variantId },
           data: { reserved: { decrement: reservation.qty } },

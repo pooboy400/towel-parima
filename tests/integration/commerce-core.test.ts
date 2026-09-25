@@ -163,6 +163,50 @@ describe("InventoryService — رزرو اتمیک (§13)", () => {
     });
     expect(rows.every((r) => r.status === "EXPIRED")).toBe(true);
   });
+
+  // ─── رگرسیون TOCTOU double-decrement (گزارش 47-a HIGH-1) ───
+
+  it("رفع TOCTOU: release دوم روی رزرو RELEASED → no-op (reserved یک‌بار کم می‌شود)", async () => {
+    const variant = await makeVariantWithStock(6);
+    const { reservationId: rid } = await db.$transaction((tx) =>
+      reserveVariant(tx, { variantId: variant.id, qty: 2 }),
+    );
+    // لغو سفارش و سپس رویداد همزمان دوباره (مثلاً failPayment دیررسیده)
+    await db.$transaction((tx) => releaseReservation(tx, rid));
+    await db.$transaction((tx) => releaseReservation(tx, rid));
+    const v = await db.variant.findUnique({ where: { id: variant.id } });
+    expect(v!.reserved).toBe(0); // نه −2
+    const row = await db.inventoryReservation.findUnique({ where: { id: rid } });
+    expect(row!.status).toBe("RELEASED");
+  });
+
+  it("رفع TOCTOU: convert بعد از release → no-op (رقابت لغو×پرداخت)", async () => {
+    const variant = await makeVariantWithStock(6);
+    const { reservationId: rid } = await db.$transaction((tx) =>
+      reserveVariant(tx, { variantId: variant.id, qty: 2 }),
+    );
+    await db.$transaction((tx) => releaseReservation(tx, rid)); // cancelOrder برنده شد
+    await db.$transaction((tx) => convertReservation(tx, rid)); // confirmPayment دیر رسید
+    const v = await db.variant.findUnique({ where: { id: variant.id } });
+    expect(v!.reserved).toBe(0);
+    expect(v!.stock).toBe(6); // stock کم نشده — فروشی در کار نبوده
+  });
+
+  it("رفع TOCTOU: انقضای worker روی رزروِ قبلاً CONVERTED → موجودی خراب نمی‌شود", async () => {
+    const variant = await makeVariantWithStock(5);
+    const { reservationId: rid } = await db.$transaction((tx) =>
+      reserveVariant(tx, { variantId: variant.id, qty: 2, ttlMs: -1000 }),
+    );
+    // پرداخت دقیقاً لحظهٔ انقضا موفق شد (رکورد هنوز ACTIVE بود)
+    await db.$transaction((tx) => convertReservation(tx, rid));
+    // worker انقضا حالا می‌رسد — نباید reserved منفی شود
+    await expireStaleReservations();
+    const v = await db.variant.findUnique({ where: { id: variant.id } });
+    expect(v!.reserved).toBe(0); // 0 باقی می‌ماند، نه −2
+    expect(v!.stock).toBe(3);
+    const row = await db.inventoryReservation.findUnique({ where: { id: rid } });
+    expect(row!.status).toBe("CONVERTED"); // وضعیت هم خراب نشد
+  });
 });
 
 describe("CheckoutService — ثبت تراکنشی (§10.1)", () => {
