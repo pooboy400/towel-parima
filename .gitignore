@@ -44,8 +44,3 @@ tool-results/
 .pg/
 .data/
 
-# پوشه‌های ابزاری/متحرک غیرپروژه‌ای — فقط لوکال بمانند
-/skills/
-/examples/
-/download/
-/upload/

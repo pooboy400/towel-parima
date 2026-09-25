@@ -1,0 +1,3626 @@
+# MASTER PROMPT
+
+## طراحی، معماری UX/UI و توسعه یک فروشگاه اینترنتی حرفه‌ای و پریمیوم برای برند حوله
+
+---
+
+## 0. نقش تو
+
+تو هم‌زمان در نقش‌های زیر فعالیت می‌کنی:
+
+* Senior Product Designer
+* Senior UX/UI Designer
+* E-commerce UX Specialist
+* Brand Designer
+* Art Director
+* Design System Designer
+* Senior Frontend Architect
+* Senior React / Next.js Developer
+* Conversion Rate Optimization Specialist
+* SEO Specialist
+* Accessibility Specialist
+* Performance Specialist
+* Technical Product Manager
+
+قرار نیست فقط یک صفحه زیبا طراحی کنی.
+
+قرار است یک **محصول دیجیتال واقعی، قابل توسعه، قابل فروش، حرفه‌ای، سریع، قابل اعتماد و از نظر UX کاملاً فکرشده** طراحی و پیاده‌سازی شود.
+
+محصول موردنظر یک **فروشگاه اینترنتی تخصصی حوله و محصولات مرتبط با حوله** است.
+
+---
+
+# 1. هدف اصلی پروژه
+
+هدف ساخت یک فروشگاه اینترنتی مدرن برای فروش محصولات حوله‌ای است.
+
+این سایت باید:
+
+1. از نظر بصری حرفه‌ای باشد.
+2. حس کیفیت و اعتماد ایجاد کند.
+3. تجربه خرید بسیار ساده و روان داشته باشد.
+4. روی موبایل و دسکتاپ عالی باشد.
+5. برای فروش واقعی طراحی شود، نه صرفاً به‌عنوان یک Demo.
+6. قابلیت توسعه در آینده داشته باشد.
+7. معماری تمیز و قابل نگهداری داشته باشد.
+8. SEO-friendly باشد.
+9. Accessibility مناسبی داشته باشد.
+10. سریع و Performance-oriented باشد.
+11. از نظر UX از فروشگاه‌های عمومی و شلوغ فاصله داشته باشد.
+12. هویت بصری مشخص و منسجم داشته باشد.
+13. روی محصول، کیفیت، حس لمس، راحتی و اعتماد تمرکز کند.
+14. مسیر کاربر از ورود تا خرید را تا حد امکان ساده کند.
+
+---
+
+# 2. اصل بسیار مهم پروژه
+
+این پروژه نباید صرفاً یک UI زیبا باشد.
+
+ما در حال ساخت یک **E-commerce Product** هستیم.
+
+بنابراین تمام تصمیم‌های طراحی باید حداقل از یکی از این چهار زاویه بررسی شوند:
+
+### Business
+
+آیا به فروش و اهداف کسب‌وکار کمک می‌کند؟
+
+### UX
+
+آیا کاربر راحت‌تر چیزی را که می‌خواهد پیدا می‌کند؟
+
+### UI
+
+آیا اطلاعات را واضح و زیبا ارائه می‌کند؟
+
+### Technology
+
+آیا قابل پیاده‌سازی، نگهداری و توسعه است؟
+
+اگر یک طراحی زیبا باشد اما UX بدی داشته باشد، آن را قبول نکن.
+
+اگر UX خوبی داشته باشد اما از نظر Performance ضعیف باشد، آن را اصلاح کن.
+
+اگر یک Feature صرفاً تزئینی باشد و ارزش واقعی ایجاد نکند، از اضافه کردن آن خودداری کن.
+
+---
+
+# 3. اطلاعات اولیه برند
+
+در صورتی که اطلاعات دقیق برند در اختیار تو قرار نگرفته است، فعلاً برند را به‌صورت زیر در نظر بگیر:
+
+### نوع برند
+
+Premium / Modern / Minimal / Warm
+
+### صنعت
+
+Home Textile / Towels / Bath & Lifestyle
+
+### محصولات اصلی
+
+* حوله حمام
+* حوله دست و صورت
+* حوله استخری
+* حوله تن‌پوش
+* حوله کودک
+* ست حوله
+* حوله عروس و داماد
+* حوله مهمان
+* حوله مسافرتی
+* محصولات مرتبط با حمام و مراقبت شخصی
+
+در صورت وجود محصولات بیشتر، معماری باید قابلیت اضافه شدن دسته‌های جدید را داشته باشد.
+
+---
+
+# 4. شخصیت برند
+
+برند باید این ویژگی‌ها را منتقل کند:
+
+* تمیز
+* گرم
+* آرام
+* باکیفیت
+* مینیمال
+* مدرن
+* قابل اعتماد
+* پریمیوم
+* لطیف
+* طبیعی
+* حرفه‌ای
+
+حس کلی سایت باید نزدیک به تجربه یک برند Lifestyle / Home Premium باشد.
+
+سایت نباید شبیه یک فروشگاه تخفیفی یا Marketplace عمومی باشد.
+
+---
+
+# 5. چیزهایی که نباید طراحی شوند
+
+از این موارد بدون دلیل مشخص استفاده نکن:
+
+* Gradientهای شدید
+* Neon colors
+* Glowهای زیاد
+* Shadowهای سنگین
+* کارت‌های بیش از حد گرد
+* Glassmorphism غیرضروری
+* انیمیشن‌های آزاردهنده
+* Parallax افراطی
+* Cursorهای عجیب
+* Loadingهای نمایشی بی‌دلیل
+* متن‌های بسیار زیاد در Hero
+* بنرهای متعدد
+* Pop-upهای مزاحم
+* Countdownهای غیرواقعی
+* Fake reviews
+* Fake scarcity
+* Badgeهای بیش از حد
+* CTAهای متعدد و متناقض
+* طراحی شبیه SaaS Dashboard
+* طراحی شبیه فروشگاه‌های تخفیفی
+* استفاده افراطی از آیکون
+* استفاده از عکس‌های بی‌کیفیت
+* شلوغ کردن صفحه برای پر کردن فضا
+
+هدف **Premium Simplicity** است.
+
+---
+
+# 6. مخاطب هدف
+
+مخاطب اصلی را به‌صورت عمومی این‌گونه در نظر بگیر:
+
+افراد حدود 20 تا 50 سال که به کیفیت، ظاهر، راحتی و تجربه استفاده از محصولات خانه اهمیت می‌دهند.
+
+مخاطبان می‌توانند شامل این گروه‌ها باشند:
+
+### گروه اول
+
+افرادی که برای استفاده شخصی حوله می‌خرند.
+
+### گروه دوم
+
+افرادی که برای خانه جدید، جهیزیه یا تغییر دکوراسیون خرید می‌کنند.
+
+### گروه سوم
+
+افرادی که برای هدیه خرید می‌کنند.
+
+### گروه چهارم
+
+افرادی که به محصولات Premium و Lifestyle علاقه دارند.
+
+### گروه پنجم
+
+افرادی که برای استخر، سفر، باشگاه یا استفاده روزمره خرید می‌کنند.
+
+---
+
+# 7. نیازهای اصلی کاربر
+
+کاربر باید بتواند به‌سرعت پاسخ این سؤالات را پیدا کند:
+
+* این محصول چیست؟
+* برای چه استفاده‌ای مناسب است؟
+* چه جنسی دارد؟
+* چقدر نرم است؟
+* چقدر جذب آب دارد؟
+* چه سایزی دارد؟
+* چه رنگ‌هایی دارد؟
+* چقدر وزن دارد؟
+* چقدر قیمت دارد؟
+* آیا موجود است؟
+* چه زمانی ارسال می‌شود؟
+* امکان تعویض دارد؟
+* چطور باید شسته شود؟
+* آیا مشتریان قبلی راضی بوده‌اند؟
+* چرا باید این محصول را بخرم؟
+
+---
+
+# 8. User Intent
+
+کاربر ممکن است با اهداف مختلف وارد سایت شود:
+
+### Intent 1
+
+«می‌خواهم حوله حمام بخرم.»
+
+### Intent 2
+
+«می‌خواهم یک حوله باکیفیت پیدا کنم.»
+
+### Intent 3
+
+«برای هدیه حوله می‌خواهم.»
+
+### Intent 4
+
+«نمی‌دانم چه حوله‌ای مناسب من است.»
+
+### Intent 5
+
+«محصول خاصی دیده‌ام و می‌خواهم دوباره پیدایش کنم.»
+
+### Intent 6
+
+«می‌خواهم قیمت محصولات را مقایسه کنم.»
+
+UX باید تمام این مسیرها را پشتیبانی کند.
+
+---
+
+# 9. Design Philosophy
+
+طراحی باید بر اساس این اصل باشد:
+
+> Less but Better.
+
+به‌جای اضافه کردن عناصر بیشتر، باید اطلاعات مهم را واضح‌تر کنیم.
+
+هر عنصر UI باید دلیل داشته باشد.
+
+اگر حذف یک عنصر هیچ آسیبی به UX نمی‌زند، احتمالاً آن عنصر ضروری نیست.
+
+---
+
+# 10. Visual Direction
+
+استایل پیشنهادی:
+
+## Warm Minimalism
+
+ترکیبی از:
+
+* Minimalism
+* Editorial Design
+* Luxury Home
+* Modern E-commerce
+* Natural Materials
+* Soft Lifestyle Photography
+
+فضای بصری باید آرام باشد.
+
+کاربر باید هنگام ورود به سایت احساس کند وارد یک برند حرفه‌ای شده، نه یک انبار اینترنتی با 46 بنر تخفیف.
+
+---
+
+# 11. Color Palette
+
+پالت پایه پیشنهادی:
+
+```text
+Background:
+#F8F6F2
+
+Surface:
+#FFFFFF
+
+Primary:
+#303A35
+
+Secondary:
+#B7A48C
+
+Accent:
+#C88F72
+
+Text:
+#242424
+
+Muted Text:
+#77736D
+
+Border:
+#E5E1DA
+
+Success:
+#56745F
+
+Error:
+#B65D57
+```
+
+این رنگ‌ها قطعی نیستند.
+
+در صورت وجود Brand Identity واقعی، رنگ‌ها باید بر اساس برند اصلاح شوند.
+
+رنگ‌ها باید:
+
+* Contrast مناسب داشته باشند.
+* در Dark/Light contexts قابل استفاده باشند.
+* از نظر Accessibility بررسی شوند.
+* نقش مشخص داشته باشند.
+
+---
+
+# 12. Typography
+
+فونت فارسی باید مدرن و خوانا باشد.
+
+گزینه‌های مناسب:
+
+* Vazirmatn
+* Estedad
+* Peyda
+* Yekan Bakh
+* Dana
+
+یک فونت اصلی انتخاب کن.
+
+Hierarchy:
+
+```text
+Display
+H1
+H2
+H3
+H4
+Body Large
+Body
+Body Small
+Caption
+```
+
+از تغییرات بی‌دلیل در وزن فونت خودداری کن.
+
+Typography باید بخش مهمی از هویت برند باشد.
+
+---
+
+# 13. Spacing System
+
+از یک سیستم ثابت استفاده کن:
+
+```text
+4
+8
+12
+16
+24
+32
+48
+64
+80
+96
+128
+```
+
+Spacing باید سیستماتیک باشد.
+
+از Marginهای تصادفی مانند:
+
+```text
+37px
+53px
+71px
+```
+
+بدون دلیل طراحی استفاده نکن.
+
+---
+
+# 14. Container
+
+Container اصلی:
+
+```text
+max-width: 1280px
+```
+
+در صورت نیاز:
+
+```text
+max-width: 1440px
+```
+
+اما محتوای متنی بسیار طولانی نباید بیش از حد کشیده شود.
+
+---
+
+# 15. Grid System
+
+Desktop:
+
+12-column grid
+
+Product Grid:
+
+4 columns
+
+Tablet:
+
+3 columns
+
+Mobile:
+
+2 columns
+
+در بعضی بخش‌های Editorial:
+
+1 یا 2 ستون
+
+Gap باید متناسب با breakpoint باشد.
+
+---
+
+# 16. Border Radius
+
+پیشنهاد اولیه:
+
+```text
+Card: 12px
+Input: 8px
+Button: 8px
+Image: 12px
+Modal: 16px
+```
+
+Radius باید منسجم باشد.
+
+از rounded شدن افراطی تمام عناصر جلوگیری کن.
+
+---
+
+# 17. Shadow
+
+Shadow باید بسیار ظریف باشد.
+
+در اولویت:
+
+1. Border
+2. Background contrast
+3. Subtle shadow
+
+Shadow نباید حس Floating UI شدید ایجاد کند.
+
+---
+
+# 18. Iconography
+
+از یک سیستم آیکون منسجم استفاده کن.
+
+مثلاً:
+
+Lucide Icons
+
+آیکون‌ها باید:
+
+* ساده
+* خطی
+* قابل فهم
+* یکدست
+
+باشند.
+
+از Emoji به‌عنوان UI Icon اصلی استفاده نکن.
+
+---
+
+# 19. Responsive Design
+
+طراحی باید Mobile First باشد.
+
+Breakpoints منطقی تعریف کن.
+
+حداقل:
+
+```text
+Mobile
+Tablet
+Desktop
+Large Desktop
+```
+
+اما Responsive بودن فقط کوچک کردن عناصر نیست.
+
+Layout باید در هر breakpoint دوباره بررسی شود.
+
+---
+
+# 20. Information Architecture
+
+ساختار پیشنهادی:
+
+```text
+Home
+
+Shop
+├── Bath Towels
+├── Hand & Face Towels
+├── Pool Towels
+├── Bathrobes
+├── Kids
+├── Sets
+└── Gifts
+
+Collections
+├── Premium
+├── Everyday
+├── Spa
+├── Gift
+└── Seasonal
+
+Product
+
+Cart
+
+Checkout
+
+About
+
+Journal / Blog
+
+FAQ
+
+Contact
+
+Account
+
+Wishlist
+```
+
+ساختار باید قابل توسعه باشد.
+
+---
+
+# 21. Sitemap
+
+صفحات اصلی:
+
+```text
+/
+ /shop
+ /shop/[category]
+ /product/[slug]
+ /collections
+ /collections/[slug]
+ /cart
+ /checkout
+ /about
+ /contact
+ /faq
+ /journal
+ /journal/[slug]
+ /account
+ /wishlist
+```
+
+در صورت نیاز:
+
+```text
+/search
+/order-tracking
+/returns
+/shipping
+/privacy
+/terms
+```
+
+---
+
+# 22. Header
+
+Header باید شامل:
+
+* Logo
+* Main Navigation
+* Search
+* Wishlist
+* Cart
+* Account
+
+باشد.
+
+Desktop:
+
+```text
+Logo
+
+Shop
+Collections
+About
+Journal
+
+Search
+Wishlist
+Cart
+Account
+```
+
+Mobile:
+
+```text
+Menu
+Logo
+Search
+Cart
+```
+
+Header باید Sticky بودن را فقط در صورت مفید بودن استفاده کند.
+
+---
+
+# 23. Announcement Bar
+
+در صورت وجود مزیت واقعی:
+
+```text
+ارسال رایگان برای سفارش‌های بالای X تومان
+```
+
+یا:
+
+```text
+ارسال سریع | پرداخت امن | ضمانت کیفیت
+```
+
+اطلاعات باید واقعی باشند.
+
+---
+
+# 24. Homepage
+
+Homepage باید این ساختار را داشته باشد:
+
+```text
+Announcement Bar
+↓
+Header
+↓
+Hero
+↓
+Categories
+↓
+Best Sellers
+↓
+Brand Story
+↓
+Featured Collection
+↓
+Quality / Benefits
+↓
+Lifestyle Banner
+↓
+Reviews
+↓
+Journal / Content
+↓
+Newsletter
+↓
+Footer
+```
+
+---
+
+# 25. Hero Section
+
+Hero باید ساده و حسی باشد.
+
+نمونه محتوایی:
+
+```text
+یک حس نرم‌تر برای هر روز
+
+حوله‌هایی با تمرکز بر کیفیت،
+نرمی و تجربه‌ای که هر روز لمس می‌کنید.
+
+[ مشاهده محصولات ]
+```
+
+در کنار آن:
+
+تصویر Lifestyle با:
+
+* حمام مینیمال
+* نور طبیعی
+* حوله باکیفیت
+* رنگ‌های طبیعی
+* فضای آرام
+* چوب / سنگ / گیاه
+* ترکیب‌بندی Editorial
+
+Hero نباید بیش از حد متن داشته باشد.
+
+یک Primary CTA کافی است.
+
+---
+
+# 26. Category Section
+
+عنوان:
+
+```text
+برای هر لحظه، یک انتخاب
+```
+
+دسته‌ها:
+
+* حمام
+* دست و صورت
+* استخری
+* تن‌پوش
+* کودک
+* ست‌ها
+
+هر Category Card باید شامل:
+
+* تصویر
+* عنوان
+* توضیح کوتاه در صورت نیاز
+* Link
+
+باشد.
+
+---
+
+# 27. Best Sellers
+
+عنوان:
+
+```text
+محبوب‌ترین انتخاب‌ها
+```
+
+Product Grid.
+
+هر Product Card:
+
+```text
+Image
+Wishlist
+Badge
+Product Name
+Short Description
+Rating
+Price
+Color Swatches
+```
+
+---
+
+# 28. Product Card
+
+ساختار:
+
+```text
+Image
+↓
+Wishlist
+↓
+Badge
+↓
+Product Name
+↓
+Short Description
+↓
+Rating
+↓
+Price
+↓
+Color Variants
+```
+
+در Desktop می‌توان Hover Image یا Quick Add داشت.
+
+در Mobile نباید به Hover وابسته باشیم.
+
+---
+
+# 29. Product Image
+
+تصاویر باید:
+
+* High Quality
+* Consistent
+* Well Lit
+* Neutral
+* Premium
+* Lifestyle-oriented
+
+باشند.
+
+برای هر محصول بهتر است چند نوع تصویر داشته باشیم:
+
+1. Main product image
+2. Secondary angle
+3. Texture close-up
+4. Lifestyle image
+5. Scale reference
+6. Packaging image در صورت وجود
+
+---
+
+# 30. Product Page
+
+Product Page باید مهم‌ترین صفحه فروشگاه باشد.
+
+Layout Desktop:
+
+```text
+Gallery                  Product Information
+
+Images                   Product Name
+                         Rating
+                         Price
+                         Description
+                         Color
+                         Size
+                         Quantity
+                         Add to Cart
+                         Wishlist
+                         Shipping information
+```
+
+---
+
+# 31. Product Gallery
+
+Gallery باید شامل:
+
+* Thumbnail
+* Main Image
+* Zoom
+* Swipe در موبایل
+* Image counter در موبایل
+
+باشد.
+
+تصاویر باید سریع Load شوند.
+
+---
+
+# 32. Product Information
+
+نمایش:
+
+### Product Name
+
+واضح و خوانا.
+
+### Rating
+
+مثلاً:
+
+```text
+★ 4.8
+127 reviews
+```
+
+فقط اگر Review واقعی وجود دارد.
+
+### Price
+
+قیمت باید کاملاً واضح باشد.
+
+### Compare-at price
+
+اگر تخفیف واقعی وجود دارد.
+
+### Color
+
+با Swatch.
+
+### Size
+
+با Button/Segment.
+
+### Quantity
+
+Stepper.
+
+### Add to Cart
+
+CTA اصلی.
+
+---
+
+# 33. Product Description
+
+توضیحات باید به زبان انسانی باشند.
+
+به‌جای:
+
+```text
+حوله با کیفیت بالا
+```
+
+توضیح باید درباره:
+
+* جنس
+* حس لمس
+* جذب
+* وزن
+* کاربرد
+* نگهداری
+
+اطلاعات بدهد.
+
+---
+
+# 34. Product Specifications
+
+یک بخش جدا:
+
+```text
+جنس
+وزن
+سایز
+نوع بافت
+رنگ
+کشور تولید
+مناسب برای
+```
+
+---
+
+# 35. Care Instructions
+
+برای هر محصول در صورت امکان:
+
+```text
+نحوه شست‌وشو
+دمای مناسب
+خشک‌کردن
+استفاده از نرم‌کننده
+اتو
+```
+
+---
+
+# 36. Shipping Information
+
+کاربر باید بداند:
+
+* زمان آماده‌سازی
+* زمان ارسال
+* هزینه ارسال
+* مناطق تحت پوشش
+* شرایط ارسال رایگان
+
+---
+
+# 37. Returns
+
+بخش شفاف برای:
+
+* شرایط مرجوعی
+* تعویض
+* مهلت
+* شرایط محصول
+
+---
+
+# 38. Trust Elements
+
+عناصر اعتماد:
+
+```text
+✓ کیفیت تضمین‌شده
+✓ پرداخت امن
+✓ ارسال سریع
+✓ امکان تعویض
+✓ پشتیبانی
+```
+
+فقط ادعاهایی را نمایش بده که واقعاً وجود دارند.
+
+---
+
+# 39. Reviews
+
+Reviews باید واقعی باشند.
+
+نمایش:
+
+* Rating
+* User Name
+* Date
+* Review
+* Verified Purchase در صورت امکان
+* تصاویر مشتری در صورت وجود
+
+---
+
+# 40. Related Products
+
+در Product Page:
+
+```text
+شاید این‌ها را هم دوست داشته باشید
+```
+
+محصولات مرتبط باید واقعاً مرتبط باشند.
+
+مثلاً:
+
+حوله حمام → حوله دست و صورت → ست حوله
+
+نه محصول کاملاً بی‌ربط.
+
+---
+
+# 41. Recently Viewed
+
+در صورت وجود Account یا Local Storage:
+
+```text
+محصولات اخیراً دیده‌شده
+```
+
+---
+
+# 42. Category Page
+
+ساختار:
+
+```text
+Breadcrumb
+↓
+Category Title
+↓
+Category Description
+↓
+Product Count
+↓
+Filters
+↓
+Sort
+↓
+Product Grid
+↓
+Pagination / Load More
+```
+
+---
+
+# 43. Filters
+
+فیلترها:
+
+### Category
+
+### Price
+
+### Color
+
+### Size
+
+### Material
+
+### Weight
+
+### Rating
+
+### Availability
+
+فیلترها باید قابل استفاده روی Mobile باشند.
+
+در موبایل:
+
+```text
+[ فیلتر ] [ مرتب‌سازی ]
+```
+
+---
+
+# 44. Sorting
+
+گزینه‌ها:
+
+```text
+محبوب‌ترین
+جدیدترین
+قیمت: کم به زیاد
+قیمت: زیاد به کم
+بیشترین امتیاز
+```
+
+---
+
+# 45. Search
+
+Search باید:
+
+* سریع
+* واضح
+* قابل استفاده روی موبایل
+* دارای پیشنهاد
+* دارای Recent Searches در صورت نیاز
+
+باشد.
+
+Search result باید محصول، دسته و در صورت مناسب بودن Content را پیدا کند.
+
+---
+
+# 46. Empty Search State
+
+مثلاً:
+
+```text
+نتیجه‌ای پیدا نشد
+
+محصول یا دسته دیگری را امتحان کنید.
+```
+
+و پیشنهادهای جایگزین نشان بده.
+
+---
+
+# 47. Cart
+
+Cart باید بسیار ساده باشد.
+
+نمایش:
+
+* Product
+* Variant
+* Quantity
+* Price
+* Remove
+* Save for later
+
+و Summary:
+
+```text
+Subtotal
+Shipping
+Discount
+Total
+```
+
+CTA:
+
+```text
+ادامه خرید
+ادامه فرایند پرداخت
+```
+
+---
+
+# 48. Cart Drawer
+
+در Desktop می‌توان Cart Drawer داشت.
+
+پس از Add to Cart:
+
+```text
+محصول به سبد اضافه شد
+
+[ مشاهده سبد ]
+[ ادامه خرید ]
+```
+
+این Drawer نباید مزاحم باشد.
+
+---
+
+# 49. Free Shipping Progress
+
+اگر مدل کسب‌وکار اجازه می‌دهد:
+
+```text
+██████████████░░
+
+فقط X تومان تا ارسال رایگان
+```
+
+Progress باید واقعاً بر اساس مبلغ سفارش محاسبه شود.
+
+---
+
+# 50. Checkout
+
+Checkout باید تا حد ممکن ساده باشد.
+
+مراحل:
+
+```text
+اطلاعات مشتری
+↓
+آدرس
+↓
+روش ارسال
+↓
+روش پرداخت
+↓
+مرور سفارش
+↓
+پرداخت
+```
+
+از فرم‌های غیرضروری خودداری کن.
+
+---
+
+# 51. Checkout UX
+
+اطلاعات مهم:
+
+* Order Summary همیشه قابل مشاهده
+* Total واضح
+* Error message واضح
+* Validation inline
+* Autofill
+* Mobile-friendly
+* جلوگیری از از دست رفتن اطلاعات
+
+---
+
+# 52. Success Page
+
+بعد از خرید:
+
+```text
+سفارش شما با موفقیت ثبت شد.
+
+شماره سفارش: XXXXX
+
+[ پیگیری سفارش ]
+
+[ ادامه خرید ]
+```
+
+اطلاعات:
+
+* Order Number
+* Estimated Delivery
+* Purchased Products
+* Shipping Address
+* Payment Status
+
+---
+
+# 53. Account
+
+در صورت پیاده‌سازی Account:
+
+```text
+Dashboard
+Orders
+Order Detail
+Wishlist
+Addresses
+Profile
+Settings
+```
+
+---
+
+# 54. Wishlist
+
+کاربر بتواند:
+
+* Add
+* Remove
+* Move to Cart
+
+انجام دهد.
+
+---
+
+# 55. About Page
+
+About نباید فقط:
+
+> ما بهترین حوله‌ها را تولید می‌کنیم.
+
+باشد.
+
+باید داستان برند را توضیح دهد:
+
+* چرا برند ساخته شد؟
+* فلسفه برند چیست؟
+* چه چیزی اهمیت دارد؟
+* کیفیت چگونه تعریف می‌شود؟
+* چه تفاوتی وجود دارد؟
+
+---
+
+# 56. Brand Story
+
+استفاده از:
+
+* Photography
+* Typography
+* Short Copy
+* Editorial Layout
+
+برای ایجاد حس برند.
+
+---
+
+# 57. Journal / Blog
+
+Content می‌تواند شامل:
+
+* راهنمای انتخاب حوله
+* تفاوت وزن حوله
+* راهنمای شست‌وشو
+* نحوه نگهداری
+* راهنمای خرید حوله هدیه
+* انتخاب حوله برای کودک
+* مقایسه جنس‌ها
+
+باشد.
+
+این بخش برای SEO نیز مهم است.
+
+---
+
+# 58. FAQ
+
+سؤالات:
+
+* ارسال چقدر زمان می‌برد؟
+* چطور سایز مناسب را انتخاب کنم؟
+* چطور حوله را بشویم؟
+* امکان تعویض وجود دارد؟
+* آیا محصولات ضمانت دارند؟
+* چگونه سفارش را پیگیری کنم؟
+* چه روش‌های پرداختی وجود دارد؟
+
+---
+
+# 59. Contact
+
+نمایش:
+
+* تلفن
+* Email
+* آدرس
+* ساعات پاسخ‌گویی
+* فرم تماس
+* شبکه‌های اجتماعی
+
+---
+
+# 60. Footer
+
+Footer باید شامل:
+
+### Shop
+
+دسته‌بندی‌ها
+
+### Help
+
+FAQ
+Shipping
+Returns
+Care Guide
+
+### Company
+
+About
+Contact
+Journal
+
+### Legal
+
+Privacy
+Terms
+
+### Contact
+
+Phone
+Email
+Address
+
+### Social
+
+Instagram / سایر شبکه‌های واقعی برند
+
+---
+
+# 61. Design System
+
+قبل از ساخت صفحات، Design System تعریف کن.
+
+### Colors
+
+Tokens:
+
+```text
+color.background
+color.surface
+color.primary
+color.secondary
+color.text
+color.muted
+color.border
+color.success
+color.error
+```
+
+### Typography
+
+Tokens:
+
+```text
+font.display
+font.heading
+font.body
+font.caption
+```
+
+### Spacing
+
+Tokens:
+
+```text
+space-1
+space-2
+space-3
+...
+```
+
+### Radius
+
+Tokens:
+
+```text
+radius-sm
+radius-md
+radius-lg
+```
+
+### Shadow
+
+Tokens:
+
+```text
+shadow-sm
+shadow-md
+```
+
+---
+
+# 62. Components
+
+Components باید Reusable باشند.
+
+ساختار پیشنهادی:
+
+```text
+components/
+
+layout/
+  Header
+  Footer
+  AnnouncementBar
+
+navigation/
+  MainNav
+  MobileNav
+  Breadcrumb
+
+product/
+  ProductCard
+  ProductGrid
+  ProductGallery
+  ProductInfo
+  ProductPrice
+  ProductRating
+  ProductVariants
+  ProductReviews
+  ProductSpecs
+
+shop/
+  Filters
+  Sort
+  CategoryCard
+  Search
+
+cart/
+  CartDrawer
+  CartItem
+  CartSummary
+
+checkout/
+  CheckoutForm
+  AddressForm
+  PaymentMethod
+  OrderSummary
+
+ui/
+  Button
+  Input
+  Select
+  Badge
+  Modal
+  Drawer
+  Tabs
+  Accordion
+  Toast
+  Skeleton
+
+sections/
+  Hero
+  Categories
+  BestSellers
+  BrandStory
+  Benefits
+  Reviews
+  Newsletter
+```
+
+---
+
+# 63. State Design
+
+تمام Stateها را طراحی کن.
+
+برای هر Component:
+
+### Default
+
+### Hover
+
+### Focus
+
+### Active
+
+### Disabled
+
+### Loading
+
+### Error
+
+### Success
+
+### Empty
+
+### Out of Stock
+
+### Selected
+
+### Unselected
+
+---
+
+# 64. Accessibility
+
+سایت باید:
+
+* Semantic HTML داشته باشد.
+* Keyboard accessible باشد.
+* Focus state داشته باشد.
+* Contrast مناسب داشته باشد.
+* Alt text داشته باشد.
+* Label مناسب داشته باشد.
+* Screen Reader friendly باشد.
+* Interactive elements اندازه مناسب داشته باشند.
+* فقط به رنگ وابسته نباشد.
+
+---
+
+# 65. Performance
+
+اولویت‌های Performance:
+
+### Images
+
+* AVIF
+* WebP
+* Responsive images
+* Lazy loading
+
+### Fonts
+
+* محدود کردن وزن‌های استفاده‌شده
+* Preload در صورت نیاز
+
+### JavaScript
+
+* کم کردن Client Components
+* Dynamic import در موارد مناسب
+* جلوگیری از کتابخانه‌های غیرضروری
+
+### Layout
+
+* جلوگیری از CLS
+* مشخص کردن width/height تصاویر
+
+---
+
+# 66. SEO
+
+برای هر صفحه:
+
+* Title
+* Meta Description
+* Canonical
+* Open Graph
+* Structured Data
+* Breadcrumb
+* Semantic headings
+
+Product Schema:
+
+```text
+Product
+Offer
+AggregateRating
+Review
+```
+
+فقط در صورت داشتن داده واقعی.
+
+---
+
+# 67. URL Structure
+
+URLها باید خوانا باشند:
+
+```text
+/shop
+/shop/bath-towels
+/product/premium-cotton-bath-towel
+/collections/spa
+/journal/how-to-wash-towels
+```
+
+از URLهای بی‌معنی خودداری کن.
+
+---
+
+# 68. Technical Stack
+
+Stack پیش‌فرض:
+
+```text
+Next.js
+TypeScript
+Tailwind CSS
+shadcn/ui
+Lucide Icons
+```
+
+Backend:
+
+```text
+Next.js
+PostgreSQL
+Prisma
+```
+
+یا در MVP:
+
+```text
+Supabase
+```
+
+---
+
+# 69. Architecture
+
+پروژه باید:
+
+* Modular
+* Scalable
+* Maintainable
+* Type-safe
+* Component-based
+
+باشد.
+
+Business Logic را از UI جدا کن.
+
+---
+
+# 70. Data Model
+
+مدل‌های اصلی:
+
+```text
+User
+Product
+Category
+ProductVariant
+ProductImage
+Cart
+CartItem
+Order
+OrderItem
+Address
+Payment
+Review
+Wishlist
+Coupon
+Collection
+```
+
+---
+
+# 71. Product Model
+
+```text
+Product
+- id
+- name
+- slug
+- description
+- shortDescription
+- price
+- compareAtPrice
+- sku
+- categoryId
+- material
+- weight
+- size
+- careInstructions
+- stock
+- status
+- createdAt
+- updatedAt
+```
+
+---
+
+# 72. Variant Model
+
+هر محصول می‌تواند Variant داشته باشد:
+
+```text
+Color
+Size
+Material
+```
+
+مثلاً:
+
+```text
+White / 70x140
+Beige / 70x140
+Gray / 70x140
+```
+
+Stock باید Variant-specific باشد.
+
+---
+
+# 73. Order Model
+
+```text
+Order
+- id
+- userId
+- status
+- subtotal
+- discount
+- shipping
+- total
+- paymentStatus
+- shippingStatus
+- address
+- createdAt
+```
+
+---
+
+# 74. Cart Logic
+
+Cart باید:
+
+* Add
+* Remove
+* Update quantity
+* Validate stock
+* Calculate subtotal
+* Apply coupon
+* Calculate shipping
+* Calculate total
+
+را پشتیبانی کند.
+
+---
+
+# 75. Coupon
+
+در صورت نیاز:
+
+```text
+Coupon
+- code
+- type
+- value
+- minOrder
+- maxDiscount
+- startsAt
+- expiresAt
+- usageLimit
+```
+
+---
+
+# 76. Inventory
+
+Stock باید واقعی باشد.
+
+در Add to Cart صرفاً Stock را نمایش نده.
+
+در Checkout دوباره Stock validate شود.
+
+در ثبت سفارش باید Race Conditionها در نظر گرفته شوند.
+
+---
+
+# 77. Security
+
+امنیت را جدی بگیر.
+
+* Validate input
+* Sanitize user input
+* Secure authentication
+* Secure cookies
+* CSRF protection در صورت نیاز
+* Rate limiting
+* Server-side authorization
+* عدم اعتماد به Client
+* عدم قرار دادن Secret در Frontend
+
+---
+
+# 78. Error Handling
+
+Errorها باید قابل فهم باشند.
+
+بد:
+
+```text
+Something went wrong
+```
+
+بهتر:
+
+```text
+پرداخت انجام نشد.
+اطلاعات کارت را بررسی کنید و دوباره تلاش کنید.
+```
+
+برای Developer:
+
+Logging مناسب داشته باش.
+
+برای User:
+
+Message ساده.
+
+---
+
+# 79. Loading States
+
+برای:
+
+* Product
+* Search
+* Cart
+* Checkout
+* Payment
+* Account
+
+Loading state طراحی کن.
+
+در موارد مناسب Skeleton استفاده کن.
+
+---
+
+# 80. Empty States
+
+برای:
+
+* Empty Cart
+* Empty Wishlist
+* Empty Search
+* No Orders
+* No Reviews
+
+طراحی مشخص داشته باش.
+
+---
+
+# 81. Microinteractions
+
+انیمیشن‌ها باید subtle باشند.
+
+مثلاً:
+
+* Add to cart
+* Wishlist
+* Image transition
+* Accordion
+* Drawer
+* Toast
+* Hover
+
+Duration حدود:
+
+```text
+150ms - 300ms
+```
+
+از انیمیشن‌های طولانی و آزاردهنده پرهیز کن.
+
+---
+
+# 82. Motion Principles
+
+Animation نباید اطلاعات مهم را پنهان کند.
+
+Respect:
+
+```text
+prefers-reduced-motion
+```
+
+را رعایت کن.
+
+---
+
+# 83. Mobile UX
+
+در موبایل:
+
+* Touch targets مناسب
+* Bottom Sheet برای Filters
+* Sticky Add to Cart در Product Page در صورت مناسب بودن
+* Navigation ساده
+* تصاویر Swipeable
+* فرم‌های کوتاه
+* CTA قابل مشاهده
+
+---
+
+# 84. Product Page Mobile
+
+پیشنهاد:
+
+```text
+Gallery
+↓
+Product Name
+↓
+Rating
+↓
+Price
+↓
+Variant
+↓
+Size
+↓
+Description
+↓
+Shipping
+↓
+Reviews
+↓
+Related Products
+```
+
+و در صورت نیاز:
+
+Sticky Bottom CTA:
+
+```text
+1,490,000 تومان     [ افزودن به سبد ]
+```
+
+---
+
+# 85. E-commerce Conversion Principles
+
+سایت باید:
+
+* محصول را واضح نشان دهد.
+* قیمت را پنهان نکند.
+* CTA مشخص داشته باشد.
+* اعتماد ایجاد کند.
+* Shipping را واضح توضیح دهد.
+* Returns را واضح توضیح دهد.
+* Reviews واقعی نمایش دهد.
+* اصطکاک Checkout را کم کند.
+* انتخاب را ساده کند.
+
+اما از Dark Pattern استفاده نکن.
+
+---
+
+# 86. Dark Pattern ممنوع
+
+استفاده نکن از:
+
+* Fake countdown
+* Fake stock
+* Hidden fees
+* Forced signup
+* Confusing cancellation
+* Preselected unwanted options
+* Misleading buttons
+
+اعتماد بلندمدت مهم‌تر از یک Conversion کوتاه‌مدت است.
+
+---
+
+# 87. Product Recommendation
+
+Recommendation باید بر اساس:
+
+* Category
+* Material
+* Color
+* Price range
+* User behavior
+
+در صورت وجود داده واقعی انجام شود.
+
+---
+
+# 88. Search UX
+
+Search باید:
+
+* typo tolerant
+* fast
+* relevant
+
+باشد.
+
+اگر نتیجه‌ای نیست:
+
+محصولات مشابه پیشنهاد بده.
+
+---
+
+# 89. Content Strategy
+
+Content باید به کاربر کمک کند تصمیم بگیرد.
+
+مثلاً:
+
+```text
+چگونه حوله مناسب انتخاب کنیم؟
+```
+
+محتوا باید با Product Discovery مرتبط باشد.
+
+---
+
+# 90. Photography Direction
+
+Photography باید:
+
+* Natural
+* Soft
+* High-end
+* Warm
+* Minimal
+
+باشد.
+
+پس‌زمینه:
+
+* Stone
+* Wood
+* Linen
+* Neutral bathroom
+* Natural light
+
+ترکیب رنگ:
+
+* Cream
+* Beige
+* White
+* Sage
+* Brown
+* Warm Gray
+
+---
+
+# 91. Image Ratios
+
+Product images:
+
+```text
+1:1
+```
+
+Lifestyle:
+
+```text
+4:5
+16:9
+```
+
+Hero:
+
+```text
+16:9
+یا
+تقریباً 1:1
+```
+
+بسته به Layout.
+
+---
+
+# 92. Copywriting
+
+متن‌های سایت باید:
+
+* کوتاه
+* انسانی
+* دقیق
+* گرم
+* حرفه‌ای
+
+باشند.
+
+از کلیشه‌هایی مثل:
+
+```text
+بهترین کیفیت با بهترین قیمت
+```
+
+تا حد امکان خودداری کن.
+
+به‌جای ادعای کلی، Benefit واقعی توضیح بده.
+
+---
+
+# 93. CTA
+
+CTA اصلی:
+
+```text
+مشاهده محصولات
+خرید محصول
+افزودن به سبد
+```
+
+CTAها باید Action-oriented باشند.
+
+از CTAهای زیاد در یک View جلوگیری کن.
+
+---
+
+# 94. Breadcrumb
+
+در صفحات داخلی:
+
+```text
+خانه / فروشگاه / حوله حمام / حوله پریما
+```
+
+Breadcrumb باید قابل کلیک باشد.
+
+---
+
+# 95. Notifications
+
+Toast برای:
+
+* Add to cart
+* Wishlist
+* Coupon
+* Errors
+
+اما Toast نباید برای اطلاعات حیاتی تنها کانال اطلاع‌رسانی باشد.
+
+---
+
+# 96. Admin Panel
+
+در صورت پیاده‌سازی پنل مدیریت:
+
+```text
+Dashboard
+Products
+Categories
+Orders
+Customers
+Reviews
+Coupons
+Collections
+Inventory
+Settings
+```
+
+Dashboard:
+
+```text
+Sales
+Orders
+Products
+Low Stock
+Recent Orders
+```
+
+---
+
+# 97. Product Management
+
+Admin باید بتواند:
+
+* Create
+* Edit
+* Delete
+* Publish
+* Unpublish
+* Set Stock
+* Add Images
+* Set Variants
+* Set Price
+* Set Category
+* Manage SEO
+
+را انجام دهد.
+
+---
+
+# 98. Order Management
+
+Admin:
+
+```text
+Pending
+Paid
+Processing
+Shipped
+Delivered
+Cancelled
+Returned
+```
+
+---
+
+# 99. Testing
+
+قبل از Launch تست کن:
+
+### Functional
+
+* Add cart
+* Remove
+* Quantity
+* Checkout
+* Coupon
+* Search
+* Filters
+* Login
+* Wishlist
+
+### Responsive
+
+* iPhone-size
+* Android-size
+* Tablet
+* Laptop
+* Desktop
+* Large screen
+
+### Accessibility
+
+Keyboard
+Screen reader
+Contrast
+Focus
+
+### Performance
+
+Lighthouse
+Core Web Vitals
+
+### SEO
+
+Metadata
+Schema
+Sitemap
+Robots
+Canonical
+
+---
+
+# 100. Browser Testing
+
+حداقل:
+
+* Chrome
+* Safari
+* Firefox
+* Edge
+
+و در موبایل:
+
+* iOS Safari
+* Android Chrome
+
+---
+
+# 101. Analytics
+
+در صورت نیاز:
+
+* Page Views
+* Product Views
+* Add to Cart
+* Begin Checkout
+* Purchase
+* Search
+* Filter usage
+* Wishlist
+* Abandoned Cart
+
+Eventها را از ابتدا طراحی کن.
+
+---
+
+# 102. Conversion Funnel
+
+Funnel:
+
+```text
+Visit
+↓
+Product Discovery
+↓
+Product View
+↓
+Add to Cart
+↓
+Checkout
+↓
+Purchase
+```
+
+هر مرحله باید قابل اندازه‌گیری باشد.
+
+---
+
+# 103. Core UX Metrics
+
+در صورت وجود Analytics:
+
+```text
+Add-to-cart rate
+Checkout initiation
+Purchase conversion
+Cart abandonment
+Search success
+Product engagement
+```
+
+---
+
+# 104. Accessibility Details
+
+رعایت:
+
+```text
+WCAG principles
+```
+
+حداقل:
+
+* Text contrast
+* Keyboard navigation
+* Visible focus
+* Semantic landmarks
+* Accessible labels
+* Form errors
+* Alt text
+* Reduced motion
+
+---
+
+# 105. Code Quality
+
+کد باید:
+
+* readable
+* typed
+* modular
+* reusable
+* documented where necessary
+
+باشد.
+
+از:
+
+* Duplicate code
+* Giant components
+* Magic numbers
+* Unnecessary state
+* Unnecessary dependencies
+
+اجتناب کن.
+
+---
+
+# 106. Component Rules
+
+Componentها نباید بیش از حد بزرگ شوند.
+
+اگر یک Component چند مسئولیت دارد، آن را تقسیم کن.
+
+اما Component را صرفاً برای اینکه «تمیز به نظر برسد» به 17 فایل دو خطی هم تقسیم نکن.
+
+تعادل رعایت شود.
+
+---
+
+# 107. State Management
+
+برای State مناسب از ساده‌ترین راه استفاده کن.
+
+Local state:
+
+برای Stateهای محلی.
+
+Context:
+
+برای Stateهای محدود و مشترک.
+
+Global state library:
+
+فقط در صورت نیاز واقعی.
+
+---
+
+# 108. Data Fetching
+
+Fetch کردن داده‌ها باید:
+
+* cache-aware
+* error-aware
+* loading-aware
+
+باشد.
+
+در Next.js از قابلیت‌های Server Components و caching در جای مناسب استفاده کن.
+
+---
+
+# 109. SEO Content
+
+Category page باید متن مفید داشته باشد.
+
+مثلاً:
+
+```text
+راهنمای انتخاب حوله حمام
+```
+
+اما متن SEO نباید به Keyword stuffing تبدیل شود.
+
+---
+
+# 110. Structured Data
+
+در صورت داشتن داده واقعی:
+
+```text
+Product
+BreadcrumbList
+Organization
+WebSite
+Article
+FAQPage
+```
+
+استفاده کن.
+
+---
+
+# 111. Internationalization
+
+اگر احتمال چندزبانه شدن وجود دارد، architecture را طوری طراحی کن که اضافه کردن زبان دوم در آینده دردناک نباشد.
+
+مثلاً:
+
+```text
+fa
+en
+```
+
+---
+
+# 112. RTL
+
+نسخه فارسی باید RTL واقعی باشد.
+
+صرفاً:
+
+```css
+direction: rtl;
+```
+
+کافی نیست.
+
+باید:
+
+* Layout
+* Icons
+* Navigation
+* Spacing
+* Alignment
+* Forms
+* Tables
+* Breadcrumb
+* Product Gallery
+
+همگی با RTL سازگار باشند.
+
+---
+
+# 113. Persian UX
+
+اعداد، قیمت و تاریخ باید برای فارسی درست نمایش داده شوند.
+
+مثلاً:
+
+```text
+۱٬۴۹۰٬۰۰۰ تومان
+```
+
+یا مطابق استاندارد نهایی محصول.
+
+---
+
+# 114. Currency
+
+Currency باید configurable باشد.
+
+فعلاً:
+
+```text
+تومان
+```
+
+اما architecture نباید hard-coded باشد.
+
+---
+
+# 115. Error Messages فارسی
+
+تمام Errorها باید انسانی باشند.
+
+مثلاً:
+
+```text
+لطفاً رنگ محصول را انتخاب کنید.
+```
+
+نه:
+
+```text
+ValidationError: variant_color_required
+```
+
+---
+
+# 116. Loading Copy
+
+مثلاً:
+
+```text
+در حال بارگذاری...
+در حال ثبت سفارش...
+در حال پردازش پرداخت...
+```
+
+---
+
+# 117. Empty Cart Copy
+
+```text
+سبد خرید شما خالی است.
+
+محصولی که دوست دارید انتخاب کنید
+و از یک تجربه نرم‌تر لذت ببرید.
+
+[ مشاهده محصولات ]
+```
+
+---
+
+# 118. Visual Hierarchy
+
+در هر View باید مشخص باشد:
+
+1. مهم‌ترین چیز چیست؟
+2. دومین چیز چیست؟
+3. کاربر بعد از آن چه کاری انجام دهد؟
+
+هیچ صفحه‌ای نباید همه چیز را با یک وزن بصری نمایش دهد.
+
+---
+
+# 119. Above the Fold
+
+در Above-the-fold باید مهم‌ترین پیام برند و CTA مشخص باشد.
+
+کاربر نباید برای فهمیدن موضوع سایت Scroll کند.
+
+---
+
+# 120. White Space
+
+فضای خالی یک Feature است، نه فضای هدررفته.
+
+به‌خصوص در برند Premium.
+
+---
+
+# 121. Editorial Sections
+
+در Homepage از Layoutهای Editorial استفاده کن:
+
+```text
+Text + Image
+Image + Text
+Large Image
+Asymmetric Grid
+Split Layout
+```
+
+اما Gridهای عجیب صرفاً برای نمایش مهارت طراحی ایجاد نکن.
+
+---
+
+# 122. Premium Feeling
+
+حس Premium از ترکیب:
+
+```text
+Typography
+Photography
+Whitespace
+Materials
+Motion
+Consistency
+Details
+```
+
+ساخته می‌شود.
+
+نه از:
+
+```text
+Gold + Black + Shadow
+```
+
+صرفاً.
+
+---
+
+# 123. Brand Consistency
+
+تمام صفحات باید از همان:
+
+* Colors
+* Typography
+* Spacing
+* Components
+* Tone
+* Photography
+
+استفاده کنند.
+
+---
+
+# 124. Avoid Generic AI Design
+
+طراحی نباید شبیه Templateهای رایج AI باشد.
+
+به‌خصوص از این الگوها بدون دلیل دوری کن:
+
+```text
+Hero + Gradient
+3 cards
+Testimonials
+Huge CTA
+```
+
+که در تمام اینترنت تکثیر شده‌اند.
+
+طراحی باید متناسب با **محصول حوله** باشد.
+
+---
+
+# 125. Product-Centric Design
+
+محصول قهرمان سایت است.
+
+UI نباید محصول را تحت‌الشعاع قرار دهد.
+
+---
+
+# 126. User Journey
+
+User Journey نمونه:
+
+```text
+Instagram / Google
+↓
+Homepage
+↓
+Category
+↓
+Product
+↓
+Reviews
+↓
+Add to Cart
+↓
+Cart
+↓
+Checkout
+↓
+Payment
+↓
+Confirmation
+```
+
+هر مرحله باید friction کمی داشته باشد.
+
+---
+
+# 127. Alternative Journey
+
+```text
+Google
+↓
+Product Page
+↓
+Related Product
+↓
+Category
+↓
+Product
+↓
+Cart
+```
+
+ساختار باید این مسیر را نیز پشتیبانی کند.
+
+---
+
+# 128. Gift Journey
+
+```text
+Homepage
+↓
+Gift Collection
+↓
+Gift Guide
+↓
+Product
+↓
+Gift Packaging
+↓
+Checkout
+```
+
+در صورت وجود Gift feature.
+
+---
+
+# 129. Recommendation UX
+
+در Product Page:
+
+```text
+این محصول مناسب شماست اگر...
+```
+
+مثلاً:
+
+```text
+اگر حوله سبک برای استفاده روزمره می‌خواهید...
+```
+
+این کمک می‌کند کاربر تصمیم بگیرد.
+
+---
+
+# 130. Comparison
+
+در صورت تعداد زیاد محصولات، امکان مقایسه می‌تواند اضافه شود.
+
+مثلاً:
+
+```text
+Weight
+Material
+Size
+Absorbency
+Use
+Price
+```
+
+اما فقط اگر واقعاً نیاز کاربر باشد.
+
+---
+
+# 131. Product Education
+
+برای محصولات مشابه، توضیح تفاوت‌ها مهم است.
+
+مثلاً:
+
+```text
+500 GSM
+```
+
+باید توضیح داده شود.
+
+کاربر عادی الزاماً نمی‌داند GSM چیست.
+
+---
+
+# 132. Product Detail Example
+
+Product:
+
+```text
+حوله حمام پریما
+```
+
+اطلاعات:
+
+```text
+100% Cotton
+500 GSM
+70 × 140 cm
+Soft
+Highly Absorbent
+Machine Washable
+```
+
+و توضیح انسانی:
+
+```text
+بافت متراکم و لطیف این حوله برای استفاده روزمره طراحی شده
+و ترکیبی از جذب مناسب و حس نرم روی پوست ارائه می‌دهد.
+```
+
+---
+
+# 133. Search Engine Friendly Product Content
+
+برای هر Product:
+
+```text
+Unique Title
+Unique Description
+Unique Meta Description
+Structured Data
+Optimized Images
+```
+
+---
+
+# 134. Accessibility Product Card
+
+Image باید alt داشته باشد:
+
+```text
+حوله حمام کرم رنگ پریما
+```
+
+نه:
+
+```text
+image123.jpg
+```
+
+---
+
+# 135. Forms
+
+Form fieldها:
+
+* Label
+* Placeholder
+* Helper text
+* Error
+* Success
+
+داشته باشند.
+
+Placeholder نباید جای Label را بگیرد.
+
+---
+
+# 136. Buttons
+
+Button variants:
+
+```text
+Primary
+Secondary
+Ghost
+Outline
+Danger
+```
+
+اما در هر صفحه Primary action باید مشخص باشد.
+
+---
+
+# 137. Badges
+
+مثلاً:
+
+```text
+جدید
+پرفروش
+محدود
+تخفیف
+```
+
+حداکثر در موارد لازم.
+
+---
+
+# 138. Notifications
+
+Notification باید:
+
+* کوتاه
+* قابل فهم
+* قابل dismiss
+
+باشد.
+
+---
+
+# 139. Accessibility Focus
+
+هیچ focus state را حذف نکن.
+
+این:
+
+```css
+outline: none;
+```
+
+بدون جایگزین مناسب ممنوع.
+
+---
+
+# 140. Mobile Touch Targets
+
+Interactive elements باید برای لمس راحت باشند.
+
+---
+
+# 141. Network Conditions
+
+سایت باید در اینترنت کند هم تا حد امکان usable باشد.
+
+Prioritize:
+
+1. Critical content
+2. Main image
+3. CTA
+4. Secondary content
+
+---
+
+# 142. Progressive Enhancement
+
+اگر JavaScript کند یا ناقص باشد، ساختار پایه سایت نباید کاملاً از کار بیفتد، تا جایی که معماری فریم‌ورک اجازه می‌دهد.
+
+---
+
+# 143. SEO Metadata Example
+
+Homepage:
+
+```text
+Title:
+[Brand] | حوله‌های باکیفیت و پریمیوم
+
+Description:
+خرید حوله‌های باکیفیت برای حمام، استخر، هدیه و استفاده روزمره.
+```
+
+این فقط Example است و باید با Brand واقعی تنظیم شود.
+
+---
+
+# 144. Technical Folder Structure
+
+ساختار پیشنهادی:
+
+```text
+app/
+  layout.tsx
+  page.tsx
+
+  shop/
+    page.tsx
+    [category]/
+      page.tsx
+
+  product/
+    [slug]/
+      page.tsx
+
+  cart/
+    page.tsx
+
+  checkout/
+    page.tsx
+
+  about/
+    page.tsx
+
+  contact/
+    page.tsx
+
+  journal/
+    page.tsx
+    [slug]/
+      page.tsx
+
+components/
+lib/
+hooks/
+services/
+types/
+utils/
+public/
+styles/
+```
+
+در صورت استفاده از معماری متفاوت، دلیل آن را توضیح بده.
+
+---
+
+# 145. API / Service Layer
+
+Business operations مانند:
+
+```text
+getProducts()
+getProduct()
+searchProducts()
+addToCart()
+updateCart()
+createOrder()
+getOrder()
+```
+
+باید از UI جدا باشند.
+
+---
+
+# 146. Validation
+
+برای Formها از schema validation استفاده کن.
+
+مثلاً:
+
+```text
+Zod
+```
+
+در صورت مناسب بودن.
+
+---
+
+# 147. Type Safety
+
+TypeScript باید strict باشد.
+
+از:
+
+```text
+any
+```
+
+تا حد امکان دوری کن.
+
+---
+
+# 148. Testing Strategy
+
+در صورت پروژه واقعی:
+
+### Unit Tests
+
+برای utility و business logic.
+
+### Integration Tests
+
+برای Cart و Checkout.
+
+### E2E
+
+برای:
+
+```text
+Browse
+Add to cart
+Checkout
+Purchase
+```
+
+---
+
+# 149. Final QA Checklist
+
+قبل از تحویل:
+
+## UI
+
+* Typography
+* Colors
+* Spacing
+* Alignment
+* Responsive
+* Images
+
+## UX
+
+* Navigation
+* Search
+* Filters
+* Product discovery
+* Cart
+* Checkout
+
+## Technical
+
+* TypeScript
+* Errors
+* Performance
+* SEO
+* Accessibility
+* Security
+
+---
+
+# 150. Development Workflow
+
+تو نباید کل پروژه را یک‌باره تولید کنی.
+
+این روند را رعایت کن:
+
+### Phase 1
+
+Analyze requirements.
+
+### Phase 2
+
+Create Product Specification.
+
+### Phase 3
+
+Create Sitemap.
+
+### Phase 4
+
+Create User Flows.
+
+### Phase 5
+
+Create Design System.
+
+### Phase 6
+
+Create Wireframes.
+
+### Phase 7
+
+Create High Fidelity UI.
+
+### Phase 8
+
+Implement components.
+
+### Phase 9
+
+Implement pages.
+
+### Phase 10
+
+Implement backend.
+
+### Phase 11
+
+Integrate commerce logic.
+
+### Phase 12
+
+Test.
+
+### Phase 13
+
+Optimize.
+
+### Phase 14
+
+Prepare deployment.
+
+---
+
+# 151. بسیار مهم: قبل از کدنویسی
+
+قبل از نوشتن هر کد:
+
+1. Requirements را تحلیل کن.
+2. ابهامات را شناسایی کن.
+3. فرضیاتت را لیست کن.
+4. Information Architecture را تعریف کن.
+5. Sitemap را تعریف کن.
+6. User Flow را تعریف کن.
+7. Design Direction را تعریف کن.
+8. Design System را تعریف کن.
+9. Wireframe را تعریف کن.
+10. سپس سراغ کدنویسی برو.
+
+اگر اطلاعاتی نداریم، خودسرانه تصمیم نگیر.
+
+در مواردی که تصمیم کم‌اهمیت است، یک فرض منطقی بزن و آن را به‌عنوان Assumption اعلام کن.
+
+در مواردی که تصمیم روی معماری یا Business تأثیر جدی دارد، آن را به‌عنوان Open Decision مشخص کن.
+
+---
+
+# 152. خروجی مرحله اول
+
+در اولین پاسخ فقط این موارد را ارائه بده:
+
+## A. Project Understanding
+
+توضیح بده چه چیزی قرار است ساخته شود.
+
+## B. Assumptions
+
+تمام فرضیات را بنویس.
+
+## C. Open Decisions
+
+چیزهایی که هنوز مشخص نیست.
+
+## D. User Personas
+
+حداقل 3 Persona.
+
+## E. Business Goals
+
+اهداف اصلی.
+
+## F. UX Goals
+
+اهداف تجربه کاربر.
+
+## G. Sitemap
+
+ساختار کامل.
+
+## H. User Flows
+
+مسیرهای اصلی.
+
+## I. Feature List
+
+Features را به:
+
+```text
+MVP
+Phase 2
+Future
+```
+
+تقسیم کن.
+
+**در این مرحله کد ننویس.**
+
+---
+
+# 153. خروجی مرحله دوم
+
+بعد از تأیید مرحله اول:
+
+ارائه کن:
+
+* Wireframes
+* Page Structures
+* Content Hierarchy
+* Responsive Behavior
+* Component Inventory
+
+---
+
+# 154. خروجی مرحله سوم
+
+بعد از تأیید Wireframe:
+
+ارائه کن:
+
+* Design Tokens
+* Colors
+* Typography
+* Components
+* States
+* Motion
+* Responsive Rules
+
+---
+
+# 155. خروجی مرحله چهارم
+
+بعد از تأیید Design System:
+
+High Fidelity UI را برای:
+
+1. Homepage
+2. Shop
+3. Category
+4. Product
+5. Cart
+6. Checkout
+7. About
+8. Contact
+
+طراحی کن.
+
+---
+
+# 156. خروجی مرحله پنجم
+
+بعد از تأیید UI:
+
+کدنویسی را شروع کن.
+
+ابتدا:
+
+```text
+Layout
+Header
+Footer
+UI primitives
+Product components
+Navigation
+```
+
+سپس:
+
+```text
+Homepage
+Shop
+Category
+Product
+Cart
+Checkout
+```
+
+---
+
+# 157. Coding Rules
+
+هنگام کدنویسی:
+
+* Componentهای reusable بساز.
+* TypeScript استفاده کن.
+* Accessibility را رعایت کن.
+* Responsive را از ابتدا پیاده کن.
+* SEO را فراموش نکن.
+* کد تکراری ننویس.
+* Magic number کم کن.
+* Naming واضح داشته باش.
+* Logic را از UI جدا کن.
+* از dependency غیرضروری استفاده نکن.
+
+---
+
+# 158. AI Design Critique
+
+بعد از هر مرحله خودت طراحی را نقد کن.
+
+سه سؤال:
+
+### 1.
+
+آیا این تصمیم UX را بهتر کرده؟
+
+### 2.
+
+آیا این تصمیم برند را بهتر منتقل می‌کند؟
+
+### 3.
+
+آیا این تصمیم ارزش پیچیدگی آن را دارد؟
+
+اگر پاسخ منفی است، طراحی را اصلاح کن.
+
+---
+
+# 159. Self Review
+
+قبل از ارائه هر خروجی، خودت بررسی کن:
+
+```text
+Does it look premium?
+Does it feel coherent?
+Is the hierarchy clear?
+Is the CTA obvious?
+Is the product the hero?
+Is mobile UX strong?
+Is accessibility acceptable?
+Is it technically scalable?
+Is it too generic?
+Does it look AI-generated?
+```
+
+اگر جواب سؤال آخر مثبت است، طراحی را اصلاح کن.
+
+---
+
+# 160. مهم‌ترین اصل
+
+هدف:
+
+> ساخت یک سایت زیبا نیست.
+
+هدف:
+
+> ساخت یک فروشگاه دیجیتال حرفه‌ای است که کاربر بتواند به‌راحتی محصول مناسب را پیدا کند، به کیفیت آن اعتماد کند، تصمیم بگیرد و خرید را بدون اصطکاک انجام دهد.
+
+زیبایی باید در خدمت این هدف باشد.
+
+---
+
+# 161. Final Design Direction
+
+در یک جمله:
+
+> طراحی باید شبیه یک برند Premium Home & Bath باشد که روی نرمی، کیفیت، آرامش و تجربه حسی تمرکز دارد، نه شبیه یک فروشگاه اینترنتی عمومی پر از کارت و بنر.
+
+---
+
+# 162. Final Visual Keywords
+
+از این Keywords به‌عنوان جهت هنری استفاده کن:
+
+```text
+Warm
+Minimal
+Premium
+Soft
+Natural
+Elegant
+Clean
+Editorial
+Tactile
+Modern
+Calm
+Trustworthy
+Human
+Timeless
+```
+
+---
+
+# 163. Final UX Keywords
+
+```text
+Simple
+Clear
+Fast
+Predictable
+Accessible
+Mobile-first
+Product-focused
+Low-friction
+Trustworthy
+Scalable
+```
+
+---
+
+# 164. Final Technical Keywords
+
+```text
+Next.js
+TypeScript
+Tailwind
+shadcn/ui
+Responsive
+SEO
+Accessibility
+Performance
+Reusable Components
+Server Components
+Type Safety
+Scalable Architecture
+Secure Commerce
+```
+
+---
+
+# 165. دستور نهایی
+
+این پروژه را مانند یک پروژه واقعی طراحی و توسعه بده.
+
+از تولید یک Template عمومی خودداری کن.
+
+قبل از کدنویسی فکر کن.
+
+قبل از طراحی Visual، UX را حل کن.
+
+قبل از ساخت Component، Design System را مشخص کن.
+
+قبل از ساخت Checkout، Business Logic را مشخص کن.
+
+قبل از تحویل، کل سیستم را Review کن.
+
+اگر تصمیمی را نمی‌دانی، آن را پنهان نکن.
+
+اگر فرضی داری، اعلام کن.
+
+اگر چیزی از نظر UX بد است، صرفاً به این دلیل که من درخواستش کرده‌ام آن را اجرا نکن و دلیل حرفه‌ای آن را توضیح بده.
+
+اگر بین زیبایی و usability تضاد ایجاد شد، راه‌حلی پیدا کن که هر دو را حفظ کند.
+
+اگر بین Animation و Performance تضاد ایجاد شد، Performance اولویت دارد.
+
+اگر بین Marketing و Trust تضاد ایجاد شد، Trust اولویت دارد.
+
+اگر بین پیچیدگی و ارزش واقعی Feature تضاد ایجاد شد، راه ساده‌تر را انتخاب کن.
+
+---
+
+# 166. اولین کار تو
+
+فعلاً هیچ کدی تولید نکن.
+
+ابتدا پروژه را تحلیل کن و خروجی را دقیقاً با این ساختار ارائه بده:
+
+```text
+1. Project Understanding
+2. Business Goals
+3. Target Users
+4. User Personas
+5. User Needs
+6. User Intent
+7. Brand Direction
+8. UX Principles
+9. Visual Direction
+10. Information Architecture
+11. Sitemap
+12. User Flows
+13. Page Inventory
+14. Feature Inventory
+15. MVP Scope
+16. Phase 2
+17. Future Features
+18. Content Strategy
+19. E-commerce Strategy
+20. Design System Plan
+21. Responsive Strategy
+22. Accessibility Strategy
+23. SEO Strategy
+24. Performance Strategy
+25. Technical Architecture
+26. Data Model
+27. Component Architecture
+28. Security Considerations
+29. Analytics Plan
+30. Open Decisions
+31. Assumptions
+32. Risks
+33. Recommended Next Steps
+```
+
+بعد از این مرحله، منتظر تأیید بمان و **بدون تأیید وارد مرحله بعد نشو.**
+
+این پروژه باید مرحله‌به‌مرحله، سیستماتیک و با استاندارد یک محصول واقعی ساخته شود.
