@@ -2,14 +2,30 @@
  * JSON-LD Structured Data — پرامپت 66 و 110
  * فقط داده واقعی (پرامپت: اگر داده واقعی وجود دارد)
  * data می‌تواند یک اسکیمای تکی یا آرایه‌ای از اسکیماها باشد.
+ *
+ * امنیت (رفع XSS گزارش 47-c): JSON.stringify به‌تنهایی «</script>» را escape
+ * نمی‌کند — اگر فیلدی (مثلاً description محصول) شامل تگ بسته‌شدن اسکریپت باشد،
+ * از بلوک script خارج می‌شود و در مرورگر ادمین اجرا می‌شود (content→XSS).
+ * توکن‌های خطرناک JSON (< U+2028 U+2029) با escape امن جایگزین می‌شوند —
+ * خروجی برای JSON.parse معتبر می‌ماند.
  */
 type JsonLdData = Record<string, unknown> | Record<string, unknown>[];
+
+/** escape امن برای درج JSON داخل تگ script — تست‌پذیر */
+export function safeJsonForScript(data: JsonLdData): string {
+  return JSON.stringify(data)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}
 
 export function JsonLd({ data }: { data: JsonLdData }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+      dangerouslySetInnerHTML={{ __html: safeJsonForScript(data) }}
     />
   );
 }
