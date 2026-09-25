@@ -13,6 +13,7 @@ import { revalidatePath } from "next/cache";
 import { DomainError } from "@/core/errors";
 import { getCustomerContext, requireCustomerContext, createCustomerSession, revokeCustomerSession } from "@/core/auth/customer-session";
 import { sendOtp, verifyOtpAndLogin } from "@/core/auth/otp-auth-service";
+import { getClientIp } from "@/lib/client-ip";
 import { signInWithPassword } from "@/core/auth/customer-auth-service";
 import {
   otpSendSchema,
@@ -37,8 +38,8 @@ export type AuthActionResult =
   | { ok: false; message: string };
 
 async function clientIp(): Promise<string | null> {
-  const hdrs = await headers();
-  return hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+  // SEC-02 — فقط XFF پروکسی معتمد (بدون CIDR: null → bucket اشتراکی)
+  return getClientIp();
 }
 
 export async function sendOtpAction(input: { phone: string }): Promise<AuthActionResult> {

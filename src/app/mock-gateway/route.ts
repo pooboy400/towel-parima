@@ -1,6 +1,12 @@
+import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 import { paymentProvider } from "@/providers/payment";
 import { allowMocksInProduction } from "@/core/env";
+import { getCustomerContext } from "@/core/auth/customer-session";
+import {
+  PAY_PROOF_COOKIE,
+  isValidProof,
+} from "@/core/commerce/checkout-service";
 
 export const dynamic = "force-dynamic";
 
@@ -8,9 +14,12 @@ export const dynamic = "force-dynamic";
  * Mock Gateway — شبیه‌ساز درگاه پرداخت (فقط dev)
  * Route Handler — HTML مستقل با دکمه‌های «پرداخت موفق/ناموفق».
  * در production هرگز در دسترس نیست (گارد دوبل: provider + این route).
+ * SEC-07 (F-4/51d): مبلغ/کد سفارش فقط برای صاحب پرداخت نمایش داده می‌شود —
+ * نشست مالک یا کوکی اثبات شروع پرداخت؛ authority به‌تنهایی کافی نیست
+ * (از لاگ سرور/Referer/تاریخچهٔ مرورگر مشترک قابل نشت است).
  */
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   if (
     (process.env.NODE_ENV === "production" && !allowMocksInProduction()) ||
     paymentProvider.name !== "mock"
@@ -25,9 +34,29 @@ export async function GET(request: Request) {
   const payment = authority
     ? await db.payment.findUnique({
         where: { authority },
-        select: { status: true, amount: true, order: { select: { code: true } } },
+        select: {
+          status: true,
+          amount: true,
+          order: { select: { code: true, userId: true } },
+        },
       })
     : null;
+
+  // SEC-07 — نمایش جزئیات فقط برای صاحب پرداخت
+  let authorized = false;
+  if (payment?.status === "PENDING") {
+    // ۱) مالک نشست (سفارش کاربر لاگین)
+    if (payment.order.userId) {
+      const customer = await getCustomerContext();
+      authorized = Boolean(customer?.userId && customer.userId === payment.order.userId);
+    }
+    // ۲) کوکی اثبات شروع پرداخت (مهمان — فقط پرداخت‌کنندهٔ واقعی دارد)
+    if (!authorized) {
+      authorized = isValidProof(request.cookies.get(PAY_PROOF_COOKIE)?.value, authority);
+    }
+  }
+
+  const showDetails = Boolean(payment && payment.status === "PENDING" && authorized);
 
   const html = `<!DOCTYPE html>
 <html lang="fa" dir="rtl">
@@ -60,11 +89,11 @@ export async function GET(request: Request) {
   <div class="card">
     <span class="badge">درگاه آزمایشی — بدون انتقال پول واقعی</span>
     ${
-      payment && payment.status === "PENDING"
+      showDetails
         ? `
     <h1>پرداخت سفارش</h1>
-    <div class="amount">${payment.amount.toLocaleString("fa-IR")} تومان</div>
-    <div class="meta">کد سفارش: ${payment.order.code}</div>
+    <div class="amount">${payment!.amount.toLocaleString("fa-IR")} تومان</div>
+    <div class="meta">کد سفارش: ${payment!.order.code}</div>
     <div class="btns">
       <a class="btn pay" href="/checkout/callback?authority=${encodeURIComponent(authority)}&status=OK">پرداخت موفق (آزمایش)</a>
       <a class="btn cancel" href="/checkout/callback?authority=${encodeURIComponent(authority)}&status=NOK">انصراف / پرداخت ناموفق</a>

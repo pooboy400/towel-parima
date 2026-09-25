@@ -2,10 +2,12 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/admin/page-header";
 import { adminGetProduct, adminGetProductFormOptions } from "@/lib/repositories/admin-repository";
 import { ProductForm } from "@/components/admin/product-form";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
+  await requirePageAccess("products");
   const { id } = await params;
   const [product, options] = await Promise.all([adminGetProduct(id), adminGetProductFormOptions()]);
   if (!product) notFound();

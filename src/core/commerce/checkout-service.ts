@@ -15,9 +15,10 @@
  * از روی آن resolve می‌شود؛ قیمت همیشه از DB.
  */
 
-import { randomInt } from "node:crypto";
+import { randomInt, createHash, timingSafeEqual } from "node:crypto";
 import { db } from "@/lib/db";
 import { DomainError } from "@/core/errors";
+import { normalizePhone, isValidIranMobile } from "@/domain/policies/otp";
 import { enqueueOutbox } from "@/core/commerce/outbox-service";
 import { invalidateStorefrontForOrder } from "./storefront-invalidation";
 import { reserveVariant, RESERVATION_TTL_MS } from "./inventory-service";
@@ -332,11 +333,36 @@ export async function placeOrder(input: PlaceOrderInput): Promise<CheckoutResult
 /* خواندن سفارش‌ها                                                     */
 /* ------------------------------------------------------------------ */
 
-/** سفارش با کد رهگیری — برای صفحه پیگیری */
-export async function getOrderByCode(code: string) {
+/** نام کوکی اثبات پرداخت — هم درگاه mock (شروع پرداخت) هم success (بازگشت موفق) */
+export const PAY_PROOF_COOKIE = "prima_pay_proof";
+/** TTL کوکی اثبات (ثانیه) — فقط برای همان سفر پرداخت */
+export const PAY_PROOF_TTL_S = 15 * 60;
+
+/** sha256(authority) — اثبات کوتاه‌عمر؛ بدون authority قابل ساخت نیست */
+export function paidProofValue(authority: string): string {
+  return createHash("sha256").update(authority).digest("hex");
+}
+
+/** مقایسهٔ زمان-ثابت کوکی اثبات با sha256(authority) */
+export function isValidProof(
+  provided: string | null | undefined,
+  authority: string,
+): boolean {
+  if (!provided) return false;
+  const expected = Buffer.from(paidProofValue(authority));
+  const given = Buffer.from(provided);
+  return expected.length === given.length && timingSafeEqual(expected, given);
+}
+
+/**
+ * سفارش با کد رهگیری + فاکتور دوم موبایل (SEC-04 — IDOR F-3/51d).
+ * عدم تطبیق کد/موبایل → null؛ پیام UI برای هر دو حالت یکسان است (بدون نشت وجود سفارش).
+ */
+export async function getOrderByCodeForTracking(code: string, phone: string) {
   const clean = code.trim();
-  if (!clean) return null;
-  return db.order.findUnique({
+  const candidate = normalizePhone(phone);
+  if (!clean || !isValidIranMobile(candidate)) return null;
+  const order = await db.order.findUnique({
     where: { code: clean },
     include: {
       items: true,
@@ -344,6 +370,38 @@ export async function getOrderByCode(code: string) {
       shipments: true,
     },
   });
+  if (!order) return null;
+  return normalizePhone(order.phone) === candidate ? order : null;
+}
+
+/**
+ * سفارش برای صفحهٔ success (SEC-04) — فقط با یکی از این دو:
+ * ۱) مالکیت نشست (سفارش کاربر لاگین)
+ * ۲) کوکی اثبات callback = sha256(authority آخرین پرداخت) که فقط پرداخت‌کنندهٔ واقعی دارد
+ * غریبه با حدس کد → null → صفحه فقط پیام generic نشان می‌دهد.
+ */
+export async function getOrderByCodeForSuccess(
+  code: string,
+  proofCookie: string | null,
+  sessionUserId: string | null,
+) {
+  const clean = code.trim();
+  if (!clean) return null;
+  const order = await db.order.findUnique({
+    where: { code: clean },
+    include: { items: true, payments: { orderBy: { createdAt: "desc" }, take: 1 } },
+  });
+  if (!order) return null;
+
+  // ۱) مالک نشست
+  if (order.userId && sessionUserId && order.userId === sessionUserId) return order;
+
+  // ۲) اثبات بازگشت موفق از درگاه
+  const latestAuthority = order.payments[0]?.authority;
+  if (latestAuthority && isValidProof(proofCookie, latestAuthority)) {
+    return order;
+  }
+  return null;
 }
 
 /** تاریخچه سفارش‌های کاربر — پنل حساب کاربری */

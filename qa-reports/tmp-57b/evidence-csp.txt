@@ -1,0 +1,27 @@
+=== baseline dev.log=124 ===
+[R0-سالم 228B] status=204
+[R1-CL=9000 بدنه=100B] status=204
+[R2-CL=-5 بدنهٔ سالم] status=400
+[R3-CL=1e20] status=400
+[R4-CL=abc (NaN)] status=400
+[R5-دو CL تکراری 50/50] status=400
+[R6-chunked+CL همزمان] status=400
+R7 body len: 4096 / R8 body len: 4097
+[R7-بدنه دقیقاً 4096] status=204
+[R8-بدنه دقیقاً 4097] status=204
+[R9-JSON نامعتبر 1KB] status=204
+[R10-HEAD] status=405
+[R10b-PUT] status=405
+[R11-chunked 100KB] status=204
+=== رکوردهای dev.log بعد از تست‌ها (خط‌ها) ===
+1:{"level":"warn","type":"csp_violation","ts":"2026-09-25T22:46:35.831Z","ip":"unknown","report":{"csp-report":{"document-uri":"https://prima.example/x","violated-directive":"script-src"}}}
+2: POST /api/csp-report 204 in 72ms (next.js: 53ms, application-code: 19ms)
+3: POST /api/csp-report 204 in 5ms (next.js: 1.6ms, application-code: 4ms)
+4:{"level":"warn","type":"csp_violation_oversized","ts":"2026-09-25T22:46:36.044Z","ip":"unknown","size":4090}
+5: POST /api/csp-report 204 in 10ms (next.js: 2ms, application-code: 7ms)
+6: POST /api/csp-report 204 in 5ms (next.js: 1.4ms, application-code: 3ms)
+7: POST /api/csp-report 204 in 9ms (next.js: 5ms, application-code: 4ms)
+8: HEAD /api/csp-report 405 in 5ms (next.js: 1.3ms, application-code: 3ms)
+9: PUT /api/csp-report 405 in 4ms (next.js: 1.3ms, application-code: 3ms)
+10: POST /api/csp-report 204 in 7ms (next.js: 1.7ms, application-code: 5ms)
+=== بررسی نشت خطا/استک (باید خالی باشد) ===

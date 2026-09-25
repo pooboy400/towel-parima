@@ -1,10 +1,12 @@
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/admin/page-header";
 import { ReviewsModerator } from "../faq/faq-manager";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminReviewsPage() {
+  await requirePageAccess("reviews");
   const pending = await db.review.findMany({
     where: { status: "PENDING" },
     include: { product: { select: { name: true } } },

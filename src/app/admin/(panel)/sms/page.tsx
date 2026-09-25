@@ -1,8 +1,6 @@
 import { MessageSquareText } from "lucide-react";
-import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { getPanelContext } from "@/core/auth/session-service";
-import { PERMISSIONS } from "@/core/auth/permissions";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 import { PageHeader } from "@/components/admin/page-header";
 import { formatDate, faDigits } from "@/lib/format";
 import { SMS_TAG_LABELS } from "@/core/async/sms-templates";
@@ -17,9 +15,8 @@ export const dynamic = "force-dynamic";
  * «می‌رفت» + وضعیت رساندن هر نامه توسط نامه‌رسان (Worker).
  */
 export default async function AdminSmsPage() {
-  const ctx = await getPanelContext();
-  if (!ctx) redirect("/admin/login");
-  if (!ctx.actor.permissions.includes(PERMISSIONS.ordersRead)) redirect("/admin");
+  // CR-8/55-c — گارد یکدست با نقشهٔ read (مقصد عدم دسترسی: no-access نه /admin)
+  await requirePageAccess("sms");
 
   const [logs, total] = await Promise.all([
     db.smsLog.findMany({ orderBy: { createdAt: "desc" }, take: 100 }),

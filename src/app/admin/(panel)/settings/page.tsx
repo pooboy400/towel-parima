@@ -3,10 +3,12 @@ import { PageHeader } from "@/components/admin/page-header";
 import { SettingsForms } from "./settings-forms";
 import { DEFAULT_STORE_CONFIG } from "./defaults";
 import { DEFAULT_BADGE_RULES } from "@/lib/config";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminSettingsPage() {
+  await requirePageAccess("settings");
   const [configSetting, shippingSetting, testimonialsSetting, homeFeatured, badgeRulesSetting] = await Promise.all([
     db.setting.findUnique({ where: { key: "store.config" } }),
     db.setting.findUnique({ where: { key: "store.shipping" } }),

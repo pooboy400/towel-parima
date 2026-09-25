@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { CheckCircle2, Package, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getOrderByCode } from "@/core/commerce/checkout-service";
+import {
+  getOrderByCodeForSuccess,
+  PAY_PROOF_COOKIE,
+} from "@/core/commerce/checkout-service";
+import { getCustomerContext } from "@/core/auth/customer-session";
 import { formatPrice, faDigits } from "@/lib/format";
 import { ClearCartOnMount } from "./clear-cart";
 
@@ -12,8 +17,10 @@ export const metadata = {
 };
 
 /**
- * Success Page — پس از تأیید درگاه. سفارش با کد رهگیری واقعی از DB خوانده
- * می‌شود؛ وضعیت PROCESSING یعنی پرداخت تأیید و موجودی قطعی شده است.
+ * Success Page — پس از تأیید درگاه. سفارش با کد رهگیری از DB خوانده می‌شود؛
+ * SEC-04: جزئیات فقط برای صاحب بازگشت موفق از درگاه (کوکی اثبات callback)
+ * یا مالک نشست؛ غریبه با حدس کد فقط پیام generic می‌بیند.
+ * وضعیت PROCESSING یعنی پرداخت تأیید و موجودی قطعی شده است.
  */
 export default async function CheckoutSuccessPage({
   searchParams,
@@ -21,7 +28,12 @@ export default async function CheckoutSuccessPage({
   searchParams: Promise<{ code?: string }>;
 }) {
   const { code } = await searchParams;
-  const order = code ? await getOrderByCode(code) : null;
+  const jar = await cookies();
+  const proof = jar.get(PAY_PROOF_COOKIE)?.value ?? null;
+  const customer = await getCustomerContext();
+  const order = code
+    ? await getOrderByCodeForSuccess(code, proof, customer?.userId ?? null)
+    : null;
 
   return (
     <div className="container-brand flex flex-col items-center py-16 lg:py-24">

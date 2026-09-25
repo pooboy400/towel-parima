@@ -20,6 +20,8 @@ export const RATE_RULES = {
   otpVerifyPerPhone: { limit: 5, windowMs: 15 * MINUTE },
   /** signIn با رمز — per IP+شناسه */
   signIn: { limit: 5, windowMs: 15 * MINUTE },
+  /** signIn ادمین — per email (SEC-03: مستقل از IP؛ با چرخش IP/XFF هم قفل می‌شود) */
+  signInPerEmail: { limit: 10, windowMs: HOUR },
   /** شروع پرداخت — per user */
   paymentStart: { limit: 5, windowMs: 10 * MINUTE },
   /** اعمال کوپن — per user */
@@ -32,6 +34,8 @@ export const RATE_RULES = {
   newsletterSubscribe: { limit: 5, windowMs: HOUR },
   /** GET /api/search — per IP */
   search: { limit: 30, windowMs: MINUTE },
+  /** پیگیری سفارش (صفحه) — per IP (SEC-04: سد ارقام‌زنی کد رهگیری) */
+  orderTracking: { limit: 30, windowMs: MINUTE },
   /** بقیه APIهای عمومی — per IP */
   publicApi: { limit: 120, windowMs: MINUTE },
 } as const satisfies Record<string, RateLimitRule>;

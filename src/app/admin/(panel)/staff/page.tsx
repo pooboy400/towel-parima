@@ -2,11 +2,13 @@ import { db } from "@/lib/db";
 import { formatNumber, formatDate } from "@/lib/format";
 import { PageHeader } from "@/components/admin/page-header";
 import { ROLE_TITLES } from "@/lib/admin/role-titles";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 import { StaffManager } from "./staff-manager";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminStaffPage() {
+  await requirePageAccess("staff");
   const [users, roles] = await Promise.all([
     db.user.findMany({
       where: { deletedAt: null },

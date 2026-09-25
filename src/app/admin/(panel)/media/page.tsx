@@ -1,9 +1,11 @@
 import { PageHeader } from "@/components/admin/page-header";
 import { MediaGrid } from "./media-grid";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
-export default function AdminMediaPage() {
+export default async function AdminMediaPage() {
+  await requirePageAccess("media");
   return (
     <div>
       <PageHeader

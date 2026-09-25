@@ -1,0 +1,18 @@
+=== دنبال‌کردن زنجیرهٔ redirect (-L) تا نقطهٔ پایانی ===
+--- http://localhost:3000/admin/staff/
+final=200 url=http://localhost:3000/admin/no-access
+--- http://localhost:3000//admin/staff
+final=200 url=http://localhost:3000/admin/no-access
+--- http://localhost:3000/admin//staff
+final=200 url=http://localhost:3000/admin/no-access
+--- http://localhost:3000/admin/staff/..
+final=200 url=http://localhost:3000/admin
+=== x-forwarded-host جعلی ===
+307 → http://localhost:3000/admin/no-access
+=== همان ترفندها روی /admin/audit و /admin/settings ===
+/admin/audit → 307 → http://localhost:3000/admin/no-access
+/admin/settings → 307 → http://localhost:3000/admin/no-access
+/admin/audit/ → 308 → http://localhost:3000/admin/audit
+/admin/settings/ → 308 → http://localhost:3000/admin/settings
+/admin/./audit → 307 → http://localhost:3000/admin/no-access
+/admin/settings/.. → 308 → http://localhost:3000/admin

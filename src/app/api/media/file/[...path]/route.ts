@@ -10,6 +10,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import path from "path";
+import { rateLimiter, RATE_RULES, rateKey } from "@/core/rate-limit";
+import { extractClientIp } from "@/lib/client-ip";
 
 const ROOT = process.env.STORAGE_LOCAL_DIR
   ? path.resolve(process.env.STORAGE_LOCAL_DIR)
@@ -23,9 +25,20 @@ const EXT_MIME: Record<string, string> = {
 };
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> },
 ) {
+  // SEC-06 — هر hit یک خواندن فایل دارد؛ قاعدهٔ publicApi وصل شد (باقی‌ماندهٔ F-6/51c)
+  const ip = extractClientIp(request.headers) ?? "unknown";
+  const rl = await rateLimiter.hit(rateKey("media-file", ip), RATE_RULES.publicApi);
+  if (!rl.ok) {
+    // CR-7 — کلاینت باید بداند کِی برگردد
+    return new NextResponse("Too Many Requests", {
+      status: 429,
+      headers: { "Retry-After": String(Math.max(1, Math.ceil(rl.retryAfterMs / 1000))) },
+    });
+  }
+
   const { path: segments } = await params;
   if (!segments?.length) return new NextResponse("Not found", { status: 404 });
 

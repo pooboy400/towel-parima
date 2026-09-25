@@ -11,8 +11,13 @@ import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { requirePermission, authenticate } from "../../src/core/auth/guard";
 import { DomainError, isDomainError } from "../../src/core/errors";
-import { PERMISSIONS } from "../../src/core/auth/permissions";
-import { ROLE_DEFINITIONS } from "../../src/core/auth/roles";
+import { PERMISSIONS, ALL_PERMISSIONS } from "../../src/core/auth/permissions";
+import { ROLE_DEFINITIONS, getRoleDefinition } from "../../src/core/auth/roles";
+import {
+  ADMIN_PAGE_READ_MAP,
+  canAccessAdminPage,
+  type AdminPageRoute,
+} from "../../src/lib/admin/page-read-map";
 import { dbSessionReader } from "../../src/core/auth/db-session-reader";
 import { PrismaAuditWriter } from "../../src/core/audit/prisma-writer";
 import { isSessionValid, newSessionExpiry } from "../../src/domain/policies/session";
@@ -72,6 +77,94 @@ afterAll(async () => {
 });
 
 describe("RBAC ماتریس روی DB واقعی", () => {
+  it(
+    "read-matrix صفحات ادمین (SEC-01) — هر نقش فقط صفحات مجاز read را می‌بیند",
+    async () => {
+      if (!dbUp) return console.log("skip: DB در دسترس نیست");
+
+      // ۱) سلامت نقشه: همهٔ مجوزهای نقشه در فهرست کانونی مجوزها هستند
+      for (const perms of Object.values(ADMIN_PAGE_READ_MAP)) {
+        for (const p of perms) expect(ALL_PERMISSIONS).toContain(p);
+      }
+
+      // ۲) شرط پذیرش SEC-01 — نقش SUPPORT_AGENT:
+      //    staff / audit / settings / journal / media / faq را نبیند؛
+      //    orders / messages / products / reviews / categories را ببیند
+      const support = getRoleDefinition("SUPPORT_AGENT").permissions as string[];
+      expect(canAccessAdminPage(support, "staff")).toBe(false);
+      expect(canAccessAdminPage(support, "audit")).toBe(false);
+      expect(canAccessAdminPage(support, "settings")).toBe(false);
+      expect(canAccessAdminPage(support, "journal")).toBe(false);
+      expect(canAccessAdminPage(support, "media")).toBe(false);
+      expect(canAccessAdminPage(support, "faq")).toBe(false);
+      expect(canAccessAdminPage(support, "orders")).toBe(true);
+      expect(canAccessAdminPage(support, "messages")).toBe(true);
+      expect(canAccessAdminPage(support, "products")).toBe(true);
+      expect(canAccessAdminPage(support, "reviews")).toBe(true);
+      expect(canAccessAdminPage(support, "categories")).toBe(true);
+      expect(canAccessAdminPage(support, "collections")).toBe(true);
+      // صفحات اضافه‌شدهٔ Task 56 (CR-1/CR-8 از 55-c): داشبورد با analyticsRead —
+      // SUPPORT_AGENT ندارد (نشتی KPI/ارزش انبار اثبات 55-b)؛ sms با ordersRead
+      // و notifications با reviewsRead دارد
+      expect(canAccessAdminPage(support, "dashboard")).toBe(false);
+      expect(canAccessAdminPage(support, "sms")).toBe(true);
+      expect(canAccessAdminPage(support, "notifications")).toBe(true);
+
+      // ۳) CONTENT_MANAGER — محتوا بله؛ سفارش/کارکنان/تنظیمات/پیام خصوصی مشتری خیر
+      const content = getRoleDefinition("CONTENT_MANAGER").permissions as string[];
+      expect(canAccessAdminPage(content, "journal")).toBe(true);
+      expect(canAccessAdminPage(content, "faq")).toBe(true);
+      expect(canAccessAdminPage(content, "media")).toBe(true);
+      expect(canAccessAdminPage(content, "reviews")).toBe(true);
+      expect(canAccessAdminPage(content, "orders")).toBe(false);
+      expect(canAccessAdminPage(content, "staff")).toBe(false);
+      expect(canAccessAdminPage(content, "settings")).toBe(false);
+      expect(canAccessAdminPage(content, "messages")).toBe(false);
+      // CONTENT_MANAGER analyticsRead دارد → داشبورد می‌بیند (CR-1)
+      expect(canAccessAdminPage(content, "dashboard")).toBe(true);
+
+      // ۴) STORE_MANAGER — سفارش و تنظیمات بله؛ کارکنان/audit خیر
+      const store = getRoleDefinition("STORE_MANAGER").permissions as string[];
+      expect(canAccessAdminPage(store, "orders")).toBe(true);
+      expect(canAccessAdminPage(store, "settings")).toBe(true);
+      expect(canAccessAdminPage(store, "messages")).toBe(true);
+      expect(canAccessAdminPage(store, "staff")).toBe(false);
+      expect(canAccessAdminPage(store, "audit")).toBe(false);
+      // STORE_MANAGER analyticsRead دارد → داشبورد (CR-1)
+      expect(canAccessAdminPage(store, "dashboard")).toBe(true);
+
+      // ۵) SUPER_ADMIN همه را می‌بیند
+      const superAdmin = getRoleDefinition("SUPER_ADMIN").permissions as string[];
+      for (const route of Object.keys(ADMIN_PAGE_READ_MAP) as AdminPageRoute[]) {
+        expect(canAccessAdminPage(superAdmin, route)).toBe(true);
+      }
+
+      // ۶) اجرای زنده روی DB — گارد requirePermission پشت نقشه:
+      //    نشست SUPPORT_AGENT برای usersRead (صفحهٔ staff) باید FORBIDDEN بدهد
+      const supportPerms = getRoleDefinition("SUPPORT_AGENT").permissions as string[];
+      const token = await seedRoleSession("SUPPORT_AGENT", supportPerms);
+      let threw = false;
+      try {
+        await requirePermission(PERMISSIONS.usersRead, {
+          sessionReader: dbSessionReader,
+          token,
+        });
+      } catch (e) {
+        threw = true;
+        expect(isDomainError(e) && e.code === "FORBIDDEN").toBe(true);
+      }
+      expect(threw).toBe(true);
+
+      // و همان نشست برای ordersRead (صفحهٔ سفارش‌ها) باید عبور کند
+      const okActor = await requirePermission(PERMISSIONS.ordersRead, {
+        sessionReader: dbSessionReader,
+        token,
+      });
+      expect(okActor.role).toBe("SUPPORT_AGENT");
+    },
+    30_000,
+  );
+
   it(
     "هر نقش با requirePermission دقیقاً مطابق ROLE_DEFINITIONS رفتار می‌کند",
     async () => {

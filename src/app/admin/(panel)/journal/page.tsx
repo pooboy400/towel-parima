@@ -3,10 +3,12 @@ import { db } from "@/lib/db";
 import { formatNumber, formatDate } from "@/lib/format";
 import { PageHeader } from "@/components/admin/page-header";
 import { JournalStatusBadge } from "./journal-badges";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminJournalPage() {
+  await requirePageAccess("journal");
   const posts = await db.journalPost.findMany({
     orderBy: { createdAt: "desc" },
     select: { id: true, title: true, slug: true, status: true, createdAt: true, publishedAt: true },

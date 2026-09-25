@@ -1,0 +1,22 @@
+DRAIN(122):     118 200       4 429 
+ESCAPE xff-single: 429 429
+ESCAPE xff-multihop: 429 429
+ESCAPE xff-first-ext-last-int: 429 429
+ESCAPE xff-last-ext: 429 429
+ESCAPE xff-internal-10: 429 429
+ESCAPE xff-internal-192: 429 429
+ESCAPE x-real-ip: 429 429
+ESCAPE true-client-ip: 429 429
+ESCAPE cf-connecting-ip: 429 429
+ESCAPE forwarded-std: 429 429
+ESCAPE xff-dup-2lines: 429 429
+ESCAPE ipv6-full: 429 429
+ESCAPE ipv6-short: 429 429
+ESCAPE ipv6-fe80: 429 429
+ESCAPE zero-addr: 429 429
+ESCAPE broken: 429 429
+ESCAPE long-5k: 429 429
+ESCAPE empty-xff: 429 429
+ESCAPE combo-all: 429 429
+PLAIN CHECK:
+429 429 429 429 429 

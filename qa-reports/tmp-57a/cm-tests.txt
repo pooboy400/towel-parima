@@ -1,0 +1,4 @@
+/admin/sms => 307 http://localhost:3000/admin/no-access
+/admin/notifications => 200 
+/admin => 200 
+/admin/journal => 200 

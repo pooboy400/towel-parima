@@ -8,12 +8,18 @@
 
 "use server";
 
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
 import { db } from "@/lib/db";
 import { DomainError } from "@/core/errors";
 import { getCustomerContext } from "@/core/auth/customer-session";
 import { rateLimiter, RATE_RULES, rateKey } from "@/core/rate-limit";
-import { placeOrder } from "@/core/commerce/checkout-service";
+import { getClientIp } from "@/lib/client-ip";
+import {
+  placeOrder,
+  PAY_PROOF_COOKIE,
+  PAY_PROOF_TTL_S,
+  paidProofValue,
+} from "@/core/commerce/checkout-service";
 import { evaluateCoupon } from "@/core/commerce/coupon-service";
 import { startPayment } from "@/core/commerce/payment-service";
 import {
@@ -106,8 +112,7 @@ export async function validateCouponAction(input: {
 }): Promise<{ ok: true; discount: number } | { ok: false; message: string }> {
   try {
     const customer = await getCustomerContext();
-    const hdrs = await headers();
-    const ip = hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const ip = (await getClientIp()) ?? "unknown";
     const rl = await rateLimiter.hit(
       rateKey("coupon-apply", ip, customer?.userId ?? "guest"),
       RATE_RULES.couponApply,
@@ -138,9 +143,8 @@ export async function placeOrderAction(
     const parsed = placeOrderSchema.parse(input);
     const customer = await getCustomerContext();
 
-    const hdrs = await headers();
-    const ip = hdrs.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-    const userAgent = hdrs.get("user-agent");
+    const ip = (await getClientIp()) ?? "unknown";
+    const userAgent = (await headers()).get("user-agent");
 
     // rate-limit: paymentStart (5/10min per IP+user) — اسپم سفارش PENDING/رزرو/درگاه (HIGH-2)
     const rl = await rateLimiter.hit(
@@ -164,6 +168,21 @@ export async function placeOrderAction(
       orderId: result.orderId,
       userId: customer?.userId ?? null,
     });
+
+    // SEC-07 — اثبات کوتاه‌عمر ورود به درگاه mock؛ مهمان هم بدون اصطکاک دارد
+    // (فقط پرداخت‌کنندهٔ واقعی این کوکی را دارد — authority در لاگ/Referer نشت‌پذیر است)
+    if (payment.redirectUrl.includes("/mock-gateway")) {
+      const jar = await cookies();
+      jar.set({
+        name: PAY_PROOF_COOKIE,
+        value: paidProofValue(payment.authority),
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: PAY_PROOF_TTL_S,
+        secure: process.env.NODE_ENV === "production",
+      });
+    }
 
     return {
       ok: true,

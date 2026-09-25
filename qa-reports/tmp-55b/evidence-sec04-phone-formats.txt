@@ -1,0 +1,11 @@
+09125550001            → ACCEPTED
++989125550001          → ACCEPTED
+00989125550001         → ACCEPTED
+9125550001             → ACCEPTED
+0912 555 0001 (space)  → ACCEPTED
+0912-555-0001 (dash)   → ACCEPTED
+۰۹۱۲۵۵۵۰۰۰۱ (persian)  → ACCEPTED
+٠٩١٢٥٥٥٠٠٠١ (arabic)   → ACCEPTED
+(+98) 912 555 0001     → ACCEPTED
+9125550001x (dirty)    → rejected-notfound
+09125550002 (phone B)  → rejected-notfound

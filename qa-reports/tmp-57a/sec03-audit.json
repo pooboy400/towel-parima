@@ -1,0 +1,20 @@
+{
+ "email": "lock57a@example.invalid",
+ "total": 6,
+ "byAction": [
+  {
+   "_count": {
+    "action": 1
+   },
+   "action": "auth.login.rate_limited"
+  },
+  {
+   "_count": {
+    "action": 5
+   },
+   "action": "auth.login.failed"
+  }
+ ],
+ "perEmailScoped": 0,
+ "perIpScoped": 1
+}

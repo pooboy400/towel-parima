@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { PackageX, MessageSquareQuote, ShieldAlert, FileEdit, Activity } from "lucide-react";
-import { requireAnyPermission } from "@/core/auth/guard";
-import { dbSessionReader } from "@/core/auth/db-session-reader";
-import { PERMISSIONS } from "@/core/auth/permissions";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/admin/page-header";
 import { formatRelativeFa } from "@/lib/admin/format-utils";
@@ -20,10 +18,9 @@ const LOW_STOCK_THRESHOLD = 5;
 type Severity = "warning" | "info" | "critical";
 
 export default async function AdminNotificationsPage() {
-  await requireAnyPermission(
-    [PERMISSIONS.analyticsRead, PERMISSIONS.productsRead, PERMISSIONS.reviewsRead],
-    { sessionReader: dbSessionReader },
-  );
+  // CR-8/55-c — گارد یکدست با نقشهٔ read: عدم دسترسی = redirect به no-access
+  // (requireAnyPermission قبلی throw می‌کرد و صفحهٔ خطای 500-مانند می‌داد)
+  await requirePageAccess("notifications");
 
   const variants = await db.variant.findMany({
     where: { isActive: true, deletedAt: null, product: { deletedAt: null } },

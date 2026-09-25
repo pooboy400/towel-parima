@@ -1,0 +1,12 @@
+import { PrismaClient } from "@prisma/client";
+const db = new PrismaClient();
+const order = await db.order.findFirst({ orderBy: { createdAt: "desc" }, select: { id: true, code: true } });
+const journal = await db.journalPost.findFirst({ orderBy: { createdAt: "desc" }, select: { id: true, slug: true } });
+const product = await db.product.findUnique({ where: { id: "p1" }, select: { id: true } });
+const variant = await db.variant.findUnique({ where: { id: "p1__cream__bath-large" }, select: { id: true, stock: true, reserved: true, isActive: true } });
+const media = await db.mediaObject.findFirst({ orderBy: { createdAt: "desc" }, select: { storageKey: true, mime: true } });
+const auditLock = await db.auditLog.count({ where: { entityId: "lock57a@example.invalid" } });
+const minted = await db.user.count({ where: { email: { contains: "57a" } } });
+const reservedN = await db.$queryRaw`SELECT COUNT(*)::int AS n FROM "Variant" WHERE "reserved" > 0`;
+console.log(JSON.stringify({ order, journal, product, variant, media, auditLock, minted, reservedNonZero: reservedN[0].n }, null, 1));
+await db.$disconnect();

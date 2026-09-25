@@ -1,0 +1,50 @@
+════ ۱) /admin با SUPPORT_AGENT — ۱۷ واریانت URL (--path-as-is) ════
+V1 /admin → 307 → http://localhost:3000/admin/no-access
+V2 /admin/ → 308 → http://localhost:3000/admin
+V3 /admin/?x=1 → 308 → http://localhost:3000/admin?x=1
+V4 /admin/. → 308 → http://localhost:3000/admin
+V5 /admin/./ → 308 → http://localhost:3000/admin
+V6 /ADMIN → 404 
+V7 /Admin → 404 
+V8 /admin%2F → 404 
+V9 /%61dmin → 404 
+V10 /admin; → 404 
+V11 /admin;a=b → 404 
+V12 //admin → 308 → http://localhost:3000/admin
+V13 /admin// → 308 → http://localhost:3000/admin/
+V14 /./admin → 307 → http://localhost:3000/admin/no-access
+V15 /admin?next=/admin/staff → 307 → http://localhost:3000/admin/no-access
+V16 /%2e/admin → 307 → http://localhost:3000/admin/no-access
+V17 /admin/.. → 200 
+════ ۱-ب) دنبال‌کردن کامل زنجیرهٔ redirect برای واریانت‌های 3xx (-L) ════
+FOLLOW /admin → http://localhost:3000/admin/no-access [200]
+FOLLOW /admin/ → http://localhost:3000/admin/no-access [200]
+FOLLOW /ADMIN → http://localhost:3000/ADMIN [404]
+FOLLOW //admin → http://localhost:3000/admin/no-access [200]
+FOLLOW /admin/.. → http://localhost:3000/admin/.. [200]
+FOLLOW /%61dmin → http://localhost:3000/%61dmin [404]
+════ ۲) APIهای ادمین با SUPPORT_AGENT (ordersRead/productsRead/reviewsRead/customersRead دارد؛ analyticsRead/mediaRead ندارد) ════
+SUPPORT GET /api/admin/dashboard/sales → 403 | POST → 405 | body: {"error":{"code":"FORBIDDEN","message":"شما به این عملیات دسترسی ندارید.","meta":{"permission":"analytics.read","requestId":"req_muhjx
+SUPPORT GET /api/admin/notifications → 200 | POST → 405 | body: {"data":[{"id":"low-stock-cmuh89rtd0007lt0uq7xlwy46","type":"lowStock","title":"موجودی تمام شد: حوله حمام پریما","description":"کرم 
+SUPPORT GET /api/admin/media/list → 403 | POST → 405 | body: {"error":{"code":"FORBIDDEN","message":"شما به این عملیات دسترسی ندارید.","meta":{"permission":"media.read","requestId":"req_muhjxoia_
+════ ۳) همان ۳ API با QA57B_MIN (فقط content.read) ════
+MIN GET /api/admin/dashboard/sales → 403 | body: {"error":{"code":"FORBIDDEN","message":"شما به این عملیات دسترسی ندارید.","meta":{"permission"
+MIN GET /api/admin/notifications → 403 | body: {"error":{"code":"FORBIDDEN","message":"شما به این عملیات دسترسی ندارید.","meta":{"permissions
+MIN GET /api/admin/media/list → 403 | body: {"error":{"code":"FORBIDDEN","message":"شما به این عملیات دسترسی ندارید.","meta":{"permission"
+════ ۴) بدون نشست / کوکی جعلی ════
+NO-COOKIE /api/admin/dashboard/sales → 401 | FAKE-COOKIE → 401 | body: {"error":{"code":"UNAUTHENTICATED","message":"نشست شما منقضی شده است. دوباره
+NO-COOKIE /api/admin/notifications → 401 | FAKE-COOKIE → 401 | body: {"error":{"code":"UNAUTHENTICATED","message":"نشست شما منقضی شده است. دوباره
+NO-COOKIE /api/admin/media/list → 401 | FAKE-COOKIE → 401 | body: {"error":{"code":"UNAUTHENTICATED","message":"نشست شما منقضی شده است. دوباره
+════ ۵) صفحات مجاز SUPPORT_AGENT — آیا KPI مالی تجمیعی دارند؟ ════
+PAGE /admin/orders → 200 
+PAGE /admin/messages → 200 
+PAGE /admin/products → 200 
+PAGE /admin/reviews → 200 
+PAGE /admin/categories → 200 
+PAGE /admin/collections → 200 
+PAGE /admin/sms → 200 
+PAGE /admin/notifications → 200 
+SCAN /admin/orders → 85673 bytes | کلمات کلیدی:       2 تومان 
+SCAN /admin/products → 146303 bytes | کلمات کلیدی:      26 تومان 
+SCAN /admin/collections → 96427 bytes | کلمات کلیدی:       2 تومان 
+SCAN /admin/messages → 74314 bytes | کلمات کلیدی:       2 تومان 

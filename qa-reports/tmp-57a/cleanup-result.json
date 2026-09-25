@@ -1,0 +1,12 @@
+{
+ "order": "8687459998",
+ "outboxEvents": 1,
+ "sms": 1,
+ "payments": 1,
+ "orderItems": 1,
+ "reservations": 1,
+ "reservedRecomputedVariants": 1,
+ "auditDeleted": 6,
+ "mintedSessions": 1,
+ "mintedUsers": 3
+}

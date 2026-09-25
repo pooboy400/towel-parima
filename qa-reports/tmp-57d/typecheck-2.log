@@ -1,0 +1,10 @@
+$ tsc --noEmit
+qa-reports/tmp-56/cleanup-56.ts(9,34): error TS18047: 'u.email' is possibly 'null'.
+qa-reports/tmp-57a/db-facts.ts(11,107): error TS18046: 'reservedN' is of type 'unknown'.
+qa-reports/tmp-57b/cleanup-57b.ts(24,59): error TS2353: Object literal may only specify known properties, and 'phone' does not exist in type 'SmsLogWhereInput'.
+qa-reports/tmp-57d/db-look.ts(28,20): error TS2322: Type '(string | null)[]' is not assignable to type 'string[] | FieldRef<"Order", "String[]"> | undefined'.
+  Type '(string | null)[]' is not assignable to type 'string[]'.
+    Type 'string | null' is not assignable to type 'string'.
+      Type 'null' is not assignable to type 'string'.
+qa-reports/tmp-57d/db-look.ts(33,25): error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.
+  Type 'null' is not assignable to type 'string'.

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { formatNumber } from "@/lib/format";
 import { PageHeader } from "@/components/admin/page-header";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 import {
   CategoryDialog,
   CategoryDeleteButton,
@@ -9,6 +10,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function AdminCategoriesPage() {
+  await requirePageAccess("categories");
   const categories = await db.category.findMany({
     where: { deletedAt: null },
     include: { _count: { select: { products: { where: { deletedAt: null } } } } },

@@ -1,0 +1,28 @@
+════ ۵) sms/notifications — مقصد دقیق redirect (باید /admin/no-access باشد) ════
+MIN /admin/sms → 307 → http://localhost:3000/admin/no-access ✓
+MIN /admin/notifications → 307 → http://localhost:3000/admin/no-access ✓
+MIN /admin → 307 → http://localhost:3000/admin/no-access ✓
+MIN /admin/staff → 307 → http://localhost:3000/admin/no-access ✓
+MIN /admin/audit → 307 → http://localhost:3000/admin/no-access ✓
+MIN /admin/settings → 307 → http://localhost:3000/admin/no-access ✓
+MIN /admin/media → 307 → http://localhost:3000/admin/no-access ✓
+--- CONTENT_MANAGER (analyticsRead دارد؛ داشبورد باید 200 شود — کنترل مثبت) ---
+CONTENT /admin → 200 
+CONTENT /admin/media → 200 
+CONTENT /admin/sms → 307 → http://localhost:3000/admin/no-access
+CONTENT /admin/orders → 307 → http://localhost:3000/admin/no-access
+════ ۶) واریانت‌های تازهٔ URL روی /admin/staff با SUPPORT (بدون usersRead) ════
+S1 /admin/staff/. → 308 → http://localhost:3000/admin/staff
+S2 /admin/staff/./ → 308 → http://localhost:3000/admin/staff
+S3 /admin/staff%20 → 404 
+S4 /ADMIN/staff → 404 
+S5 /admin/sTaFf → 404 
+S6 /admin/staff/.. → 308 → http://localhost:3000/admin
+S7 /admin/staff/..%2Fstaff → 404 
+S8 /admin/staff? → 307 → http://localhost:3000/admin/no-access
+S9 /admin//staff → 308 → http://localhost:3000/admin/staff
+S10 /admin/./staff → 307 → http://localhost:3000/admin/no-access
+--- دنبال‌کردن زنجیرهٔ سه واریانت 3xx ---
+FOLLOW /admin/staff/.. → http://localhost:3000/admin/no-access [200]
+FOLLOW /admin//staff → http://localhost:3000/admin/no-access [200]
+FOLLOW /admin/./staff → http://localhost:3000/admin/no-access [200]

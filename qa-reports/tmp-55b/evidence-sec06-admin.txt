@@ -1,0 +1,3 @@
+/api/admin/dashboard/sales+fake → 401 
+/api/admin/media/list+fake → 401 
+/api/admin/notifications+fake → 401 {"error":{"code":"UNAUTHENTICATED","message":"نشست شما منقضی شده است. دوباره وارد شوید."

@@ -1,0 +1,2 @@
+action-id=4049d9bfabba17e14137d15792830662f22cbb9ee6
+--- Set-Cookie در پاسخ action ---

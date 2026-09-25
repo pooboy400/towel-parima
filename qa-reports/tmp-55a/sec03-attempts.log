@@ -1,0 +1,11 @@
+try1  => UNAUTHENTICATED 
+try2  => UNAUTHENTICATED 
+try3  => UNAUTHENTICATED 
+try4  => UNAUTHENTICATED 
+try5  => UNAUTHENTICATED 
+try6  => 15 دقیقه دیگر RATE_LIMITED 
+try7  => 15 دقیقه دیگر RATE_LIMITED 
+try8  => 15 دقیقه دیگر RATE_LIMITED 
+try9  => 15 دقیقه دیگر RATE_LIMITED 
+try10 => 15 دقیقه دیگر RATE_LIMITED 
+try11 => 60 دقیقه دیگر RATE_LIMITED 

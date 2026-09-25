@@ -1,0 +1,28 @@
+/admin/orders/cmuhc8rwg0011lt6iucwnaj4h|SUPER_ADMIN|404 
+/admin/orders/cmuhc8rwg0011lt6iucwnaj4h|SUPPORT_AGENT|404 
+/admin/orders/cmuhc8rwg0011lt6iucwnaj4h|STORE_MANAGER|404 
+/admin/orders/cmuhc8rwg0011lt6iucwnaj4h/invoice|SUPER_ADMIN|200 
+/admin/orders/cmuhc8rwg0011lt6iucwnaj4h/invoice|SUPPORT_AGENT|200 
+/admin/orders/cmuhc8rwg0011lt6iucwnaj4h/invoice|STORE_MANAGER|200 
+/admin/products/new|SUPER_ADMIN|200 
+/admin/products/new|SUPPORT_AGENT|200 
+/admin/products/new|STORE_MANAGER|200 
+/admin/products/p1/edit|SUPER_ADMIN|200 
+/admin/products/p1/edit|SUPPORT_AGENT|200 
+/admin/products/p1/edit|STORE_MANAGER|200 
+/admin/journal/new|SUPER_ADMIN|200 
+/admin/journal/new|SUPPORT_AGENT|307 http://localhost:3000/admin/no-access
+/admin/journal/new|STORE_MANAGER|200 
+/admin/journal/cmuh89ry0005llt0u2bljkf8e|SUPER_ADMIN|200 
+/admin/journal/cmuh89ry0005llt0u2bljkf8e|SUPPORT_AGENT|307 http://localhost:3000/admin/no-access
+/admin/journal/cmuh89ry0005llt0u2bljkf8e|STORE_MANAGER|200 
+/admin/no-access|SUPER_ADMIN|200 
+/admin/no-access|SUPPORT_AGENT|200 
+/admin/no-access|STORE_MANAGER|200 
+--- NO-SESSION CONTROL ---
+no-session|/admin/staff|307 http://localhost:3000/admin/login?next=%2Fadmin%2Fstaff
+no-session|/admin/orders|307 http://localhost:3000/admin/login?next=%2Fadmin%2Forders
+no-session|/admin/products|307 http://localhost:3000/admin/login?next=%2Fadmin%2Fproducts
+no-session|/admin|307 http://localhost:3000/admin/login?next=%2Fadmin
+no-session|/admin/sms|307 http://localhost:3000/admin/login?next=%2Fadmin%2Fsms
+no-session|/admin/notifications|307 http://localhost:3000/admin/login?next=%2Fadmin%2Fnotifications

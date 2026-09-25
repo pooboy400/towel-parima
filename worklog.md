@@ -617,3 +617,510 @@ Stage Summary:
 - حافظه: idle 157MB → زیر ۴۸ درخواست همزمان 431MB و پایدار (سرور dev: ~2.2GB و OOM-kill) — ریشه‌یافته
 - ۱۵۶/۱۵۶ تست unit (۷ جدید) · شات‌ها در qa/prod49-*.png (خارج از ریپو)
 - admin@prima-store.ir با رمز دستی Prima!Demo-2026 برای این محیط ساخته شد
+
+---
+Task ID: 50
+Agent: main (Super Z)
+Task: کلون و نصب کامل پروژه از گیت‌هاب در محیط تازه (درخواست کاربر)
+
+Work Log:
+- git clone از https://github.com/pooboy400/towel-parima به /home/z/my-project/towel-parima
+- bun install — 847 پکیج در 5.9s
+- bash scripts/setup-pg.sh — PostgreSQL پرتابل zonky 16.4 در /home/z/my-project/.pg نصب شد
+- pg.sh init + start — دیتابیس روی 127.0.0.1:5432 بالا آمد (PID 1173)
+- .env از .env.example ساخته شد
+- کشف مجدد: متغیر سراسری sandbox DATABASE_URL=file:/home/z/my-project/db/custom.db روی .env غلبه می‌کند — export صریح DATABASE_URL قبل از prisma migrate dev و bun run dev الزامی است (همان درس Task 49)
+- bunx prisma migrate dev — ۸ مایگریشن اعمال شد + seed خودکار اجرا شد (نقش‌ها: 6، محصولات: 12، واریانت‌ها: 60، نظرات: 20، ژورنال: 5، FAQ: 7، Settings: 5)
+- bun scripts/create-admin.ts --show — حساب SUPER_ADMIN ساخته شد (رمز یک‌بارچاپ)
+- سرور dev با setsid در پس‌زمینه اجرا شد (bun run dev، پورت 3000)
+
+Stage Summary:
+- health: {"status":"ok","db":{"connected":true,"latencyMs":1},"counts":{"products":12,"categories":6,"journal":5}}
+- ماتریس صفحات: / /shop /collections /journal /admin/login /cart /about همگی 200
+- پروژه آمادهٔ استفاده: فروشگاه روی http://localhost:3000 و پنل ادمین روی /admin/login
+
+---
+Task ID: 51-a
+Agent: programmer-reviewer (sub-agent)
+Task: چک‌های استاتیک + کد ریویو دستی منطق (بدون هیچ تغییر کد)
+
+Work Log:
+- محیط: DATABASE_URL صریح export شد (درس Task 49/50) · DB بالا (PID 1173) · سرور dev زنده، /api/health 200
+- Static: lint 0/0 · tsc 0 · unit 156/156 (492 expect، 14 فایل) · bun install --frozen-lockfile بدون تغییر/هشدار · bun audit: 42 مورد (0 critical؛ sharp مستقیم 2×high — پیشنهاد ارتقا در M6؛ بقیه زنجیره dev/recharts)
+- ریویو دستی ۱۰ فایل هدف + همسایه‌های مؤثر (checkout/payment/order/refund service، otp-auth-service، cart-store، schemas، اکشن‌های ادمین/چک‌اوت)
+- probe.ts (qa-reports/tmp-51a) دو باگ را اثبات کرد: (۱) assertOrderTransition لغو PENDING ادمین را 403 می‌کند — find بازیگر را نادیده می‌گیرد (latent — در پروداکشن استفاده نمی‌شود؛ order-service جدول خودش را دارد) (۲) mapProductToDomain برای محصول با همهٔ واریانت‌های غیرفعال stock مثبت نمایشی می‌سازد (8 به‌جای 0)
+- ۵ متوسط: مورد(۱)، مورد(۲)، TOCTOU سقف perUserLimit کوپن (count-then-insert)، دورزدن perUserLimit توسط مهمان (checkout مهمان مجاز است)، failPayment با update مرکب → P2025 در رقابت لغو×callback → Payment stuck PENDING (همان کلاس باگ eb74e13 که فقط در confirmPayment رفع شده بود)
+- ۱۱ پایین/نکته: تأیید با ≥۱ رزرو فعال (نیمه‌منقضی)، خط صفرتایی cart-store در stock=0، سه کپی موازی فرمول تخفیف کوپن (money/coupon-service/inline checkout)، catch بی‌لاگ expire worker، race شمارش تلاش OTP، salt پیش‌فرض OTP بی‌هشدار در production، «as never» گذار، console.error برای ZodError موردانتظار، دو اسکیمای کدپستی ناهمگون، bun-types 1.4.2 vs bun 1.3.14، کامنت ناهم‌نمای inventory.ts
+- TODO/FIXME/HACK در src/: صفر (فقط ۱ eslint-disable مستند در cache/index.ts و ۲ as never)
+- سالم تأیید شد: اتمیک بودن رزرو/claim رزروها (درس Task 48 پابرجا)، idempotency پرداخت، گارد سقف usageLimit اتمیک، Integer-only پول + floor به نفع مشتری، normalize-fa یک‌پاسه ضد-injection، گاردهای RBAC ادمین، rate-limitهای وصل کوپن/پرداخت، refund با FOR UPDATE + سقف درست
+
+Stage Summary:
+- گزارش کامل: /home/z/my-project/qa-reports/51a-programmer.md (شواهد در qa-reports/tmp-51a/)
+- نتیجه: هیچ باگ بحرانی/بالای فعال در مسیر خرید؛ ۵ متوسط (دو مورد latent/نمایشی، سه مورد رقابتی-سیاستی) + ۱۱ پایین — هر مورد با فایل:خط و پیشنهاد فیکس
+- توصیهٔ اولویت‌دار: (۱) failPayment → updateMany شرطی (۲) اتصال/اصلاح assertOrderTransition چند-بازیگر و یکی‌کردن دو جدول گذار (۳) stock=0 برای محصول بدون واریانت فعال (۴) گارد perUserLimit (قفل FOR UPDATE + تصمیم مهمان) — همه رفع‌های کم‌ریسک و قابل تست unit
+- هیچ فایلی از پروژه تغییر نکرد؛ worklog فقط append شد
+
+---
+Task ID: 51-c
+Agent: security-engineer
+Task: آدیت امنیتی تدافعی مبتنی بر کد (۱۲ حوزه) + تست غیرمخرب روی سرور زنده — بدون تغییر src/
+
+Work Log:
+- worklog.md + docs/ARCHITECTURE.md (§۹ Security Model، §۹.۳ Session، §۹.۴ OTP/Rate Limit، §۱۰-۱۱، §۲۱) خوانده شد؛ باقی‌مانده‌های عمدی M6 (XFF/trusted-proxy، rate-limit تک‌پروسه‌ای، refund بدون transactionId) ملاک پرهیز از کشف تکراری بود
+- خوانش خط‌به‌خط: core/auth (cookies/session-service/db-session-reader/guard/password/totp/customer-session/customer-auth/otp-auth-service)، permissions/roles، lib/admin/action-helpers + هر ۱۳ actions.ts ادمین، rate-limit (in-memory/policies)، checkout/payment/refund/coupon/inventory services، providers/payment (mock/zarinpal/index)، media (pipeline/sniff + local-storage + route file)، همه route.ts های api، proxy.ts، next.config.ts، instrumentation.ts، env.ts، lib/db.ts، صفحه‌های order-tracking و rendering محتوا
+- کشف محیطی مهم: طرح «JWT دستی» در کد وجود ندارد — نشست اپک ۲۵۶ بیتی دیتابیسی است (تصمیم بهتر؛ ثبت شد)
+- تست زنده غیرمخرب (curl): هدرهای امنیتی / · 401 سه API ادمین بدون کوکی · redirect /admin · لاگین ادمین برای بازرسی Set-Cookie (HttpOnly/SameSite=lax/Max-Age=28800، Secure فقط prod) · logout واقعی با Next-Action → revoke تأیید (401 بعدی) · ۴ PoC traversal روی /api/media/file → 404 · /api/csp-report → 204 · rate limit /api/search: 30×200 سپس 429 · PoC جعل XFF = bucket تازه (200) — شواهد در گزارش
+- نشست ساخته‌شده در تست با logout رسمی ابطال شد؛ هیچ رکورد دیتا دستکاری نشد؛ src/ دست‌نخورده
+
+Stage Summary:
+- گزارش کامل: /home/z/my-project/qa-reports/51c-security.md (جدول ۱۹ یافته با شدت/سناریو/فیکس + چک‌لیست سالم‌ها + ۱۲ تست زنده)
+- خلاصه: ۰ بحرانی · ۱ بالا (F-1: صفحات ادمین فقط authenticate هستند — authorize صفحه‌ای ندارند؛ STAFF/AUDIT/SETTINGS/ORDERS/MESSAGES برای هر نقش ادمینی باز است) · ۳ متوسط (F-2 کلید IP=XFF قابل جعل در دسترسی مستقیم + brute-force ادمین، F-3 csp-report بدون سقف بدنه/لاگ، F-6 قواعد بلااستفاده publicApi/reviewSubmit و مسیرهای بدون سقف) · پنج پایین + چند نکته
+- سالم تأییدشده: guard یکپارچه (هر ۳۲ action ادمین با requirePermission) · OTP کامل (هش/TTL/۵ تلاش/مصرف اتمیک/cooldown/تفکیک کارکنان) · SQL صددرصد پارامتری (۶ سایت tagged-template) · قیمت همیشه سروری + verify اتمیک پرداخت با idempotency و سقف refund · media با magic-bytes+sharp+traversal-proof · بدون react-markdown/rehype-raw (بدون مسیر HTML خام) · JSON-LD escape امن · .env خارج از git · bcrypt(12) · بدون secret هاردکد (جز fallbackهای dev مستندشده)
+- سه اولویت فیکس: (۱) authorize سطح صفحه ادمین با نقشه route→permission + تست read-matrix، (۲) TRUSTED_PROXY_CIDR/منبع IP معتبر + سقف per-email برای admin-signin قبل از go-live، (۳) سقف بدنه csp-report و وصل‌کردن publicApi به media/health
+---
+Task ID: 51-b
+Agent: qa-tester
+Task: تست یکپارچگی + API + E2E Backend روی سرور زنده (فقط گزارش — بدون تغییر کد)
+
+Work Log:
+- DATABASE_URL صریح export شد (درس 49/50)؛ health: db.connected=true
+- bun run test:integration: 41/41 pass، 146 expect، 1.45s — اولین اجرا سبز، بدون flaky/دادهٔ تکراری
+- API زنده (curl): search با q عادی/خالی/۲۰۰۰کاراکتری/کاراکتر خاص → همه 200 تمیز (برش ۶۰ کاراکتری فعال)؛ POST→405؛ q=100KB→431 خام Node (بدون 500)
+- گاردهای ادمین بدون کوکی: dashboard/sales · media/list · notifications → هر سه 401 ساختاریافته UNAUTHENTICATED (فیکس da7a7da پابرجا)
+- صفحات خراب: shop?page=-1 و 99999 → 200 سالم · product/collections/journal ناموجود → 404 تمیز · order-tracking کد جعلی → 200 با پیام «یافت نشد» · checkout/callback با authority جعلی (OK/NOK/بدون authority) → 307 تمیز به /checkout/failed یا ?error=payment — صفر 500
+- Fuzz: csp-report با JSON خراب/نوع غلط/آرایه/بدنهٔ خالی → 204 بی‌کرش؛ بدنهٔ 100KB → 204 و لاگ کامل بدنه (تأیید مستقل F-3 گزارش 51-c)
+- dev.log از 18:11: level:error=0، پاسخ 500=0، panic/OOM=0؛ فقط domain_errorهای انتظاری (401 گاردها) و 3 csp_violation
+- زمان پاسخ (curl -w): / 0.33s · /shop 0.28s · /api/search 0.023s · /collections 0.75s · /journal 0.55s — هیچ موردی بالای ۳ ثانیه
+
+Stage Summary:
+- گزارش کامل: /home/z/my-project/qa-reports/51b-tester.md
+- نتیجه: integration و API زنده هر دو سبز؛ صفر بحرانی/بالای جدید · ۱ متوسط: csp-report بدون سقف بدنه + لاگ کامل (تکرار/تأیید F-3 در 51-c) · ۲ پایین: (۱) callback با authority ناموجود stack کامل + code frame با requestId:undefined برای DomainError منتظره لاگ می‌کند (۲) 431 خام Node برای URL 100KB به‌جای 400 ساختاریافتهٔ اپ
+- سالم تأیید شد: 401 ادمین، 404 صفحات، redirectهای callback، rate-limit و برش q سرچ، 405 متدهای غلط، DB health پایدار — هیچ 5xx در کل بازه
+
+---
+Task ID: 51-d
+Agent: ethical-hacker
+Task: پنتست فعال مجاز روی localhost:3000 — ۱۳ سناریوی حمله با curl/bun (بدون مرورگر، بدون تغییر کد) + گزارش شواهد‌محور
+
+Work Log:
+- gray-box: schema.prisma + worklog 48-51c + routes حساس (media/callback/mock-gateway/search/account/contact/admin-login/rate-limit) خوانده شد و حمله طراحی شد
+- اسکریپت‌ها/شواهد در qa-reports/tmp-51d/؛ گزارش کامل: qa-reports/51d-hacker.md
+- Traversal: ۸ واریانت روی /api/media/file → همگی 404/normalize (دفاع path.resolve+startsWith اثبات)؛ %ff → 400 تمیز
+- گارد ادمین: ۳ API بدون کوکی 401 · کوکی جعلی 401 · کوکی مشتری (Session واقعی mint در DB) → 403 با نام permission · صفحات ادمین → 307 login
+- IDOR عملی: /order-tracking?code=3592959901 بدون هیچ کوکی → سفارش غریبه با مبلغ/اقلام/شهر/وضعیت (F-3 متوسط)
+- SQLi: ۵ پیلوت روی search/tracking → بدون هیچ leak؛ XSS: بازتاب q فقط \u003c escape؛ JSON-LD امن
+- XFF عملی: 33x search → 30×200 سپس 429؛ بلافاصله با X-Forwarded-For جعلی → 200 (F-1 بالا) — الگوی clientIp همهٔ actionها همین است؛ brute-force ادمین per-IP قابل دورزدن + بدون سقف per-email (F-2 بالا، تحلیل)
+- درگاه mock: Payment PENDING آزمایشی → gateway بدون احراز مبلغ+کد سفارش نشان داد؛ callback بی‌اجازه با گارد رزرو مسدود شد؛ callback تکراری/amount دستکاری → بدون double-spend (F-4 متوسط)
+- CSRF: server action با Origin evil → 500 بلاک (گارد Origin فعال)؛ oversell: ۸ رزرو موازی stock=1 → 1 OK/7 OUT_OF_STOCK (اتمی)؛ کوپن: usageLimit اتمیک سالم، perUserLimit TOCTOU + مهمان بدون چک (F-6 پایین)
+- Info-disclosure: /.env و schema و worklog از وب → 200 صفحهٔ خانه بدون leak؛ X-Powered-By و /api و CSP Report-Only ثبت شد (F-5/F-7)
+- Cleanup کامل آثار آزمایش: حذف reservation/reesePENDING/session/user ساختگی + reserved→0 — خروجی ثبت‌شده در گزارش؛ هیچ رکورد seed/سفارش واقعی تغییر نکرد
+
+Stage Summary:
+- ۰ بحرانی · ۲ بالا (XFF rate-limit bypass اثبات عملی · brute-force ادمین تحلیلی-وابسته) · ۳ متوسط (IDOR tracking، mock-gateway بی‌احراز، CSP Report-Only) · ۳ پایین
+- دفاع‌های اثبات‌شده: traversal/SQLi/XSS/گارد RBAC/اتمی رزرو/idempotency پرداخت/guard Origin — همه با شواهد curl
+- پیش‌شرط go-live: TRUSTED_PROXY_CIDR + سقف per-email ادمین + فاکتور دوم در tracking
+
+---
+Task ID: 51-e
+Agent: user1-storefront
+Task: گشت واقعی کاربر عادی در ویترین فروشگاه (بدون سبد/پرداخت) — فقط گزارش، بدون تغییر کد/داده
+
+Work Log:
+- worklog.md اسکیم شد؛ تحلیل عمدتاً curl+HTML، مرورگر (agent-browser) فقط برای موبایل 375px، تعامل فیلتر/واریانت/تب نظرات و کنسول — مرورگر در پایان بسته شد (ps: 0 پروسه)
+- صفحهٔ اصلی: 200؛ ۸ سکشن کامل؛ ۱۷ تصویر /images/* + همهٔ واریانت‌های /_next/image → همگی 200؛ ۳۵ لینک داخلی یکتا → همگی 200 (صفر لینک مرده/placeholder)
+- /shop: گرید ۱۲ محصول؛ فیلتر دسته/قیمت/رنگ/سایز/امتیاز/موجودی (تعامل ?color=white → ۷ محصول تست شد)؛ سورت واقعی popular/newest/price-asc/price-desc/rating؛ sort=xyz → پیش‌فرض بی‌کرش؛ page=-1/99999 → 200
+- محصول ×۳: گالری، واریانت رنگ (تعامل: کرم→سفید قیمت ۷۴۵→۸۹۰ هزار تومان آپدیت شد)، سایز+راهنما، تب‌ها، برچسب، breadcrumb، «موجود»؛ قیمت‌ها صددرصد ارقام فارسی+«تومان» (صفر لاتین)
+- جستجو: حوله→نتایج؛ كرم با کاف عربی→نتیجه (نرمال‌سازی کار می‌کند)؛ لنف/zzz→حالت خالی طراحی‌شده؛ خالی→پیشنهادها؛ دکمهٔ «مشاهده همهٔ نتایج»→ /shop?query سالم
+- /collections + /collections/premium (۷ محصول) 200؛ /nonexistent-xyz → 404 واقعی با طرح فارسی و لینک بازگشت
+- robots.txt سالم؛ sitemap.xml → ۳۲ URL، هر ۳۲ با curl چک شد همگی 200
+- موبایل 375px: scrollWidth==375 در /، /shop، محصول (صفر سرریز افقی واقعی)؛ همبرگری و شیت فیلتر کارا؛ ۳ اسکرین‌شات در qa-reports/shots-51e/
+- کنسول: صفر خطای JS، صفر hydration، شبکه فقط favicon.ico→404 + ۱ هشدار بنیو scroll-behavior
+- حادثهٔ محیطی: next-server دو بار OOM-kill شد (RSS~2.4GB در محیط 4GB) — سرور با export صریح DATABASE_URL دوباره بالا آمد و در پایان health 200 است؛ مرورگر زود بسته شد تا ریسک OOM کم بماند
+
+Stage Summary:
+- گزارش کامل: /home/z/my-project/qa-reports/51e-user1.md (شواهد در qa-reports/shots-51e/)
+- نتیجه: ویترین سالم و پخته — ۰ بحرانی/بالا؛ ۱ متوسط (P-1 ناسازگاری آمار نظرات: تب ادعای ۱۲۷ نظر دارد ولی توزیع جمعاً ۳۷ و لیست فقط ۳ نظر — reviewCount دستی seed در برابر نظرهای واقعی DB)؛ ۲ پایین (favicon 404 بدون لینک head؛ هشدار scroll-behavior)؛ ۲ سلیقه‌ای/محیطی (alt گالری خالی؛ OOM dev-server)
+- امتیاز تجربه: ۸٫۵/۱۰ — هیچ لینک مرده/تصویر شکسته/500/قیمت لاتین در کل گشت
+---
+Task ID: 51-g
+Agent: user3-content-mobile
+Task: تست محتوایی/فرم/موبایل/ادمین فقط‌خواندنی فروشگاه پریما روی localhost:3000 — فقط گزارش، بدون تغییر کد
+
+Work Log:
+- worklog skim شد (درس‌های 51b/51c/51d ملاک پرهیز از کشف تکراری)؛ همهٔ صفحات محتوا با curl 200: /journal /faq /about /terms /privacy /returns /shipping /contact /sitemap.xml /robots.txt
+- ژورنال: ۵ مقاله باز شد — تاریخ جلالی صحیح (time+dateTime)، زمان مطالعه، کاور/hero با alt کامل، رندر تمیز بدون ماندهٔ مارک‌داون؛ نکته: بدنه بدون h2/h3 و تصویر درون‌متنی
+- FAQ: ۷ سؤال، آکاردئون aria-expanded در مرورگر تست شد و پاسخ کامل باز می‌شود؛ پاسخ‌ها SSR نیستند + بدون FAQPage schema
+- صفحات ثابت همه پُر (۱۱۴۸ تا ۲۵۳۰ کاراکتر متن، h2های واقعی، لینک‌های سالم)
+- تماس با Server Action (Next-Action + server-reference-manifest): معتبر→ok+ردیف DB، ایمیل بد/خالی→خطای فارسی تمیز، ۱۰هزار کاراکتر→رد بدون 500 ولی با پیام انگلیسی خام Zod (max(2000) بی‌پیام + اسکیمای کلاینت بی‌max)
+- خبرنامه فوتر: معتبر/تکراری (idempotent)/نامعتبر — هر سه پیام فارسی درست، صفر 500
+- sitemap: ۳۴ URL، ۸ نمونهٔ تصادفی همه 200؛ robots سالم؛ فقط 404: favicon.ico
+- موبایل 375px (۴ شات در qa-reports/shots-51g/51g-m-*.png): خانه/محصول/سبد/تماس — صفر سرریز افقی، خطای JS صفر
+- اکسسوریلیت تحلیلی: altها کامل؛ کنتراست CTA terracotta (#c88f72/سفید)=۲.۷۵:۱ رد WCAG؛ primary تیره ۱۰.۹:۱ عالی؛ label/aria فرم‌ها کامل
+- ادمین فقط‌خواندنی: ورود→داشبورد (KPIها+۳۴SVG نمودار رندر)→محصولات/سفارش‌ها/مقالات/FAQ/پیام‌ها (پیام تستی من دیده شد)/رسانه (۰ تصویر)/پیامک‌های آزمایشی (دمو M5) همه سالم؛ هیچ ثبت/حذفی نزدم
+- ⚠️ محیطی: باز کردن /admin/settings در dev سه بار next-server را OOM-kill کرد (dmesg: RSS ~1.7–2.4GB روی باکس 4GB)؛ تنظیمات QAنشده ماند؛ سرور برای ادامهٔ کار با subshell detach دوباره بالا آمد
+- dev.log: صفر level:error و صفر 500 در کل بازه
+
+Stage Summary:
+- گزارش کامل: /home/z/my-project/qa-reports/51g-user3.md
+- نتیجه: همهٔ صفحات محتوایی کامل ✅ · فرم تماس و خبرنامه سرور-محور و مقاوم ✅ · موبایل تمیز ✅ · ادمین سالم به‌جز تنظیمات
+- یافته‌ها: ۰ بحرانی/بالا · ۲ متوسط (OOM در کامپایل /admin/settings در dev — محیط‌وابسته؛ کنتراست دکمهٔ terracotta ۲.۷۵:۱) · ۴ پایین (پیام انگلیسی Zod برای >۲۰۰۰ کاراکتر، favicon 404، SSR نبودن پاسخ FAQ + نبود FAQPage، مقالات بدون تیتر بخش/تصویر درون‌متنی) · ۱ سلیقه‌ای
+- ساخته‌های تستی: ۱ پیام تماس «تست QA» + ۱ عضویت خبرنامه (در /admin/messages قابل مشاهده؛ پاکسازی عمداً انجام نشد)
+
+---
+Task ID: 51-f
+Agent: user2-purchase
+Task: سفر کامل خرید کاربر واقعی شمارهٔ ۲ — ثبت‌نام OTP تا پیگیری سفارش (فقط گزارش؛ بدون تغییر کد)
+
+Work Log:
+- worklog (درس‌های 48-51: export صریح DATABASE_URL، بستن مرورگر برای OOM) رعایت شد؛ مرورگر فقط برای مسیرهای server-action باز بود و در پایان بسته شد (صفر پروسهٔ کروم)؛ بقیه با curl/bun
+- OTP 09120000077: کد هم در UI (بنر dev) هم در dev.log (mock-sms)؛ کد غلط → «کد تأیید اشتباه است.»؛ تایمر resend فعال؛ ورود دوم پس از logout سالم (سفارش در پنل دیده شد)
+- آدرس: کدپستی ۵ رقمی فقط پیام جنریک «ذخیره آدرس ناموفق بود.» (ZodError بلعیده می‌شود) — با ۱۰ رقم ذخیره و «پیش‌فرض» شد
+- محصول/واریانت: کرم ۷۴۵٬۰۰۰ = DB ✓ (سفید: compareAt ۸۹۰٬۰۰۰ + ۱۶٪)؛ افزودن ×۳ به سبد
+- سبد: ۳→۲ → جمع ۱٬۴۹۰٬۰۰۰ + ارسال ۸۹٬۰۰۰ = ۱٬۵۷۹٬۰۰۰ ✓ (آستانهٔ رایگان ۱٫۵ دقیق)؛ + در qty=stock disabled شد (سد اضافه‌خرید)؛ حذف/حالت خالی OK؛ ردیف «تخفیف −۴۳۵٬۰۰۰» گمراه‌کننده (فقط compareAt-saving، پرداخت را تغییر نمی‌دهد)
+- کوپن: FAKE123 → «کد تخفیف معتبر نیست.» ✓؛ QA51F10 → سقف درست ۲۰۰٬۰۰۰ (از ۲۲۳٬۵۰۰) و پرداخت ۲٬۰۳۵٬۰۰۰ ✓
+- wishlist: افزودن/حذف/صفحه همه UI-درست ولی صرفاً localStorage — جدول WishlistItem در DB خالی ماند (مدل مرده)
+- سفارش 9407461763 (کرم ×۳، ارسال رایگان، QA51F10): درگاه mock مبلغ درست → success → DB: PROCESSING/PAID/رزرو CONVERTED/stock 3→0/reserved=0/usedCount 2/فقط یک Payment — رفرش دوبارهٔ success بدون double-processing
+- لبهٔ پرداخت رهاشده: سفارش 8756263087 (سفید ×۱ + ارسال ۸۹٬۰۰۰ = ۸۳۴٬۰۰۰) → PENDING + پرداخت PENDING + رزرو ACTIVE (~۱۵دقیقه) + reserved=1 + آیتم در سبد باقی — سازگار و قابل بازیابی با کارگر انقضا
+- tracking: PAID تایم‌لاین/پرداخت‌شده/تاریخ جلالی ✓، PENDING «در انتظار پرداخت» ✓، کد جعلی پیام تمیز ✓ (بدون نیاز به موبایل — تأیید مجدد IDOR شناخته‌شدهٔ 51-d)
+- محیط: بدون OOM در این اجرا (next-server ~9۲۲MB در پایان)؛ dev.log صفر level:error؛ کنسول فقط ۲ هشدار شناخته‌شده (LCP/scroll-behavior)
+
+Stage Summary:
+- گزارش کامل: /home/z/my-project/qa-reports/51f-user2.md (شات‌ها: qa-reports/shots-51f/51f-*.png · اسکریپت‌ها: qa-reports/tmp-51f/)
+- نتیجه: ۰ بحرانی/بالا · ۳ متوسط (پیام جنریک فرم آدرس بدون اعتبارسنجی کلاینت · wishlist فقط localStorage با مدل DB مرده · ردیف «تخفیف» گمراه‌کنندهٔ سبد) · ۵ پایین (toast روی دکمه، حساسیت OTP به fill/paste، dup getCustomerStateAction، نام حساب ثبت‌نشدنی نیست، خالی‌شدن سبد فقط سمت کلاینت success)
+- داده‌های تستی باقی‌مانده (عمدی): سفارش 9407461763 PROCESSING · سفارش 8756263087 PENDING (رزرو منقضی‌شدنی) · کاربر 09120000077 با ۱ آدرس · یک قلم در سبد
+- سالم تأییدشده: محاسبات پول همهٔ مراحل، سقف کوپن، آستانهٔ ارسال رایگان، سد اضافه‌خرید، idempotency پرداخت در رفرش، پیگیری سه‌حالته، خروج/ورود دوباره
+- امتیاز تجربه: ۸٫۵/۱۰
+
+---
+Task ID: 51 (هماهنگی)
+Agent: main (Super Z)
+Task: اجرای موازی ۷ ساب‌ایجنت QA/امنیت روی سایت (۴ فنی + ۳ کاربر واقعی)
+
+Work Log:
+- 51-a برنامه‌نویس: lint 0 · tsc 0 · unit 156/156 · audit 42 (0 critical) · ۵ باگ منطقی متوسط + ۱۱ پایین
+- 51-b تستر: integration 41/41 · صفر 500 · ۱ متوسط (csp-report بدون سقف بدنه) + ۲ پایین
+- 51-c مهندس امنیت: ۱ بالا (authorize صفحه‌ای ادمین) · ۳ متوسط (XFF/brute-force، csp-body، قواعد بلااستفاده) · ۵ پایین
+- 51-d هکر: ۱۳ سناریوی حمله — ۲ موفق (XFF rate-limit bypass، IDOR پیگیری سفارش) · traversal/SQLi/XSS/CSRF/oversell همگی ناموفق
+- 51-e کاربر ۱ (ویترین): ۸.۵/۱۰ · آمار نظرات ناسازگار (متوسط) · favicon 404
+- 51-f کاربر ۲ (خرید کامل): ۸.۵/۱۰ · سفر خرید سالم، صفر باگ پولی · فرم آدرس/علاقه‌مندی localStorage/ردیف تخفیف (متوسط)
+- 51-g کاربر ۳ (محتوا/موبایل/ادمین): ۸.۵/۱۰ · کنتراست CTA برند ۲.۷۵:۱ · خطای خام Zod · OOM محیطی در /admin/settings
+- حادثهٔ محیطی: اجرای ۷گانهٔ همزمان → OOM سرور dev (دوبار) — با پاکسازی کروم‌های جامانده + rm -rf .next + ری‌استارت رفع شد؛ دسته‌بندی به ۳ دسته برای پرهیز از تکرار
+- گزارش‌های کامل: /home/z/my-project/qa-reports/51[a-g]-*.md
+
+Stage Summary:
+- صفر بحرانی کد · ۲ بالا (هر دو لایهٔ زیرساختی: authorize صفحه‌ای ادمین + اعتماد به XFF) · ~۱۰ متوسط · ~۲۰ پایین/سلیقه‌ای
+- ۱۵۶/۱۵۶ unit + ۴۱/۴۱ integration پاس · حمله‌های فعال کلاسیک همگی دفع شدند
+- سه اولویت فیکس قبل از go-live: (۱) authorize صفحه‌ای ادمین، (۲) TRUSTED_PROXY_CIDR + سقف per-email ادمین، (۳) تأیید موبایل در پیگیری سفارش
+
+---
+Task ID: 52
+Agent: main (Super Z)
+Task: ساخت تسک‌لیست جامع رفع مشکلات امنیتی + UX (بر اساس یافته‌های ۷ ایجنت تسک ۵۱)
+
+Work Log:
+- مرور کامل گزارش‌های qa-reports/51[a-g]-*.md
+- ساخت tasks.md در ریشهٔ پروژه با ۵۳ تسک در ۶ فاز: امنیت حیاتی (۷) · پول/دیتا (۵) · بهداشت کد (۱۵) · UX به ۱۰/۱۰ (۱۴) · سئو (۴) · زیرساخت M6 (۸)
+- هر تسک: شناسه، شدت، فایل/خط دقیق، شرح، راه‌حل و معیار پذیرش
+- شامل ترتیب اجرای پیشنهادی ۶ دوخ و معیار پذیرش نهایی (تکرار ۷ ایجنت، صفر حملهٔ موفق، UX ≥ 9.5)
+
+Stage Summary:
+- خروجی: tasks.md (ریشهٔ پروژه) + کپی در /home/z/my-project/download/tasks.md
+- منبع یافته‌ها: ۲ بالا + ۷ متوسط امنیتی، ۵ متوسط منطقی، ~۱۵ پایین/بهداشتی، ~۱۴ UX، ۴ سئو، ۸ زیرساخت
+
+---
+Task ID: 53
+Agent: main (Super Z)
+Task: بازبینی کامل tasks.md و تطبیق یک‌به‌یک با هر ۷ گزارش qa-reports (درخواست کارفرما)
+
+Work Log:
+- هر ۷ گزارش (51a…51g) دوباره کامل خوانده شد و تک‌تک یافته‌ها به ردیف‌های tasks.md ردیابی شد
+- نتیجهٔ تطبیق: ۵۰/۵۳ ردیف قبلی مستقیماً به یافتهٔ گزارش‌ها نگاشت شد؛ هیچ ردیف بی‌منبعی یافت نشد
+- ۴ مورد ریزِ جاافتاده شناسایی و اضافه شد:
+  - BUG-14 (51d-F9): رد تمیز server action با Origin جعلی — الان 500 خام به‌جای 403
+  - BUG-15 (51a §۶): returns.ts هیچ‌جا enforce نمی‌شود؛ UI «۷ روز مرجوعی» بدون پشتوانه
+  - BUG-16 (51a پایین ۱۱ + §۶): کامنت نادرست inventory.ts:38 + ریسک مستند compareAt واریانت ناهم‌قیمت
+- رفرنس `admin/login/actions.ts:49-53` به SEC-02 اضافه شد («۷ سایت» → «۸ سایت (۷ فایل)»)
+- فاز ۳: ۱۵ → ۱۸ تسک؛ دوش ۵ به‌روز شد (BUG-06…BUG-16)
+- موارد عمداً خارج‌شده (تأیید صحت حذف): N-6 (callback GET = استاندارد درگاه)، نویز لاگ cache (51b)، as never بی‌خطر settings-service.ts:39، OOM محیطی گشت موازی (عملیاتی، نه کد)، حجم HTML در dev
+
+Stage Summary:
+- tasks.md نهایی: ۵۶ تسک در ۶ فاز (۷ امنیت + ۵ پول/دیتا + ۱۸ بهداشت + ۱۴ UX + ۴ سئو + ۸ زیرساخت)
+- پوشش یافته‌های ۷ گزارش اکنون ۱۰۰٪ است؛ کپی download همگام شد
+
+---
+Task ID: 54-a (SEC-01)
+Agent: main (Super Z)
+Task: authorize سطح صفحهٔ ادمین — بستن شکاف read پنل (F-1 گزارش 51c)
+
+Work Log:
+- ساخت `src/lib/admin/page-read-map.ts` — نقشهٔ کانونی route→permission برای ۱۲ مسیر پنل (منبع حقیقت مشترک کد/تست)
+- ساخت `src/lib/admin/page-guard.ts` — helper سروری `requirePageAccess(route)`: بدون نشست → login؛ بدون مجوز → /admin/no-access
+- ساخت صفحهٔ `/admin/no-access` (پیام دوستانه + لینک شرطی داشبورد/حساب من — ضدحلقهٔ redirect)
+- اعمال گارد روی ۱۷ صفحه (۱۲ مسیر + زیرصفحه‌های orders/invoice، products new/edit، journal new/edit)
+- نگاشت: staff→usersRead · audit→auditRead · settings→settingsRead · messages→customersRead (حوزهٔ مشتری؛ پشتیبان مجاز) · orders→ordersRead · products/categories/collections→productsRead · reviews→reviewsRead · journal/faq→contentRead · media→mediaRead
+- تست read-matrix جدید در tests/integration/rbac-matrix.test.ts (نقش×مسیر + اجرای زندهٔ گارد روی DB)
+- اثبات زندهٔ curl با نشست mint‌شده: SUPPORT_AGENT → staff/audit/settings/media/journal/faq = 307 به no-access؛ orders/messages/products/reviews/categories/collections = 200؛ SUPER_ADMIN همه = 200 (بدون مثبت کاذب)؛ پاکسازی کامل نشست‌های تستی
+- محیطی: next-server یک‌بار OOM شد؛ با الگوی double-fork (setsid &) که PPID=1 شود دوباره بالا آمد (درس خط ۱۵۲ worklog)
+
+Stage Summary:
+- typecheck ✅ · lint ✅ · unit 156/156 ✅ · integration 42/42 ✅ (+۱ تست جدید)
+- SEC-01 در tasks.md تیک خورد؛ فایل‌های موقت: qa-reports/tmp-53/
+
+---
+Task ID: 54-b (SEC-02)
+Agent: main (Super Z)
+Task: منبع IP معتبر — getClientIp مشترک + TRUSTED_PROXY_CIDR (F-2/51c، F-1/51d)
+
+Work Log:
+- ساخت `src/lib/client-ip.ts` — extractClientIp خالص (تست‌پذیر) + getClientIp برای server actions
+  · بدون TRUSTED_PROXY_CIDR (دسترسی مستقیم): null → bucket اشتراکی "unknown" (fail-closed)
+  · با CIDR: آخرین هاپ XFF معتبر خارج از CIDR معتمد، سپس x-real-ip با همان قواعد؛ پارس IPv4 CIDR (prefix 0-32) + IPv6 تطبیق دقیق
+- وصل‌کردن هر ۸ سایت: action-helpers.requestMeta (شامل admin-login) · account/actions.clientIp · checkout/actions ×۲ (coupon-apply، payment-start) · contact/actions.requestIp · api/search · api/csp-report
+- تست unit جدید tests/unit/client-ip.test.ts (۱۱ تست: مستقیم/پروکسی/چندهاپ/CIDR نامعتبر/IPv6)
+- .env.example: مستند کامل TRUSTED_PROXY_CIDR + پیش‌نیاز دیپلوی
+- اثبات زنده: 30×200 سپس 429؛ سپس ۱۰ درخواست با XFF جعلی (1.2.3.x) → همگی 429 (قبلاً 200 می‌گرفت)
+- typecheck ✅ lint ✅ unit 167/167 ✅
+
+Stage Summary:
+- جعل XFF دیگر bucket تازه نمی‌سازد؛ در دیپلوی واقعی TRUSTED_PROXY_CIDR رنج Caddy ست شود + پورت اپ فقط از پروکسی در دسترس باشد
+
+---
+Task ID: 54-c (SEC-03)
+Agent: main (Super Z)
+Task: سقف مستقل per-email برای ورود ادمین (F-2/51c، F-2/51d)
+
+Work Log:
+- قاعدهٔ جدید `signInPerEmail: {10/hour}` در policies.ts
+- adminLoginAction: گیت دوم قبل از گیت per-IP — کلید `admin-signin-email:{email}` مستقل از IP؛ پس از سقف: audit `auth.login.rate_limited` با after.scope=per-email + پیام generic با retryAfter
+- تست integration جدید tests/integration/admin-signin-ratelimit.test.ts (۱۰ تلاش/۱۰ IP → قفل در یازدهمی؛ ایمیل دیگر آزاد)
+- اثبات زنده با فراخوانی واقعی Server Action (استخراج action-id از chunk کلاینت + TRUSTED_PROXY_CIDR="10.99.0.0/16" برای شبیه‌سازی چرخش IP):
+  ۱۰ تلاش با ۱۰ IP متفاوت → generic UNAUTHENTICATED؛ تلاش ۱۱ و ۱۲ با IP تازه → RATE_LIMITED 🔒
+- audit DB: ۱۰ × auth.login.failed + ۲ × auth.login.rate_limited (scope=per-email) تأیید شد
+- typecheck ✅ lint ✅ unit 167/167 ✅ integration 43/43 ✅
+
+Stage Summary:
+- brute-force رمز ادمین حالا مستقل از IP بعد از ۱۰ تلاش/ساعت per email قفل می‌شود؛ سرور به حالت عادی (بدون CIDR) برگشت
+
+---
+Task ID: 54-d (SEC-04)
+Agent: main (Super Z)
+Task: فاکتور دوم پیگیری سفارش + گارد صفحهٔ success (IDOR F-3/51d، F-7/51c) — تصمیم کارفرما: کد + موبایل کامل
+
+Work Log:
+- checkout-service: getOrderByCodeForTracking (کد + normalizePhone سفارش؛ عدم تطبیق = null، پیام UI یکسان بدون نشت) + getOrderByCodeForSuccess (نشست مالک یا کوکی اثبات) + paidProofValue (sha256 authority) + حذف getOrderByCode قدیمی
+- کشف و بستن همین IDOR در /checkout/success که در گزارش‌ها جا مانده بود: callback حالا کوکی httpOnly کوتاه‌عمر (۱۵ دقیقه) = sha256(authority) ست می‌کند؛ فقط پرداخت‌کنندهٔ واقعی دارد
+- صفحهٔ tracking: فیلد موبایل + حالت «missingPhone» با پیام حریم خصوصی + rate-limit per-IP (rule جدید orderTracking 30/min — فقط روی تلاشِ پیگیری)
+- پیام «یافت نشد» برای کد غلط و موبایل غلط یکسان (بدون شمارش‌پذیری)
+- تست integration جدید order-tracking.test.ts (۳ حالت: فاکتور دوم، اثبات کوکی، مالکیت نشست)
+- اثبات زنده: کد بدون موبایل → پیام حریم خصوصی بدون مبلغ؛ کد+موبایل درست → نمایش سفارش؛ موبایل غلط → «یافت نشد»؛ success بدون کوکی → generic؛ با کوکی اثبات → جزئیات؛ ۳۰/min → پیام «تلاش‌های زیاد»
+- typecheck ✅ lint ✅ unit 167/167 ✅ integration 46/46 ✅
+- انحراف مستند از معیار: به‌جای 429 HTTP، پیام دوستانه درون صفحه (صفحهٔ App Router بدون middleware وضعیت 429 ندارد)؛ سقف و اثر یکسان است
+
+Stage Summary:
+- IDOR پیگیری سفارش بسته شد (هر دو مسیر tracking و success)؛ تجربهٔ پرداخت موفق کاربر واقعی بی‌اصطکاک ماند
+
+---
+Task ID: 54-e (SEC-05/06/07)
+Agent: main (Super Z)
+Task: سقف csp-report + وصل‌کردن publicApi/پاکسازی health + گارد درگاه mock
+
+Work Log:
+- SEC-05: /api/csp-report — چک Content-Length (4KB) قبل از خواندن + سقف رکورد لاگ (2KB) برای پوشش chunked → رکورد بزرگ فقط متادیتا (csp_violation_oversized). اثبات: بدنهٔ 100KB → 204 بدون لاگ؛ بدنهٔ سالم → لاگ عادی (+۱)
+- SEC-06: قاعدهٔ publicApi (120/min) به /api/media/file و /api/health وصل شد؛ health دیگر error.message جزئیات اتصال DB را برنمی‌گرداند. اثبات: ۱۲۵ درخواست health → دقیقاً ۵×429
+- SEC-07: /mock-gateway — نمایش مبلغ/کد فقط با نشست مالک سفارش یا کوکی اثبات (prima_pay_proof = sha256(authority)، ۱۵ دقیقه، httpOnly)؛ placeOrderAction کوکی را برای مهمان هم ست می‌کند (بی‌اصطکاک)؛ startPayment حالا authority برمی‌گرداند (StartResult+authority)؛ کوکی با success یکپارچه شد (rename prima_order_paid_proof → prima_pay_proof)
+- اثبات زندهٔ SEC-07 با Payment PENDING واقعی: بدون کوکی → «تراکنش یافت نشد»؛ کوکی درست → مبلغ+کد؛ کوکی جعلی → «تراکنش یافت نشد»؛ رگرسیون callback (بدون authority / جعلی) → redirectهای تمیز قبلی
+- typecheck ✅ lint ✅ unit 167/167 ✅ integration 46/46 ✅
+
+Stage Summary:
+- هر ۷ تسک فاز ۱ (SEC-01…07) کامل و اثبات‌شده است — بلوکه‌کننده‌های go-live امنیتی بسته شدند
+- کشف جانبی: /checkout/success هم همین IDOR را داشت (در گزارش‌ها نبود) — با همان الگو بسته شد
+---
+Task ID: 55-a
+Agent: security-verifier
+Task: تأیید مستقل زندهٔ ۴ فلگ SEC-01/03/05/07 روی سرور dev (بدون تغییر کد)
+Work Log:
+- SEC-01: mint نشست ۳ نقش (SUPER_ADMIN/SUPPORT_AGENT/STORE_MANAGER) در DB + ماتریس curl کامل ۱۹ مسیر×۳ نقش + بدون‌نشست + no-access → دقیقاً مطابق page-read-map: صفر مثبت/منفی کاذب؛ شمارش گارد: ۱۷ صفحه requirePageAccess، ۴ صفحه خارج نقشه (داشبورد=یافتهٔ متوسط، account/sms=پایین، notifications=سالم)
+- SEC-03: فراخوانی واقعی Server Action (action-id از chunk کلاینت) با ایمیل آزمایشی locktest-a@example.invalid → ۵×UNAUTHENTICATED، ۵×RATE_LIMITED(per-IP ۱۵دقیقه)، تلاش ۱۱ = RATE_LIMITED با retryAfter=۶۰دقیقه (گیت per-email) + ردیف AuditLog auth.login.rate_limited با after.scope=per-email؛ ایزوله‌سازی کامل چرخش IP زنده‌پذیر نبود (بدون CIDR→IP=unknown) → ارجاع tests/integration/admin-signin-ratelimit.test.ts؛ ادمین واقعی دست‌نخورده
+- SEC-05: سه سناریو csp-report: ۱۱۰KB با CL → 204 بدون لاگ؛ سالم ۲۲۸B → دقیقاً +۱ رکورد csp_violation؛ chunked ~۵KB → +۱ csp_violation_oversized (size=5126، بدون محتوا) — شواهد در dev.log خطوط ۷۵۰/۷۵۲
+- SEC-07: سفارش مهمان زنده با placeOrderAction (lineId واریانت فعال) → Set-Cookie prima_pay_proof=sha256(authority)، HttpOnly، Max-Age=900، Path=/؛ mock-gateway: بدون کوکی/کوکی جعلی → «تراکنش یافت نشد» بدون مبلغ/کد؛ کوکی درست → ۸۳۴٬۰۰۰ تومان + کد 1073076560
+- محیط: ۳ بار OOM کرنل next-server حین کامپایل صفحات سنگین پنل (journal/[id]/notifications/dashboard) — بازیابی با الگوی double-fork خط ۱۵۲؛ bucketهای in-memory در هر crash خالی شدند (تست‌های rate-limit همه پس از آخرین بازیابی)
+- پاکسازی کامل: سفارش+payment+item+reservation(بازسازی reserved)+outbox+sms، ۳ کاربر/نشست mint، ۱۱ ردیف audit آزمایشی — راستی‌آزمایی صفر رد باقی‌مانده
+Stage Summary:
+- هر ۴ فلگ محول روی سرور زنده تأیید شد (SEC-03 با نکتهٔ محدودیت پیکربندی CIDR) + ۱ یافتهٔ متوسط (داشبورد ادمین خارج از نقشهٔ read) و ۳ پایین؛ گزارش کامل: qa-reports/55-a-security-verify.md · شواهد: qa-reports/tmp-55a/
+---
+Task ID: 55-b
+Agent: red-team
+Task: دور زدن SEC-02/04/06 و (مسیر URL) SEC-01 روی سرور زنده — اثبات مقاومت یا شکاف، بدون تغییر کد
+Work Log:
+- خواندن پیش‌نیازها: worklog 850–937 (54-a…e)، tasks.md فاز ۱، 51c/51d، client-ip.ts، core/rate-limit/*، checkout/callback/success/tracking
+- محیطی: next-server دو بار به‌دلیل OOM توسط kernel کشته شد (dmesg، قبل از شروع من + وسط burst)؛ با الگوی مستند double-fork (خط ۱۵۲ / Task 17) بازگردانده شد؛ dev.log → dev.log.55b-pre-oom بکاپ؛ هیچ kill/env/code دست نخورد
+- SEC-02: خالی‌کردن bucket health (122 req) سپس ۱۹ ترفند هدری (XFF تک/چندهاپ/اول/آخر/داخلی، X-Real-IP، True-Client-IP، CF-Connecting-IP، Forwarded، XFF تکراری، IPv6، 0.0.0.0، خراب/۵k/خالی، کمبو) → 43/43 = 429؛ fail-closed «unknown» سالم
+- SEC-04: سفارش مهمان واقعی با Server Action (action-id از server-reference-manifest — ids طول ۴۲ کاراکتر هستند!)؛ کد 4538715669 + authority + Set-Cookie اثبات (HttpOnly/Max-Age=900/SameSite=lax)؛ callback OK → PROCESSING؛ oracle پیام یکسان + timing همپوشان؛ ۱۰ فرمت موبایل سازگار با normalizePhone؛ ۳۱ تلاش tracking → قفل حتی برای ورودی درست؛ ۶ کوکی جعلی + cross-order proof روی success → همه generic؛ ۷ دستکاری callback (authority جعلی/تزریق/amount/NOK-on-PAID) → بدون Set-Cookie و بدون تخریب وضعیت (DB verify شد)
+- SEC-06: health 125 → دقیقاً 429 در انتهای پنجره؛ bucket media-file از health جدا (اثبات متقابل زنده)؛ 404های media شمرده می‌شوند؛ search 30/min دقیق؛ /api لخت (130×200 — باقی‌ماندهٔ F-7)؛ هر 3 مسیر /api/admin بدون نشست/کوکی جعلی → 401؛ health خطا بدون نشت (استاتیک: catch → 503 generic)
+- SEC-01: نشست SUPPORT_AGENT mint (الگوی tmp-53)؛ ۱۵ واریانت URL روی staff/audit/settings (slash/./%2f/case/../زیرمسیر ساختگی/query/fragment/x-forwarded-host) با --path-as-is و دنبال‌کردن زنجیره → همه 307 no-access / 308→canon / 404؛ هیچ 200 محافظت‌شده
+- تحلیل استاتیک client-ip.ts با probe اجرایی: ۴ یافتهٔ شرطی به proxy mode (IPv6 کانونی‌سازی fail-open، garbage-IPv6 به‌عنوان کلاینت، /0 و trailing-slash = trust-all، CIDR IPv6 prefix≠/128 دور ریخته) + ۴ یافتهٔ پایین (داشبورد /admin خارج از read-map با KPIهای فروش برای support، بدون Retry-After در 429، /api بدون سقف، ناسازگاری شکل 401)
+- تداخل با ایجنت موازی: یک 429 غیرمنتظرهٔ health با صبر ۷۵ ثانیه و ۲ retry به 200 رسید (باقی‌ماندهٔ پنجرهٔ خودم، نه تداخل)؛ bucketهای گرم‌شده لیست و در گزارش آمده است
+- پاکسازی کامل: cleanup.ts → orders:2/items:2/payments:2/reservations:2/outbox:3 + بازگردانی stock/reserved (verify: هر دو واریانت stock:4 reserved:0) + حذف کاربران/نشست‌های sec01
+Stage Summary:
+- ۰ حملهٔ موفق / ~۲۳ سناریوی زندهٔ ناموفق — SEC-02 (fail-closed)، SEC-04 (oracle/proof/callback)، SEC-06 (سقف‌ها و 401ها)، SEC-01 (گارد مسیر) همگی در برابر بردارهای واقعی مقاوم بودند
+- ۸ یافتهٔ تحلیلی (۴ شرطی-بالا/متوسط مخصوص دیپلوی proxy + ۴ پایین) در qa-reports/55-b-redteam.md ثبت شد؛ گزارش کامل: /home/z/my-project/qa-reports/55-b-redteam.md
+---
+Task ID: 55-d
+Agent: test-engineer
+Task: اجرای مستقل typecheck/lint/unit/integration، سنجش کیفیت ۴ تست جدید، شکاف پوشش SEC-01..07 و پاکسازی آلودگی DB
+Work Log:
+- اجرای bun run typecheck (EXIT=0، 0 خطا، 4s) و bun run lint (EXIT=0، 0 هشدار، 12s)
+- اجرای bun test tests/unit → 167 pass / 0 fail / 0 skip (516 expect، 232ms) — ادعای 167/167 تأیید
+- اجرای bun test tests/integration دو بار → هر دو 46 pass / 0 fail / 0 skip (233 expect، ~1.3s) — flaky نه
+- تحلیل استاتیک ۴ فایل تست جدید: client-ip 7/10 (جا ماندن از باگ‌های IPv6 کشف‌شده)، rbac-matrix 8/10 (داشبورد/notifications/sms بیرون ماتریس)، admin-signin-ratelimit 5/10 (تفکیک per-IP نمایشی، اکشن تمرین نمی‌شود)، order-tracking 7/10 (وابستگی ترتیبی تست‌ها) — میانگین 6.75
+- جدول پوشش SEC-01..07: SEC-05/06/07 هیچ تست مستقیمی ندارند؛ ۶ تست جاافتاده اولویت‌بندی‌شده فقط به‌صورت طرح پیشنهاد شد
+- بازرسی فقط‌خواندن DB و پاکسازی ۲۰ ردیف قطعی‌تستی: ۳ سفارش+۳ پرداخت MOCK-sec04 (باقی‌مانده از ران kill‌شدهٔ 20:55)، ۱۲ audit با entityId sec03-live@prima.test، ۲ پیام تماس «تست QA»
+- راستی‌آزمایی stock: ۶۰ واریانت، reserved>0 = صفر، هیچ رزرو ACTIVE بی‌سفارش → ادعای 4/4 تأیید؛ /api/health روی 3000 → 200
+Stage Summary:
+- هر ۴ ادعای فاز ۱ مستقل تأیید شد (typecheck ✅ lint ✅ 167/167 ✅ 46/46 ✅، غیر-flaky)؛ اما پوشش تستی SEC ناقص است: SEC-05/06/07 بی‌تست‌اند و داشبورد ادمین از ماتریس read خارج است؛ DB پاکسازی شد و stock/health سالم‌اند. گزارش کامل: qa-reports/55-d-testsuite.md
+
+---
+Task ID: 55-c
+Agent: code-reviewer
+Task: بازبینی استاتیک خط‌به‌خط تغییرات فاز ۱ (SEC-01…07) + راستی‌آزمایی کد-سطح یافته‌های 55-a/55-b
+Work Log:
+- خواندن کامل پیش‌نیازها (worklog 850-966، tasks.md فاز ۱، 55-a، 55-b، 51c) + git diff کل ۳۷ فایل تغییر فاز ۱ + خواندن کامل ۲۰ فایل دامنه
+- پروب اجرایی فقط‌خواندنی client-ip.ts (bun، بدون تغییر env سرور): هر ۴ مورد A-1…A-4 به‌صورت اجرایی بازتأیید شد؛ کشف تکمیلی: پذیرش `1.2.3.4:80` و `[::1]` به‌عنوان IP کلاینت (CR-2) و ریشهٔ دقیق تایپ اسلش‌انتهایی = Number("")===0 در parseCidr
+- راستی‌آزمایی کد-سطح یافته‌های دستهٔ ۱: داشبورد /admin (تأیید با فهرست دقیق کوئری‌ها و permission منطقی هر ویجت) · /admin/account و /admin/sms (تأیید) · 429 بدون Retry-After (تأیید — سه محل دقیق) · /api لخت (تأیید — خارج از دامنهٔ فاز ۱، ردیابی SEC-10)
+- چک‌لیست مستقل: شمارش گارد (۱۷/۲۳ صفحه، ۶ بدون گارد = همان ۴ مورد + login/no-access) · گارد هر ۳ روت api/admin ✅ · حذف کامل getOrderByCode ✅ · یکدستی normalizePhone ثبت/پیگیری (faPhoneSchema transform + idempotency) ✅ · flags کوکی prima_pay_proof ✅ · authority = randomBytes(12) ✅ · fail-closed مسیر مستقیم client-ip ✅ · پیام‌های generic در login/tracking/mock-gateway/callback ✅ · no-access ضدحلقه ✅ · audit per-email scope ✅ (نکته: per-IP فاقد scope)
+- یافته‌های جدید: CR-1 داشبورد (متوسط) · CR-5 خواندن نامحدود بدنهٔ chunked در csp-report — سقف 2KB فقط روی رکورد لاگ است نه RAM (متوسط) · CR-2/CR-3 سخت‌سازی IPv6 (بالا-شرطی به proxy passthrough) · CR-4 سکوت پیکربندی CIDR (متوسط-شرطی) · CR-6 hash بی‌کلید اثبات (پایین) · CR-7 تا CR-12 پایین/نکته
+- گزارش کامل: qa-reports/55-c-code-review.md — هیچ کدی تغییر نکرد
+Stage Summary:
+- معیار پذیرش هر ۷ فلگ فاز ۱ در کد سالم است؛ صفر بحرانی · ۲ بالا (هر دو شرطی به پیکربندی proxy و بی‌اثر در پیکربندی مستند فعلی) · ۳ متوسط · ۴ پایین · ۳ نکته
+- رأی: بستن فاز ۱ مشروط به یک تسک تعقیبی کوچک (55-d): گیت analyticsRead داشبورد + خواندن bounded csp-report + سخت‌سازی client-ip (net.isIP/کانونی‌سازی/رد /0) + Retry-After و یکدست‌سازی sms/notifications — بقیه به فاز ۳ (CR-6 HMAC پیش از M5)
+
+---
+Task ID: 55
+Agent: main (Super Z) — فرمانده و هستهٔ اصلی
+Task: تست سخت‌گیرانهٔ فاز ۱ امنیت (SEC-01…07) با ۴ ساب‌ایجنت در ۲ دسته + راستی‌آزمایی شخصی فرمانده
+
+Work Log:
+- دستهٔ ۱ (زنده/سیاه‌جعبه، موازی): 55-a «تأییدگر امنیت» (SEC-01/03/05/07 — ماتریس ۱۹ مسیر×۳ نقش، Server Action واقعی، ۱۱۰KB chunked، سفارش مهمان واقعی) + 55-b «هکر قرمز» (SEC-02/04/06 + URL-trick — ۱۹ ترفند هدر، oracle پیام/timing، جعل کوکی، ۱۵ واریانت URL)
+- دستهٔ ۲ (سفید‌جعبه، موازی): 55-c «بازبین کد» (۱۲ یافته با فایل:خط) + 55-d «مهندس تست» (اجرای مستقل همهٔ سوئیت‌ها + ۲ دور برای flaky)
+- راستی‌آزمایی شخصی فرمانده: CR-5 (csp-report/route.ts:41 — request.json() کل بدنهٔ chunked را بدون سقف در RAM می‌خواند) و شکاف گارد داشبورد /admin (فقط getPanelContext:52، بدون requirePageAccess) — هر دو با مطالعهٔ مستقیم کد تأیید شد
+- محیطی: ۳ بار OOM next-server حین کامپایل صفحات سنگین پنل (UX-06)؛ بازیابی با الگوی double-fork؛ DB بعد از پاکسازی هر ۴ ایجنت سالم (reserved=0)
+
+Stage Summary:
+- رأی نهایی: SEC-01…07 همگی تأیید — ۰ حملهٔ موفق از ~۲۳ سناریوی زندهٔ ردتیم؛ ادعای تست‌ها (typecheck/lint صفر، unit 167/167، integration 46/46) مستقل تأیید و غیر-flaky شد
+- فاز ۱ «قابل بستن مشروط»: یافته‌های تعقیبی = ۲ بالا (داشبورد /admin بیرون read-map با KPI فروش برای هر نقش؛ A-1/A-2 IPv6 fail-open در client-ip.ts:105/112 — فقط در حالت proxy passthrough) · ۳ متوسط (CR-5 خواندن بی‌سقف chunked در csp-report؛ 429 بدون Retry-After؛ ناسازگاری redirect صفحهٔ sms) · ۴ پایین · ۳ نکته
+- شکاف پوشش تست: SEC-05/06/07 تست مستقیم ندارند؛ داشبورد در read-matrix نیست (نمرهٔ میانگین تست‌های جدید: 6.75/10)
+- گزارش‌ها: qa-reports/55-a-security-verify.md · 55-b-redteam.md · 55-c-code-review.md · 55-d-testsuite.md (+ شواهد tmp-55a/b/d)
+- پیشنهاد گام بعد: بستهٔ رفع کوچک تعقیبی فاز ۱ (گیت داشبورد + bounded-read csp + سخت‌سازی client-ip با net.isIP + Retry-After + ۳ تست P1) و سپس شروع فاز ۲ (باگ‌های پول BUG-01…05)
+
+---
+Task ID: 56
+Agent: main (Super Z) — فرمانده
+Task: رفع هر ۸ یافتهٔ تعقیبی فاز ۱ از تست ۵۵ (CR-1…CR-10 + شکاف پوشش تست) و بستن رسمی فاز ۱
+
+Work Log:
+- F55-1 (CR-1): ردیف `dashboard: [analyticsRead]` در page-read-map + `requirePageAccess("dashboard")` در داشبورد — نشتی KPI فروش/ارزش انبار به SUPPORT_AGENT بسته شد
+- F55-2/3/4 (CR-2/3/4): بازنویسی client-ip.ts — پارس واقعی با net.isIP (رد garbage::zz و 1.2.3.4:80 و [::1])، کانونی‌سازی باینری BigInt با پشتیبانی کامل prefix 1-128 هر دو خانواده، رد صریح «/0» و اسلش انتهایی + console.error برای عضو دورریخته، رد آدرس نامشخص (:: و 0.0.0.0)، .env.example مستند شد
+- F55-5 (CR-5): csp-report — خواندن bounded از stream با سقف واقعی 4KB و cancel در سرریز (بدنهٔ chunked دیگر کامل در RAM بافر نمی‌شود)
+- F55-6 (CR-7): هدر Retry-After در 429های health/media-file/search
+- F55-7 (CR-8/CR-10): sms و notifications به نقشهٔ read اضافه و به requirePageAccess یکدست شدند (account عمداً فقط-احراز مستند شد)؛ audit گیت per-IP اکنون after.scope=per-ip دارد
+- F55-8: تست مستقیم SEC-05/06/07 در tests/integration/sec-hardening.test.ts (۱۰ تست: سقف دقیق 120/30، chunked bounded، ۴ سناریوی کوکی اثبات درگاه، Retry-After) + ۵ تست IPv6 در client-ip.test + ردیف‌های dashboard/sms/notifications در read-matrix + کامنت صادقانه CR-9
+- اعتبارسنجی: typecheck ✅ · lint ✅ · unit 172/172 (قبلاً 167) · integration 56/56 (قبلاً 46) — صفر fail
+- اثبات زنده (سرور در حال اجرا، hot-reload): SUPPORT_AGENT → /admin = 307 no-access · SUPER_ADMIN → 200 · sms/notifications با پشتیبان = 200 · csp chunked 100KB = 204 در ۱۳ms · درخواست #121 به health = 429 با retry-after: 58
+- پاکسازی: کاربر/نشست/نقش تستی mint-56 حذف و با کوئری راستی‌آزمایی شد (residual=0)؛ CR-6 به‌عنوان INFRA-09 در فاز ۶ ثبت شد (HMAC پیش از درگاه واقعی)
+
+Stage Summary:
+- فاز ۱ امنیت رسماً بسته شد: ۷ فلگ اصلی + ۸ تعقیبی، همگی با تست مستقیم و اثبات زنده
+- tasks.md: بخش «تعقیبی ۵۵» با ۸ ردیف تیک‌خورده + فاز ۱ در چک‌لیست ✅ + INFRA-09؛ کپی download همگام
+- شواهد: qa-reports/tmp-56/ (mint/cleanup) · تسک بعدی پیشنهادی: فاز ۲ (باگ‌های پول BUG-01…05)
+---
+Task ID: 57-a
+Agent: security-verifier
+Task: تأیید زندهٔ فیکس‌های فاز ۱ (SEC-01..07 + ۸ تعقیبی Task 56) روی سرور dev — بدون تغییر کد
+Work Log:
+- SEC-01+F55-1+F55-7: mint ۳+۱ نقش (SUPER_ADMIN/SUPPORT_AGENT/STORE_MANAGER + CONTENT_MANAGER)؛ ماتریس ۱۵ مسیر نقشه (اکنون شامل dashboard/sms/notifications) ×۳ نقش + ۶ زیرصفحه با id واقعی DB + کنترل بدون‌نشست + no-access → صفر مثبت/منفی کاذب در ۶۶ سلول؛ SUPPORT_AGENT → /admin = 307 no-access با صفر KPI (raw و followed چک شد)؛ SUPER_ADMIN = 200 با KPIها؛ STORE_MANAGER دارای analyticsRead = 200؛ CONTENT_MANAGER بدون ordersRead → sms = 307 به /admin/no-access (نه /admin) و notifications = 200؛ لینک شرطی داشبورد no-access دقیقاً مطابق analyticsRead
+- SEC-03: ۶ فراخوانی واقعی adminLoginAction (action-id از چانک کلاینت، ایمیل lock57a@example.invalid) → ۵×UNAUTHENTICATED + تلاش ۶ = RATE_LIMITED «۱۵ دقیقه» (گیت per-IP)؛ AuditLog دقیقاً ۶ ردیف: ۵×auth.login.failed + ۱×auth.login.rate_limited با after.scope=per-ip (تأیید CR-10)؛ گیت per-email (سقف 10/h) زنده با ۶ تلاش فعال نشد — پوشش ارجاع به 55-a و تست integration
+- SEC-05+F55-5: ۱۱۰KB با CL → 204 بدون لاگ؛ سالم 178B → +۱ csp_violation (dev.log L213)؛ chunked 100KB → 204 در ۷ms بدون هیچ رکوردی (cancel در سرریز)؛ مرز 4096/4097: دقیقاً 4096 → +۱ csp_violation_oversized با size=4096 (L216 — مدرک مستقیم سقف)، 4097 → هیچ؛ انطباق‌نگاری: انتظار «رکورد oversized برای 100KB chunked» با طراحی cancel-بی‌لاگ F55-5 نمی‌سازد — خواص امنیتی (بدون flooding/RAM) کامل اثبات شد
+- SEC-06+F55-6: health 121 → 120×200 + #121=429 با retry-after:57 و {"status":"rate_limited"}؛ media-file بلافاصله بعدش = 200 (bucket جدا)؛ search 31 → 30×200 + #31=429 با retry-after:59؛ پنجرهٔ ۱دقیقه‌ای بعداً تخلیه (200)
+- SEC-07: سفارش مهمان واقعی با placeOrderAction (p1__white__bath-large) → Set-Cookie prima_pay_proof=sha256(authority)، HttpOnly/Max-Age=900/SameSite=lax/Path=/؛ mock-gateway: بدون کوکی/کوکی جعلی (طول برابر) → «تراکنش یافت نشد» بدون مبلغ/کد؛ کوکی درست → ۸۳۴٬۰۰۰ تومان + کد 8687459998
+- رگرسیون: ۵ ترفند XFF/X-Real-IP/True-Client-IP روی bucket پر → همه 429 (fail-closed)؛ ۵ واریانت URL روی /admin/staff با نشست بی‌مجوز (slash/./%2f/case) → 308/307/404، هیچ 200
+- محیط: OOM در این جلسه رخ نداد (تنها رکورد dmesg مال 21:27 و جلسهٔ 55 است)؛ instance از 22:37 با bucket سرد؛ فعالیت موازی suite/test دیگر روی همان سرور دیده شد که شواهد را آلوده نکرد (پایه‌گیری بلافاصله پیش از هر تست)؛ یک FK-error خودم در mint-cm اصلاح شد
+- پاکسازی کامل: سفارش 8687459998 (payment+item+reservation+بازسازی reserved+outbox+sms) + ۴ کاربر/نشست mint + ۶ ردیف audit → verify: orderLeft=0 · paymentLeft=0 · reservedNotZero=0 · activeReservations=0 · mintedUsers=0 · mintedSessions=0 · auditLeft=0 · realAdminIntact=true
+Stage Summary:
+- هر ۷ فیکس تعقیبی Task 56 (F55-1..7) و تست‌های F55-8 روی سرور زنده تأیید شد: FIXED-CONFIRMED ×۶ + CONFIRMED-غیرمستقیم ×۱؛ صفر رگرسیون در SEC-01..07؛ صفر یافتهٔ امنیتی جدید (۱ نکتهٔ انطباق مشاهده‌گری csp + ۱ مشاهدهٔ chrome سایدبار)
+- فاز ۱ پس از این تأیید مستقل دوم، سالم و بسته است؛ گزارش: qa-reports/57-a-security-verify.md · شواهد: qa-reports/tmp-57a/
+---
+Task ID: 57-b
+Agent: red-team
+Task: شکستن فیکس‌های تازهٔ فاز ۱ (خروجی Task 56: F55-1…F55-7) با لبه‌های تازهٔ کد بازنویسی‌شده — نه تکرار حملات 55-b؛ بدون تغییر کد
+Work Log:
+- پیش‌نیازها خوانده شد (worklog 55/55-b/56، گزارش 55-b، کد کامل client-ip.ts/csp-report/page-read-map/page-guard/api-admin/*، تمپلیت پروب 55-b)
+- بردار ۱ — پروب استاتیک client-ip.ts (bun، بدون تغییر env سرور؛ ۴۰+ مورد در qa-reports/tmp-57b/probe-57b-*.txt): همهٔ شکل‌های مرزی رد شدند — mapped/zone/leading-zero/bracket/port/case/5000char/::/0.0.0.0 → null یا IP معتبرِ کانونی‌شده؛ CIDR: host-bits mask شد، /0 و اسلش انتهایی و //8 و /33 و /129 با هشدار بلند رد شدند، prefix≠/128 IPv6 کار کرد، شکل‌های مختلف ::1 معادل شدند — فیکس‌های F55-2/3/4 پابرجا
+- بردار ۲ — قاچاق csp-report زنده: CL منفی/غول/NaN/تکراری/TE+CL همزمان همه 400 در لایهٔ HTTP (handler اجرا نشد؛ bucket مصرف نشد)؛ مرز دقیق 4096 (خواندن+رکورد متادیتا) و 4097 (cancel بدون رکورد)؛ chunked ۵۰۰B → رکورد کامل؛ JSON خراب → سکوت کامل بدون leak؛ HEAD/PUT → 405
+- بردار ۳ — گارد داشبورد با SUPPORT_AGENT mint‌شده: ۱۷ واریانت URL روی /admin → همه 307 no-access/308 canon/404 («/admin/..» = homepage عمومی نه داشبورد)؛ GET /api/admin/dashboard/sales → 403 FORBIDDEN (analytics.read) — KPI مالی از API و از هیچ صفحهٔ مجاز (orders/messages/products/reviews/categories/collections) در دسترس نیست؛ media/list → 403؛ notifications → 200 (عمدی: productsRead در نقشه)؛ نقش کمینه → هر ۳ API 403؛ بدون/جعلی کوکی → 401
+- بردار ۴ — Retry-After در 429 هر ۳ اندپوینت = 35/45/60/48 (صحیح 1..60 سرورمحور)؛ race شمارنده روی bucket سرد با ۱۰۰ متوالی + ۶۰ موازی (P=50): health=119×200 و media=دقیقاً 120×404 → «بیش از 120» نشد (اتمیک در event-loop)
+- محیطی مهم: کشف مانیتور بیرونی متناوب پلتفرم با نرخ ≈۱۲۵/min روی /api/health — در دورهٔ فعالش bucket publicApi همیشه پر است و هر کلاینت دیگری 429 می‌گیرد (با پایش ۳۰ ثانیه‌ای بی‌طرف مستند شد؛ یافتهٔ عملیاتی ۵-۵)؛ تست race بعداً روی bucket سرد تکرار شد
+- بردار ۵ — sms/notifications با نقش mint‌شدهٔ «فقط content.read»: هر ۷ مسیر → 307 با Location دقیقاً /admin/no-access (CR-8 بسته)؛ کنترل مثبت CONTENT_MANAGER دقیقاً مطابق نقشه
+- بردار ۶ — رگرسیون: ۶ ترفند XFF تازه → 5×429 + 1×400 (هدر چندخطی) — هیچ bucket تازه‌ای؛ ۱۰ واریانت URL تازه روی /admin/staff → همه fail-closed؛ tracking oracle کد موجود+موبایل غلط vs کد ناموجود (سفارش مهمان واقعی 2456563800) → ۴ پیام بایت‌به‌بایت یکسان (sha16 برابر)
+- پاکسازی: ۳ کاربر/نشست mint + نقش سفارشی + سفارش/قلم/پرداخت/رزرو/outbox حذف و راستی‌آزمایی شد (reservedSum=0، activeReservations=0، users/sessions/roles/orders 57b = 0)؛ کراد ادمین رسمی دست‌نخورده؛ بدون OOM و بدون ری‌استارت
+Stage Summary:
+- ۰ بایپس از ~۵۰ مورد مرزی/زنده — هر ۸ فیکس فاز ۱ (F55-1…F55-8) در برابر بردارهای هدفمند تازه مقاوم ماندند
+- ۵ یافتهٔ تحلیلی جدید (هیچ‌کدام بایپس): ۱ پایین (x-real-ip بدون trim → کلید bucket غیرکانونی — client-ip.ts:210)، ۲ نکته (/032 پذیرفته می‌شود — client-ip.ts:123؛ تلهٔ پیکربندی mapped-CIDR — client-ip.ts:173)، ۱ پایین طراحی (فید notifications شامل سیگنال امنیتی برای هر نقش productsRead — api/admin/notifications/route.ts:26)، ۱ متوسط عملیاتی (تعارض مانیتور پلتفرم ≈۱۲۵/min با publicApi=120/min روی health — policies.ts:40)
+- گزارش کامل: qa-reports/57-b-redteam.md · شواهد خام: qa-reports/tmp-57b/
+---
+Task ID: 57-c
+Agent: code-reviewer
+Task: بازبینی سفید‌جعبهٔ خط‌به‌خط هشت فیکس تعقیبی Task 56 (F55-1…F55-8) + راستی‌آزمایی کد-سطح دو یافتهٔ تازهٔ 57-a/57-b — بدون هیچ تغییر کد
+Work Log:
+- خواندن پیش‌نیازها (worklog 55-a…d/55/56/57-a/57-b، گزارش 55-c با CR-1…CR-12، 57-b-redteam) + خواندن کامل ۱۴ فایل دامنه + ۴ فایل تست + tasks.md/.env.example
+- دو پروب فقط‌خواندنی bun در پروسهٔ جدا (بدون touch env سرور): (۱) extractClientIp با ۱۰ مورد مرزی — x-real-ip با فاصله/تب خام برگشت، IPv6 بزرگ‌حروف خام برگشت، XFF عضو آخر trim‌شده، host-bits CIDR mask شد، /032 پذیرفته شد، mapped-CIDR خانواده‌ها جداست، fail-closed مستقیم پابرجا؛ (۲) ریاضی بایت ipv6ToBigInt — 2001:db8::1 و ::ffff:1.2.3.4 دستی تأیید، رد صحیح zone/bracket/9گروه/دو ::/گروه ۵رقمی + کشف خرد: خودِ ipv6ToBigInt صفر پیشرو دم v4 را می‌پذیرد ولی گیت isIP بالادست آن را می‌بندد (بی‌اثر در سیم‌کشی فعلی)
+- رأی ۸/۸ فیکس = FIXED-CONFIRMED (صفر PARTIAL/REGRESSION): داشبورد gate قبل از کوئری (page.tsx:55)، net.isIP سه‌مسیره (client-ip.ts:114/174/187)، تطبیق باینری BigInt (:134-180)، رد /0 و اسلش + console.error (:123-156) + .env.example، خواندن bounded با مرز اکید 4096/4097 و CL fast-path قبل از خواندن و merge بایتی بدون mojibake (csp-report:27-71)، Retry-After فقط روی 429 در هر ۳ روت با Math.max(1,ceil) سازگار با in-memory.ts:44، sms/notifications یکدست با semantics requireAny مستند (map:13) و هم‌خوان با API، scope=per-ip (actions.ts:84)، و بستهٔ تست F55-8
+- یافتهٔ ۱ مانیتور (≈125/min vs publicApi=120/min) تأیید با policies.ts:40 + health/route.ts:17 — پیشنهاد ۴بخشی: قاعدهٔ مستقل health (300/min) و/یا memo-cache چندثانیه‌ای؛ bucket per-IP به‌تنهایی کافی نیست چون مانیتور خودش از سقف عبور می‌کند
+- یافتهٔ ۲ x-real-ip بدون trim تأیید با client-ip.ts:210-211 (پروب A7c/A7d: "9.9.9.9 " و "\t9.9.9.9" خام برگشت؛ نامتقارن با XFF:205) — پایین، بدون بایپس؛ فیکس یک‌خطی return real.trim()
+- یافته‌های تازه: N-1 (پایین) خطای stream در readBodyCapped بدون catch → 500 خام و بدون cancel در آن شاخه (csp-report:36-45) · N-2 (پایین) خروجی IPv6 کانونی نمی‌شود (کلید bucket غیرکانونی، هم‌خانوادهٔ یافتهٔ ۲) · N-3…N-8 نکته (precondition isIP، assert cancel در تست chunked، برچسب per-ip+email، عنوان کهنهٔ تست، CR-12 بی‌ردیاب در tasks.md، هشدار mapped-CIDR در .env.example)
+- رأی cancel-بی‌لاگ (درخواست 57-a): قابل‌قبول — سرریز >4KB ماهیتاً تهاجمی است و لاگ‌کردنش کانال flooding تازه می‌سازد؛ هر hit شمرده می‌شود و باند 2049-4096 رکورد متادیتا دارد؛ بهبود اختیاری: رکورد یک‌خطی throttled «csp_body_capped» برای دید حمله (فاز ۳)
+- ارزش mutation: Retry-After / net.isIP / کانونی‌سازی / رد /0 / ردیف map داشبورد همگی محافظت‌شده با تست قرمزشونده؛ bounded-read محافظت رفتاری (خاصیت حافظه فقط غیرمستقیم)؛ requirePageAccess صفحات و scope=per-ip فقط-زنده‌اند (هیچ تستی قرمز نمی‌شود) — تنها کاوِت واقعی پوشش
+- نمرهٔ تست‌ها: sec-hardening 9/10 · client-ip 8/10 · rbac-matrix 8/10 · admin-signin-ratelimit 7/10 (میانگین 8)
+- شواهد: qa-reports/tmp-57c/ (notes-57c.md، probe-57c-client-ip.ts، probe-57c-ipv6-math.ts + output)
+Stage Summary:
+- هر ۸ فیکس Task 56 در کد درست/کامل و هم‌راستا با معیار پذیرش؛ هر دو یافتهٔ تازهٔ 57-b تأیید (متوسط-عملیاتی و پایین) — هیچ بایپس/رگرسیون/بلوکه‌کننده
+- مستندسازی tasks.md (F55-1…8 تیک، INFRA-09، CR-11→SEC-10) و .env.example سالم است؛ فقط CR-12 بی‌ردیاب و هشدار mapped-CIDR جا افتاده
+- رأی نهایی: فاز ۱ سالم و بسته می‌ماند؛ اقلام بعدی به ترتیب: قاعدهٔ health، دو تست گارد صفحات، فیکس‌های یک‌خطی trim/کانونی‌سازی/رکورد capped
+- گزارش کامل: qa-reports/57-c-code-review.md
+
+---
+Task ID: 57-d
+Agent: test-engineer
+Task: baseline کامل پس از فیکس — اجرای مستقل هر ۵ اجرا، ارزش محافظتی ۸ فیکس، شمارش تست‌های تازه و بهداشت DB (بدون تغییر کد)
+Work Log:
+- typecheck: EXIT=2 — هر ۳ خطا در اسکریپت‌های اسکرچ باقی‌ماندهٔ 56/57a/57b در qa-reports/tmp-* (cleanup-56.ts / db-facts.ts / cleanup-57b.ts)؛ src/tests صفر خطا — علت ساختاری: tsconfig الگوی **/*.ts را include می‌کند و qa-reports را exclude نمی‌کند (پیشنهاد: یک exclude یک‌خطی؛ اعمال نشد — خارج از صلاحیت)
+- lint: EXIT=0 با ۹ هشدار — همه از .jsهای شواهد tmp-57a؛ src/tests صفر
+- unit: 172/0/0 (15 فایل، 530 expect، 226ms) — ادعای 56 تأیید؛ دلتای +5 = دقیقاً ۵ تست IPv6 تازهٔ client-ip.test
+- integration دو دور: هر دو 56/0/0 (7 فایل، 530 expect) — عین هم؛ flaky: خیر؛ دلتای +10 = دقیقاً فایل جدید sec-hardening.test.ts
+- ساختار: sec-hardening = ۱۰ تست (۳ SEC-05 + ۳ SEC-06/Retry-After + ۴ SEC-07 کوکی)؛ client-ip = 16 تست (11+5)؛ rbac-matrix ردیف‌های dashboard(×۳ نقش)/sms/notifications + حلقهٔ SUPER روی ۱۵ مسیر؛ کامنت CR-9 در admin-signin-ratelimit (L12-19) + حذف assert بی‌اثر دور قبل
+- رأی‌های محافظتی (mutation ذهنی): F55-5 → فقط تست chunked قاتل request.json() است؛ F55-6 → هر ۳ تست SEC-06 قرمز؛ F55-2/3/4 → تست‌های CR-2/CR-3/prefix قرمز (دو assert /0 و اسلش در جهش قدیمی هم سبز می‌مانند — خروجی یکسان null)؛ F55-1 حذف ردیف نقشه → read-matrix قرمز ولی حذف requirePageAccess از page.tsx → هیچ تستی (فقط-زنده)؛ F55-7 حذف sms/notif از map → قرمز ولی scope=per-ip → هیچ تستی (فقط-زنده، مال actions.ts:84)
+- نمره‌ها: sec-hardening 8/10 · client-ip بهبودها 8/10 (از 7) · admin-signin بازنویسی 7/10 (از 5) · rbac-matrix 8.5/10 — میانگین 7.9 (دور قبل 6.75)
+- بهداشت DB فقط‌خواندنی (tmp-57d/db-look.ts): 60 واریانت reserved>0=0 · رزرو ACTIVE=0 · کاربر/نشست mint 56/57a/57b=0 · audit آزمایشی=0 · سفارش T* بی‌صاحب ۲۴h=0؛ دو رسوب بی‌ضرر فقط گزارش شد: نقش test_role_NO_ACCESS (ساخت خودِ rbac-matrix، هر ران upsert) و ۷ پرداخت MOCK-<hex> متصل به سفارش‌های فلوی زندهٔ قبلی (بدون MOCK-57*/sec04/sechard)
+- /api/health روی 3000 = 200 با db.connected:true (latency 2ms)؛ صفحهٔ اصلی 200؛ OOM/کرش رخ نداد
+Stage Summary:
+- هر ۵ ادعای Task 56 مستقل بازتأیید شد (typecheck/lint در سطح کد محصول ✅، unit 172/172 ✅، integration 56/56 دوبار ✅، غیر-flaky)؛ تنها انحراف آلودگی تایپ‌کریک/eslint از پوشهٔ شواهد است نه کد
+- پوشش SEC-01..07: سه 🔴 (SEC-05/06/07) → 🟢 و دو 🟡 (SEC-01/02) → 🟢؛ فقط SEC-03 🟡 ماند (سیم‌کشی اکشن/audit زنده‌فقط — مستند CR-9)؛ دو جزء زنده‌فقط باقی: سیم‌کشی requirePageAccess صفحات و after.scope=per-ip
+- گزارش: qa-reports/57-d-testsuite.md · شواهد: qa-reports/tmp-57d/
+
+---
+Task ID: 57
+Agent: main (Super Z) — فرمانده و هستهٔ اصلی
+Task: تست کامل پس از فیکس فاز ۱ (راستی‌آزمایی Task 56) — ۴ ساب‌ایجنت در ۲ بچ + راستی‌آزمایی شخصی فرمانده
+
+Work Log:
+- محیط: next-server هنگ‌کردهٔ قدیمی (PID 12270، health:000) با kill -9 پاک شد (SIGTERM بی‌اثر)؛ ری‌استارت تمیز double-fork + export DATABASE_URL؛ bucketهای سرد؛ گرم‌سازی خانه/shop/login/admin/no-access — «admin بدون‌نشست=307» از همان ابتدا نشانهٔ گارد جدید بود
+- بچ ۱ (موازی): 57-a «تأییدگر امنیت» — ماتریس ۱۵ مسیر×۳ نقش+زیرصفحه‌ها = ۶۶ سلول، صفر مثبت/منفی کاذب؛ SUPPORT_AGENT→/admin=307 no-access با صفر KPI؛ csp مرز 4096 (رکورد size=4096) و 4097 (بی‌لاگ)؛ Retry-After زنده 57/59؛ SEC-03 با ۶ فراخوانی واقعی Server Action + ردیف‌های audit؛ SEC-07 با سفارش مهمان واقعی (کوکی sha256 + flags کامل)؛ رگرسیون XFF/URL پاک؛ پاکسازی کامل (reserved=0، mint=0، audit=0)
+- بچ ۱ (موازی): 57-b «ردتیم» — ~۵۰ بردار تازه روی خودِ فیکس‌ها: صفر بایپس؛ client-ip بازنویسی‌شده در برابر ۴۰+ ورودی لبه (mapped/zone/octal/bracket/پورت//0//33/129/host-bits) مقاوم؛ قاچاق CL/TE همگی در لایهٔ HTTP رد؛ /api/admin/dashboard/sales با SUPPORT_AGENT=403؛ race با ۶۰ موازی = دقیقاً 120×200 (شمارنده اتمیک)؛ sms/notifications دقیقاً به no-access؛ ۲ یافتهٔ جدید غیربلوکه‌کننده: (۱) اشباع سقف publicApi=120/min روی /api/health توسط مانیتور بیرونی ~۱۲۵/min — نیاز به قاعدهٔ مستقل/cached (policies.ts:40 + health/route.ts:17) (۲) x-real-ip بدون trim → کلید bucket غیرکانونی (client-ip.ts:210)
+- بچ ۲ (موازی): 57-c «بازبین کد» — ۸×FIXED-CONFIRMED؛ صفر PARTIAL/REGRESSION؛ ریاضی BigInt دستی تحقیق شد (2001:db8::1 صحیح)؛ شائبهٔ mojibake مرز chunk رد شد؛ هر دو یافتهٔ 57-b در سطح کد تأیید؛ رأی cancel-بی‌لاگ csp: قابل‌قبول؛ نمرهٔ تست‌های تازه 8/10 (از 6.75)؛ فقط-زنده: سیم‌کشی گارد صفحات + scope=per-ip
+- بچ ۲ (موازی): 57-d «مهندس تست» — typecheck فقط ۳ خطای اسکرچ tmp-* (src/tests=0)؛ lint 0 خطا/۹ هشدار شواهد؛ unit 172/172 (+۵ IPv6)؛ integration 56/56 دو دور بایت‌به‌بایت (غیر-flaky)؛ در جدول پوشش SEC-05/06/07 از 🔴 به 🟢 و SEC-01/02 به 🟢 رسید؛ DB سالم: reserved=0، mint=0، audit=0؛ پیشنهاد بهداشتی: exclude «qa-reports» از tsconfig/eslint
+- راستی‌آزمایی شخصی فرمانده: (۱) خواندن کامل csp-report/route.ts — readBodyCapped با سقف 4096 و cancel صحیح؛ پروب زندهٔ chunked 5.2KB → 204 در ۱۳.۹ms با صفر رکورد جدید (before=6/after=6) (۲) client-ip.ts:210-211 — نبود trim در مسیر x-real-ip با چشم تأیید شد (XFF در :205 trim می‌کند — نامتقارن) (۳) پروب زندهٔ search: hit#31=429 با retry-after: 60
+
+Stage Summary:
+- فاز ۱ (۷ فلگ + ۸ تعقیبی) با تأیید مستقل چهارگانه (زنده×۲ + سفید×۲) رسماً بسته و پایدار است: ۰ بایپس · ۰ رگرسیون · ۰ حادثه OOM در این دور
+- باقی‌مانده‌های کوچک برای فاز ۳ ثبت شد: HEALTH-MON-01 (سقف مستقل/cached health) · CLIENT-IP-T1 (trim x-real-ip + کانونی‌سازی خروجی v6) · CSP-N1 (try/catch مسیر خطای reader) · QA-HYG-01 (exclude qa-reports از typecheck/eslint) — همگی تک‌خطی/کوچک
+- گزارش‌ها: qa-reports/57-a-security-verify.md · 57-b-redteam.md · 57-c-code-review.md · 57-d-testsuite.md (+ شواهد tmp-57a/b/c/d و tmp-57cmd)
+- گام بعدی پیشنهادی: فاز ۲ — باگ‌های پول (BUG-01…05: TOCTOU کوپن، سقف مهمان، failPayment race و…)

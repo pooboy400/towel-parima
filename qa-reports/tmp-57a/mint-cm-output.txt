@@ -1,0 +1,1 @@
+CONTENT_MANAGER=sec57a_content_manager_bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb roleId=cmuh89rsi0003lt0uife04jqo hasOrdersRead=false hasProductsRead=true hasAnalyticsRead=true

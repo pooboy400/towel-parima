@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { PageHeader } from "@/components/admin/page-header";
 import { MessagesList } from "./messages-list";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
  * جایگزین فاز ۱ که فرم‌ها فقط توست موفقیت نمایش می‌دادند و چیزی ذخیره نمی‌شد.
  */
 export default async function AdminMessagesPage() {
+  await requirePageAccess("messages");
   const messages = await db.contactMessage.findMany({
     orderBy: [{ status: "asc" }, { createdAt: "desc" }],
     take: 200,

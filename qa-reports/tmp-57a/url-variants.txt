@@ -1,0 +1,5 @@
+/admin/staff/ => 308 http://localhost:3000/admin/staff
+//admin/staff => 308 http://localhost:3000/admin/staff
+/./admin/staff => 307 http://localhost:3000/admin/no-access
+/admin%2Fstaff => 404 
+/ADMIN/STAFF => 404 

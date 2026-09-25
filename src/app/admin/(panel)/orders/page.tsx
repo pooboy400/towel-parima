@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import { PageHeader } from "@/components/admin/page-header";
 import { OrdersManager } from "./orders-manager";
 import { ORDER_STATUS_FA } from "@/lib/order-status";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export const dynamic = "force-dynamic";
  * مبالغ snapshot سفارش هرگز از قیمت فعلی محصول محاسبه نمی‌شوند (§14).
  */
 export default async function AdminOrdersPage() {
+  await requirePageAccess("orders");
   const orders = await db.order.findMany({
     orderBy: { placedAt: "desc" },
     take: 100,

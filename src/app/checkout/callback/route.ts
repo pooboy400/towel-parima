@@ -6,7 +6,15 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { db } from "@/lib/db";
-import { confirmPayment, failPayment } from "@/core/commerce/payment-service";
+import {
+  confirmPayment,
+  failPayment,
+} from "@/core/commerce/payment-service";
+import {
+  PAY_PROOF_COOKIE,
+  PAY_PROOF_TTL_S,
+  paidProofValue,
+} from "@/core/commerce/checkout-service";
 
 export const dynamic = "force-dynamic";
 
@@ -31,12 +39,24 @@ export async function GET(request: NextRequest) {
 
     const result = await confirmPayment(authority);
     if (result.ok) {
-      return NextResponse.redirect(
+      // SEC-04 — اثبات کوتاه‌عمر بازگشت موفق؛ فقط پرداخت‌کنندهٔ واقعی (صاحب authority)
+      // این کوکی را دارد → صفحهٔ success جزئیات سفارش را نشان می‌دهد.
+      const response = NextResponse.redirect(
         new URL(
           `/checkout/success${orderCode ? `?code=${encodeURIComponent(orderCode)}` : ""}`,
           request.url,
         ),
       );
+      response.cookies.set({
+        name: PAY_PROOF_COOKIE,
+        value: paidProofValue(authority),
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        maxAge: PAY_PROOF_TTL_S,
+        secure: process.env.NODE_ENV === "production",
+      });
+      return response;
     }
     return NextResponse.redirect(new URL("/checkout/failed", request.url));
   } catch (error) {

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { formatNumber } from "@/lib/format";
 import { PageHeader } from "@/components/admin/page-header";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 import {
   CollectionDialog,
   CollectionDeleteButton,
@@ -10,6 +11,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function AdminCollectionsPage() {
+  await requirePageAccess("collections");
   const [collections, products] = await Promise.all([
     db.collection.findMany({
       where: { deletedAt: null },

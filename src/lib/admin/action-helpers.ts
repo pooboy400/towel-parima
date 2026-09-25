@@ -16,6 +16,7 @@ import "server-only";
 import { headers } from "next/headers";
 import { isDomainError } from "@/core/errors";
 import { requireAdminContext, type AdminAuthContext } from "@/core/auth/session-service";
+import { getClientIp } from "@/lib/client-ip";
 import { z } from "zod";
 
 export type ActionError = {
@@ -26,12 +27,11 @@ export type ActionError = {
 
 export type ActionResult<T> = { ok: true; data: T } | { ok: false; error: ActionError };
 
-/** IP + User-Agent برای AuditLog (بخش ۲۰ سند) */
+/** IP + User-Agent برای AuditLog (بخش ۲۰ سند) — IP فقط از پروکسی معتمد (SEC-02) */
 export async function requestMeta(): Promise<{ ip: string | null; userAgent: string | null }> {
   const h = await headers();
-  const forwarded = h.get("x-forwarded-for");
   return {
-    ip: forwarded ? forwarded.split(",")[0].trim() : (h.get("x-real-ip") ?? null),
+    ip: await getClientIp(),
     userAgent: h.get("user-agent"),
   };
 }

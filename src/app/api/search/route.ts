@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProducts } from "@/services/product-service";
 import { rateLimiter, RATE_RULES, rateKey } from "@/core/rate-limit";
+import { extractClientIp } from "@/lib/client-ip";
 
 /**
  * GET /api/search?q=
@@ -14,14 +15,18 @@ import { rateLimiter, RATE_RULES, rateKey } from "@/core/rate-limit";
 const MAX_Q_LENGTH = 60;
 
 export async function GET(request: NextRequest) {
-  // rate-limit قبل از هر کوئری
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    request.headers.get("x-real-ip") ??
-    "unknown";
+  // rate-limit قبل از هر کوئری — IP فقط از پروکسی معتمد (SEC-02)
+  const ip = extractClientIp(request.headers) ?? "unknown";
   const rl = await rateLimiter.hit(rateKey("search", ip), RATE_RULES.search);
   if (!rl.ok) {
-    return NextResponse.json({ items: [] }, { status: 429 });
+    // CR-7 — کلاینت باید بداند کِی برگردد
+    return NextResponse.json(
+      { items: [] },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.max(1, Math.ceil(rl.retryAfterMs / 1000))) },
+      },
+    );
   }
 
   const q = request.nextUrl.searchParams.get("q")?.trim().slice(0, MAX_Q_LENGTH) ?? "";

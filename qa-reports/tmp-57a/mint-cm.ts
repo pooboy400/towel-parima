@@ -1,0 +1,13 @@
+import { PrismaClient } from "@prisma/client";
+import { getRoleDefinition } from "../../src/core/auth/roles";
+const db = new PrismaClient();
+const admin = await db.user.findUnique({ where: { email: "admin@prima-store.ir" }, select: { passwordHash: true } });
+if (!admin?.passwordHash) throw new Error("no admin");
+const perms = getRoleDefinition("CONTENT_MANAGER").permissions as string[];
+const role = await db.role.upsert({ where: { name: "CONTENT_MANAGER" }, update: { isSystem: true, permissions: perms }, create: { id: "role_content_manager", name: "CONTENT_MANAGER", title: "CONTENT_MANAGER", isSystem: true, permissions: perms } });
+const user = await db.user.upsert({ where: { email: "sec01-57a+content_manager@prima.test" }, update: { roleId: role.id, isActive: true, deletedAt: null }, create: { email: "sec01-57a+content_manager@prima.test", phone: "09135709999", name: "تست 57a CONTENT_MANAGER", roleId: role.id, isActive: true, passwordHash: admin.passwordHash } });
+const token = "sec57a_content_manager_" + "b".repeat(38);
+await db.session.deleteMany({ where: { sessionToken: token } });
+await db.session.create({ data: { sessionToken: token, userId: user.id, isAdminSession: true, idleAt: new Date(Date.now() - 1000), expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000) } });
+console.log(`CONTENT_MANAGER=${token} roleId=${role.id} hasOrdersRead=${perms.includes("orders.read")} hasProductsRead=${perms.includes("products.read")} hasAnalyticsRead=${perms.includes("analytics.read")}`);
+await db.$disconnect();

@@ -1,0 +1,9 @@
+$ tsc --noEmit
+qa-reports/tmp-56/cleanup-56.ts(9,34): error TS18047: 'u.email' is possibly 'null'.
+qa-reports/tmp-57a/db-facts.ts(11,107): error TS18046: 'reservedN' is of type 'unknown'.
+qa-reports/tmp-57b/cleanup-57b.ts(24,59): error TS2353: Object literal may only specify known properties, and 'phone' does not exist in type 'SmsLogWhereInput'.
+
+real	0m3.406s
+user	0m4.501s
+sys	0m0.343s
+TYPECHECK_EXIT=2

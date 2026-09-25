@@ -9,6 +9,7 @@ import { SectionCard } from "@/components/admin/page-header";
 import { BestsellerAutoCard } from "@/components/admin/bestseller-card";
 import { getBestsellerReport } from "@/core/commerce/bestseller-service";
 import { ProductRowActions, StatusBadge } from "./row-actions";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export default async function AdminProductsPage({
 }: {
   searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
+  await requirePageAccess("products");
   const sp = await searchParams;
   const status =
     sp.status === "DRAFT" || sp.status === "ACTIVE" || sp.status === "ARCHIVED" ? sp.status : "ALL";

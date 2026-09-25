@@ -1,6 +1,7 @@
 import { PageHeader } from "@/components/admin/page-header";
 import { adminListAudit } from "@/lib/repositories/admin-repository";
 import { formatDate } from "@/lib/format";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +42,7 @@ export default async function AdminAuditPage({
 }: {
   searchParams: Promise<{ action?: string; page?: string }>;
 }) {
+  await requirePageAccess("audit");
   const sp = await searchParams;
   const { items, total, page, pages } = await adminListAudit({
     action: sp.action,

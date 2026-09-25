@@ -1,0 +1,45 @@
+/admin|SUPER_ADMIN|200 
+/admin|SUPPORT_AGENT|307 http://localhost:3000/admin/no-access
+/admin|STORE_MANAGER|200 
+/admin/staff|SUPER_ADMIN|200 
+/admin/staff|SUPPORT_AGENT|307 http://localhost:3000/admin/no-access
+/admin/staff|STORE_MANAGER|307 http://localhost:3000/admin/no-access
+/admin/audit|SUPER_ADMIN|200 
+/admin/audit|SUPPORT_AGENT|307 http://localhost:3000/admin/no-access
+/admin/audit|STORE_MANAGER|307 http://localhost:3000/admin/no-access
+/admin/settings|SUPER_ADMIN|200 
+/admin/settings|SUPPORT_AGENT|307 http://localhost:3000/admin/no-access
+/admin/settings|STORE_MANAGER|200 
+/admin/orders|SUPER_ADMIN|200 
+/admin/orders|SUPPORT_AGENT|200 
+/admin/orders|STORE_MANAGER|200 
+/admin/messages|SUPER_ADMIN|200 
+/admin/messages|SUPPORT_AGENT|200 
+/admin/messages|STORE_MANAGER|200 
+/admin/products|SUPER_ADMIN|200 
+/admin/products|SUPPORT_AGENT|200 
+/admin/products|STORE_MANAGER|200 
+/admin/reviews|SUPER_ADMIN|200 
+/admin/reviews|SUPPORT_AGENT|200 
+/admin/reviews|STORE_MANAGER|200 
+/admin/journal|SUPER_ADMIN|200 
+/admin/journal|SUPPORT_AGENT|307 http://localhost:3000/admin/no-access
+/admin/journal|STORE_MANAGER|200 
+/admin/media|SUPER_ADMIN|200 
+/admin/media|SUPPORT_AGENT|307 http://localhost:3000/admin/no-access
+/admin/media|STORE_MANAGER|200 
+/admin/faq|SUPER_ADMIN|200 
+/admin/faq|SUPPORT_AGENT|307 http://localhost:3000/admin/no-access
+/admin/faq|STORE_MANAGER|200 
+/admin/categories|SUPER_ADMIN|200 
+/admin/categories|SUPPORT_AGENT|200 
+/admin/categories|STORE_MANAGER|200 
+/admin/collections|SUPER_ADMIN|200 
+/admin/collections|SUPPORT_AGENT|200 
+/admin/collections|STORE_MANAGER|200 
+/admin/sms|SUPER_ADMIN|200 
+/admin/sms|SUPPORT_AGENT|200 
+/admin/sms|STORE_MANAGER|200 
+/admin/notifications|SUPER_ADMIN|200 
+/admin/notifications|SUPPORT_AGENT|200 
+/admin/notifications|STORE_MANAGER|200 

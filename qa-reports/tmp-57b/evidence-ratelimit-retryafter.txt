@@ -1,0 +1,23 @@
+════ ۱) health: ۱۰۰ متوالی روی bucket سرد ════
+متوالی ۱۰۰:     100 429 
+════ ۲) انفجار موازی ۶۰تایی (xargs -P 50) — bucket در ۱۰۰ ════
+موازی ۶۰:      60 429 
+جمع 200ها در همین پنجره: 0 (سقف=120؛ اگر بیشتر = race شمارنده)
+════ ۳) Retry-After در 429های health ════
+HTTP/1.1 429 Too Many Requests  retry-after: 35  
+HTTP/1.1 429 Too Many Requests  retry-after: 35  
+HTTP/1.1 429 Too Many Requests  retry-after: 35  
+════ ۴) media-file: تخلیهٔ bucket (۱۲۲ درخواست 404) ════
+۱۱۸تایی:     118 404 
+ ← hit 119
+ ← hit 120
+════ ۵) search: ۳۱ درخواست ════
+۳۰تایی:      30 400 
+ ← hit 31
+════ ۶) ترفندهای XFF تازه در حالت 429 (نباید bucket تازه بگیرند) ════
+XFF-trick [XFF با تب+quoted] → 429 (429=شکست حمله ✓ / 200=فرار ⚠️)
+XFF-trick [XFF chain با unknown] → 429 (429=شکست حمله ✓ / 200=فرار ⚠️)
+XFF-trick [x-real-ip mapped IPv6] → 429 (429=شکست حمله ✓ / 200=فرار ⚠️)
+XFF-trick [XFF با نقطهٔ یونیکد] → 429 (429=شکست حمله ✓ / 200=فرار ⚠️)
+XFF-trick [Forwarded با port] → 429 (429=شکست حمله ✓ / 200=فرار ⚠️)
+XFF-trick [XFF چندخطی] → 400 (429=شکست حمله ✓ / 200=فرار ⚠️)

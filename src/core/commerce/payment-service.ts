@@ -32,6 +32,8 @@ async function absoluteCallbackUrl(path: string): Promise<string> {
 export interface StartResult {
   redirectUrl: string;
   paymentId: string;
+  /** authority پرداخت — برای اثبات کوکی درگاه mock (SEC-07) */
+  authority: string;
 }
 
 /** شروع تلاش پرداخت — رکورد Payment جدید با authority یکتا */
@@ -63,7 +65,7 @@ export async function startPayment(input: {
     last.status === "PENDING" &&
     Date.now() - last.createdAt.getTime() < FIVE_MIN
   ) {
-    return { redirectUrl: paymentProvider.buildResumeUrl(last.authority), paymentId: last.id };
+    return { redirectUrl: paymentProvider.buildResumeUrl(last.authority), paymentId: last.id, authority: last.authority };
   }
 
   const { redirectUrl, authority } = await paymentProvider.startPayment({
@@ -85,7 +87,7 @@ export async function startPayment(input: {
     select: { id: true },
   });
 
-  return { redirectUrl, paymentId: payment.id };
+  return { redirectUrl, paymentId: payment.id, authority };
 }
 
 export interface ConfirmResult {

@@ -7,6 +7,7 @@
 
 import { headers } from "next/headers";
 import { rateLimiter, RATE_RULES, rateKey } from "@/core/rate-limit";
+import { getClientIp } from "@/lib/client-ip";
 import {
   contactMessageSchema,
   newsletterSchemaZ,
@@ -21,12 +22,8 @@ export interface SubmitResult {
 }
 
 async function requestIp(): Promise<string> {
-  const h = await headers();
-  return (
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-    h.get("x-real-ip") ??
-    "unknown"
-  );
+  // SEC-02 — فقط XFF پروکسی معتمد؛ بدون پروکسی → bucket اشتراکی
+  return (await getClientIp()) ?? "unknown";
 }
 
 export async function submitContactAction(input: unknown): Promise<SubmitResult> {

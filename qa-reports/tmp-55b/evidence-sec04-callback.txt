@@ -1,0 +1,24 @@
+1) fake authority:
+HTTP/1.1 307 Temporary Redirect
+location: http://localhost:3000/checkout/failed
+2) بدون authority:
+HTTP/1.1 307 Temporary Redirect
+location: http://localhost:3000/checkout?error=payment
+3) تکرار OK روی authority واقعی A:
+HTTP/1.1 307 Temporary Redirect
+location: http://localhost:3000/checkout/success?code=4538715669
+set-cookie: prima_pay_proof=982334af2b6ba1499038fa310c1ebb28ff1f09ce802609c3f38c2358314d6f42; Path=/; Expires=Fri, 25 Sep 2026 21:50:36 GMT; Max-Age=900; HttpOnly; SameSite=lax
+4) NOK روی پرداخت PAID:
+HTTP/1.1 307 Temporary Redirect
+location: http://localhost:3000/checkout/failed
+5) status تکراری OK&NOK:
+HTTP/1.1 307 Temporary Redirect
+location: http://localhost:3000/checkout/success?code=4538715669
+set-cookie: prima_pay_proof=982334af2b6ba1499038fa310c1ebb28ff1f09ce802609c3f38c2358314d6f42; Path=/; Expires=Fri, 25 Sep 2026 21:50:36 GMT; Max-Age=900; HttpOnly; SameSite=lax
+6) amount=1 دستکاری:
+HTTP/1.1 307 Temporary Redirect
+location: http://localhost:3000/checkout/success?code=4538715669
+set-cookie: prima_pay_proof=982334af2b6ba1499038fa310c1ebb28ff1f09ce802609c3f38c2358314d6f42; Path=/; Expires=Fri, 25 Sep 2026 21:50:36 GMT; Max-Age=900; HttpOnly; SameSite=lax
+7) authority با کوتیشن/تزریق:
+HTTP/1.1 307 Temporary Redirect
+location: http://localhost:3000/checkout/failed

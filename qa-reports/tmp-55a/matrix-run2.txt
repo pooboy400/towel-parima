@@ -1,0 +1,40 @@
+=== SUPPORT_AGENT ===
+307 -> http://localhost:3000/admin/no-access  /admin/staff
+307 -> http://localhost:3000/admin/no-access  /admin/audit
+307 -> http://localhost:3000/admin/no-access  /admin/settings
+200 ->   /admin/orders
+200 ->   /admin/messages
+200 ->   /admin/products
+200 ->   /admin/reviews
+307 -> http://localhost:3000/admin/no-access  /admin/journal
+307 -> http://localhost:3000/admin/no-access  /admin/media
+307 -> http://localhost:3000/admin/no-access  /admin/faq
+200 ->   /admin/categories
+200 ->   /admin/collections
+404 ->   /admin/orders/cmuhfxbed0000ltho3zl50anw
+200 ->   /admin/orders/cmuhfxbed0000ltho3zl50anw/invoice
+200 ->   /admin/products/new
+200 ->   /admin/products/p1/edit
+307 -> http://localhost:3000/admin/no-access  /admin/journal/new
+000 ->   /admin/journal/cmuh89rxx005ilt0ui3s94eb6
+000 ->   /admin/no-access
+=== STORE_MANAGER ===
+000 ->   /admin/staff
+000 ->   /admin/audit
+000 ->   /admin/settings
+000 ->   /admin/orders
+000 ->   /admin/messages
+000 ->   /admin/products
+000 ->   /admin/reviews
+000 ->   /admin/journal
+000 ->   /admin/media
+000 ->   /admin/faq
+000 ->   /admin/categories
+000 ->   /admin/collections
+000 ->   /admin/orders/cmuhfxbed0000ltho3zl50anw
+000 ->   /admin/orders/cmuhfxbed0000ltho3zl50anw/invoice
+000 ->   /admin/products/new
+000 ->   /admin/products/p1/edit
+000 ->   /admin/journal/new
+000 ->   /admin/journal/cmuh89rxx005ilt0ui3s94eb6
+000 ->   /admin/no-access

@@ -1,0 +1,213 @@
+3:I["[project]/node_modules/next/dist/next-devtools/userspace/app/segment-explorer-node.js [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],"SegmentViewNode"]
+5:"$Sreact.fragment"
+17:I["[project]/node_modules/next/dist/client/components/layout-router.js [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],"default"]
+19:I["[project]/node_modules/next/dist/client/components/render-from-template-context.js [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],"default"]
+2b:I["[project]/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],"OutletBoundary"]
+2d:"$Sreact.suspense"
+3b:I["[project]/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],"ViewportBoundary"]
+45:I["[project]/node_modules/next/dist/lib/framework/boundary-components.js [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],"MetadataBoundary"]
+:HL["/_next/static/chunks/src_app_16f9v_8._.css","style"]
+a:D"$14"
+a:D"$b"
+1c:D"$20"
+1c:D"$1d"
+26:D"$28"
+26:D"$27"
+26:D"$2a"
+26:["$","$L2b",null,{"children":["$","$2d",null,{"name":"Next.MetadataOutlet","children":"$@2e"},"$27","$2c",1]},"$27","$29",1]
+2f:X
+31:D"$34"
+31:D"$32"
+31:D"$35"
+31:null
+36:D"$38"
+36:D"$37"
+36:D"$3a"
+3c:D"$3e"
+3c:D"$3d"
+36:["$","$L3b","RmDk3r-8O1suBH8szVe1Uv",{"children":"$L3c"},"$37","$39",1]
+3f:D"$41"
+3f:D"$40"
+3f:D"$43"
+47:D"$49"
+47:D"$48"
+3f:["$","div","RmDk3r-8O1suBH8szVe1Um",{"hidden":true,"children":["$","$L45",null,{"children":["$","$2d",null,{"name":"Next.Metadata","children":"$L47"},"$40","$46",1]},"$40","$44",1]},"$40","$42",1]
+0:{"a":"$@1","f":[[["",{"children":["checkout",{"children":["__PAGE__",{},"$undefined","$undefined",4096]},"$undefined","$undefined",4096]},"$undefined","$undefined",4112],[["$","$L3","layout",{"type":"layout","pagePath":"layout.tsx","children":["$","$5","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/src_app_16f9v_8._.css","precedence":"next_static/chunks/src_app_16f9v_8._.css","crossOrigin":"$undefined","nonce":"$undefined"},null,"$6",0],["$","script","script-0",{"src":"/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","async":true,"nonce":"$undefined"},null,"$7",0],["$","script","script-1",{"src":"/_next/static/chunks/src_1hl28g1._.js","async":true,"nonce":"$undefined"},null,"$8",0],["$","script","script-2",{"src":"/_next/static/chunks/node_modules_0e6llup._.js","async":true,"nonce":"$undefined"},null,"$9",0]],"$La"]},null,"$4",1]},null,"$2",0],{"children":[["$","$5","c",{"children":[null,["$","$L17",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L19",null,{},null,"$18",1],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":"$undefined","forbidden":"$undefined","unauthorized":"$undefined","segmentViewBoundaries":["$undefined","$undefined","$undefined","$undefined"]},null,"$16",1]]},null,"$15",0],{"children":[["$","$5","c",{"children":[["$","$L3","c-page",{"type":"page","pagePath":"checkout/page.tsx","children":"$L1c"},null,"$1b",1],[["$","script","script-0",{"src":"/_next/static/chunks/src_0j-ndte._.js","async":true,"nonce":"$undefined"},null,"$21",0],["$","script","script-1",{"src":"/_next/static/chunks/node_modules_zod_v4_classic_0qgufeu._.js","async":true,"nonce":"$undefined"},null,"$22",0],["$","script","script-2",{"src":"/_next/static/chunks/node_modules_zod_v4_core_15b2lfp._.js","async":true,"nonce":"$undefined"},null,"$23",0],["$","script","script-3",{"src":"/_next/static/chunks/node_modules_zod_v4_locales_1-ided7._.js","async":true,"nonce":"$undefined"},null,"$24",0],["$","script","script-4",{"src":"/_next/static/chunks/node_modules_1tzy063._.js","async":true,"nonce":"$undefined"},null,"$25",0]],"$26"]},null,"$1a",0],{},null,false,null]},null,false,"$2f"]},null,false,null],["$","$5","h",{"children":["$31","$36","$3f"]},null,"$30",0],false]],"q":"","i":true,"b":"development"}
+2f:C
+1:D"$4a"
+1:{"ok":true,"redirectUrl":"/mock-gateway?authority=MOCK-a2ff04eb9c0030357349c748","orderCode":"9061028310"}
+4f:I["[project]/src/components/cart/cart-sync.tsx [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],"CartSync"]
+71:I["[project]/node_modules/next/dist/client/app-dir/link.js [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],""]
+83:I["[project]/src/components/cart/cart-drawer.tsx [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],"CartDrawer"]
+85:I["[project]/node_modules/sonner/dist/index.mjs [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],"Toaster"]
+a:D"$4c"
+50:D"$52"
+50:D"$51"
+50:D"$54"
+50:["$","script",null,{"type":"application/ld+json","dangerouslySetInnerHTML":{"__html":"[{\"@context\":\"https://schema.org\",\"@type\":\"Organization\",\"name\":\"پریما\",\"alternateName\":\"PRIMA\",\"url\":\"http://localhost:3000\",\"logo\":\"http://localhost:3000/logo.svg\",\"description\":\"فروشگاه آنلاین حوله‌های باکیفیت برای حمام، استخر، هدیه و استفاده روزمره\"},{\"@context\":\"https://schema.org\",\"@type\":\"WebSite\",\"name\":\"پریما\",\"url\":\"http://localhost:3000\",\"potentialAction\":{\"@type\":\"SearchAction\",\"target\":\"http://localhost:3000/shop?query={search_term_string}\",\"query-input\":\"required name=search_term_string\"}}]"}},"$51","$53",1]
+55:D"$57"
+55:D"$56"
+5c:D"$5e"
+5c:D"$5d"
+5c:D"$60"
+65:D"$6a"
+65:D"$66"
+65:D"$6c"
+65:D"$6b"
+65:D"$6e"
+65:D"$6d"
+65:D"$70"
+65:["$","$L71",null,{"href":"/shop","children":"مشاهده محصولات","data-slot":"button","className":"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-45 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-[3px] cursor-pointer bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs h-11 px-5 py-2 has-[>svg]:px-4","ref":null},"$6d","$6f",1]
+72:D"$76"
+72:D"$73"
+72:D"$78"
+72:D"$77"
+72:D"$7a"
+72:D"$79"
+72:D"$7c"
+72:["$","$L71",null,{"href":"/","children":"صفحه اصلی","data-slot":"button","className":"inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-45 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/40 focus-visible:ring-[3px] cursor-pointer border border-line bg-surface hover:bg-secondary text-foreground h-11 px-5 py-2 has-[>svg]:px-4","ref":null},"$79","$7b",1]
+5c:["$","div",null,{"className":"container-brand flex flex-col items-center py-20 text-center lg:py-28","children":[["$","p",null,{"className":"text-6xl font-bold text-sand","children":"۴۰۴"},"$5d","$61",1],["$","h1",null,{"className":"mt-4 text-xl font-bold sm:text-2xl","children":"این صفحه پیدا نشد"},"$5d","$62",1],["$","p",null,{"className":"mt-3 max-w-md text-sm leading-7 text-muted-foreground","children":"ممکن است آدرس تغییر کرده باشد یا محصول از فروشگاه حذف شده باشد. از فروشگاه، محصولات ما را ببینید."},"$5d","$63",1],["$","div",null,{"className":"mt-7 flex flex-wrap justify-center gap-2.5","children":["$65","$72"]},"$5d","$64",1]]},"$5d","$5f",1]
+7f:D"$81"
+7f:D"$80"
+a:["$","html",null,{"lang":"fa","dir":"rtl","suppressHydrationWarning":true,"children":["$","body",null,{"className":"vazirmatn_9cfc1b4-module__RiaKIq__variable flex min-h-screen flex-col bg-background font-sans text-foreground antialiased","children":[["$","$L4f",null,{},"$b","$4e",1],"$50","$L55",["$","main",null,{"className":"flex-1","children":["$","$L17",null,{"parallelRouterKey":"children","error":"$undefined","errorStyles":"$undefined","errorScripts":"$undefined","template":["$","$L19",null,{},null,"$5a",1],"templateStyles":"$undefined","templateScripts":"$undefined","notFound":["$","$L3","c-not-found",{"type":"not-found","pagePath":"not-found.tsx","children":["$5c",[]]},null,"$5b",0],"forbidden":"$undefined","unauthorized":"$undefined","segmentViewBoundaries":[["$","$L3",null,{"type":"boundary:not-found","pagePath":"not-found.tsx@boundary"},null,"$7d",1],"$undefined","$undefined",["$","$L3",null,{"type":"boundary:global-error","pagePath":"__next_builtin__global-error.js"},null,"$7e",1]]},null,"$59",1]},"$b","$58",1],"$L7f",["$","$L83",null,{"shippingRates":{"freeShippingThreshold":1500000,"standardShippingCost":89000,"expressShippingCost":189000}},"$b","$82",1],["$","$L85",null,{"position":"bottom-center","dir":"rtl","toastOptions":{"style":{"fontFamily":"var(--font-vazirmatn)","borderRadius":"0.75rem"}}},"$b","$84",1]]},"$b","$4d",1]},"$b","$4b",1]
+3c:D"$86"
+3c:[["$","meta","0",{"charSet":"utf-8"},"$27","$87",0],["$","meta","1",{"name":"viewport","content":"width=device-width, initial-scale=1"},"$27","$88",0],["$","meta","2",{"name":"theme-color","content":"#F8F6F2"},"$27","$89",0]]
+2e:D"$8a"
+2e:null
+47:D"$8b"
+47:[["$","title","0",{"children":"تکمیل خرید | پریما"},"$27","$8c",0],["$","meta","1",{"name":"description","content":"خرید حوله‌های باکیفیت برای حمام، استخر، هدیه و استفاده روزمره. حوله‌هایی با تمرکز بر کیفیت، نرمی و تجربه‌ای که هر روز لمس می‌کنید."},"$27","$8d",0],["$","meta","2",{"name":"keywords","content":"حوله,حوله حمام,حوله پریمیوم,ست حوله,تن‌پوش,حوله کودک,خرید حوله"},"$27","$8e",0],["$","meta","3",{"name":"robots","content":"noindex"},"$27","$8f",0],["$","meta","4",{"property":"og:title","content":"پریما | حوله‌های باکیفیت و پریمیوم"},"$27","$90",0],["$","meta","5",{"property":"og:description","content":"حوله‌هایی با تمرکز بر کیفیت، نرمی و تجربه‌ای که هر روز لمس می‌کنید."},"$27","$91",0],["$","meta","6",{"property":"og:site_name","content":"پریما"},"$27","$92",0],["$","meta","7",{"property":"og:locale","content":"fa_IR"},"$27","$93",0],["$","meta","8",{"property":"og:type","content":"website"},"$27","$94",0],["$","meta","9",{"name":"twitter:card","content":"summary"},"$27","$95",0],["$","meta","10",{"name":"twitter:title","content":"پریما | حوله‌های باکیفیت و پریمیوم"},"$27","$96",0],["$","meta","11",{"name":"twitter:description","content":"حوله‌هایی با تمرکز بر کیفیت، نرمی و تجربه‌ای که هر روز لمس می‌کنید."},"$27","$97",0]]
+ae:I["[project]/src/app/checkout/checkout-client.tsx [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js","/_next/static/chunks/src_0j-ndte._.js","/_next/static/chunks/node_modules_zod_v4_classic_0qgufeu._.js","/_next/static/chunks/node_modules_zod_v4_core_15b2lfp._.js","/_next/static/chunks/node_modules_zod_v4_locales_1-ided7._.js","/_next/static/chunks/node_modules_1tzy063._.js"],"CheckoutClient"]
+b7:I["[project]/src/components/layout/header.tsx [app-client] (ecmascript)",["/_next/static/chunks/src_app_cart_actions_ts_1tmy0ft._.js","/_next/static/chunks/src_1hl28g1._.js","/_next/static/chunks/node_modules_0e6llup._.js"],"Header"]
+1c:D"$9b"
+1c:D"$9d"
+1c:D"$9e"
+55:D"$a2"
+55:D"$a4"
+55:D"$a5"
+7f:D"$a8"
+7f:D"$aa"
+7f:D"$ab"
+1c:D"$ad"
+1c:["$","$Lae",null,{"savedAddresses":[],"shippingRates":{"freeShippingThreshold":1500000,"standardShippingCost":89000,"expressShippingCost":189000},"shippingDays":{"preparationDays":"۱ روز کاری","standardDays":"۲ تا ۴ روز کاری","expressDays":"روز بعد","returnWindowDays":7,"exchangeWindowDays":14}},"$1d","$ac",1]
+55:D"$af"
+b0:D"$b2"
+b0:D"$b1"
+b0:D"$b4"
+b0:["$","div",null,{"className":"bg-deep text-cream","children":["$","p",null,{"className":"container-brand py-2 text-center text-xs sm:text-[13px]","children":["ارسال رایگان برای سفارش‌های بالای ","۱٬۵۰۰٬۰۰۰"," ","تومان"," · ضمانت کیفیت و امکان تعویض تا ","۱۴"," روز"]},"$b1","$b5",1]},"$b1","$b3",1]
+55:["$b0",["$","$Lb7",null,{"categories":[{"id":"c1","slug":"bath-towels","name":"حوله حمام","description":"حوله‌های حمام با بافت متراکم و جذب بالا؛ همراه هر روز شما بعد از یک دوش گرم.","seoText":"انتخاب حوله حمام مناسب به وزن (GSM)، جنس الیاف و تراکم بافت بستگی دارد. حوله‌های ۵۰۰ به بالا وزن، جذب‌آبی بیشتر و حس لطافت عمیق‌تری دارند و برای استفاده روزمره از حمام خانه ایده‌آل هستند.","image":"/images/cat-bath.jpg"},{"id":"c2","slug":"hand-face","name":"دست و صورت","description":"حوله‌های دست و صورت لطیف برای پوست حساس؛ سبک، سریع‌الخشک و مناسب سرویس حمام.","seoText":"حوله دست و صورت به دلیل تماس مستقیم با پوست صورت باید از الیاف نرم و ظریف بافته شده باشد؛ وزن سبک‌تر (۴۰۰ تا ۵۰۰ GSM) باعث خشک‌شدن سریع‌تر و بهداشت بهتر می‌شود.","image":"/images/cat-hand.jpg"},{"id":"c3","slug":"pool","name":"استخری","description":"حوله‌های استخری بزرگ و خوش‌دوام با رنگ‌های روشن؛ برای استخر، ساحل و باشگاه.","seoText":"حوله استخری باید ابعاد بزرگ، وزن متعادل و مقاومت بالا در برابر کلر و نور آفتاب داشته باشد؛ الیاف حلقه‌ای متراکم، آب را سریع جذب می‌کنند و پس از شست‌وشو فرم خود را حفظ می‌کنند.","image":"/images/cat-pool.jpg"},{"id":"c4","slug":"bathrobes","name":"تن‌پوش","description":"تن‌پوش‌های وافل و پارچه‌ای سبک؛ حس یک اسپای خانگی بعد از حمام یا استخر.","seoText":"تن‌پوش بافت وافل به دلیل ساختار مشبک خود سبک است و رطوبت را سریع تبخیر می‌کند؛ گزینه‌ای مینیمال و سریع‌الخشک برای بعد از استخر و حمام.","image":"/images/cat-robe.jpg"},{"id":"c5","slug":"kids","name":"کودک","description":"حوله‌های کودک با الیاف ضدحساسیت و رنگ‌های ملایم؛ لطیف روی پوست نوزاد و کودک.","seoText":"پوست کودک نازک‌تر و حساس‌تر از بزرگسالان است؛ حوله کودک باید از الیاف طبیعی بدون مواد شیمیایی، با بافت لطیف و وزن سبک انتخاب شود.","image":"/images/cat-kids.jpg"},{"id":"c6","slug":"sets","name":"ست‌ها","description":"ست‌های هماهنگ حوله برای سرویس کامل حمام؛ انتخابی هوشمند برای خانه جدید و جهیزیه.","seoText":"خرید ست کامل حوله علاوه بر هماهنگی رنگی، اقتصادی‌تر از خرید تک‌به‌تک است؛ یک ست استاندارد شامل حوله حمام، حوله دست و توالت‌کاغذی‌پوش یا حوله صورت است.","image":"/images/cat-sets.jpg"}],"collections":[{"id":"col1","slug":"premium","name":"پریمیوم","description":"انتخاب برتر با بالاترین وزن و لطافت برای تجربه‌ای حسی‌تر.","image":"/images/lifestyle-shelf.jpg"},{"id":"col2","slug":"everyday","name":"روزمره","description":"حوله‌های کاربردی و باکیفیت برای مصرف روزانه خانواده.","image":"/images/lifestyle-warm.jpg"},{"id":"col3","slug":"spa","name":"اسپا","description":"حس اسپا در خانه؛ بافت‌های لطیف و رنگ‌های آرام.","image":"/images/lifestyle-spa.jpg"},{"id":"col4","slug":"gift","name":"هدیه","description":"بسته‌بندی خاص برای هدیه‌هایی که لمس‌شان می‌شود.","image":"/images/cat-gift.jpg"},{"id":"col5","slug":"seasonal","name":"فصلی","description":"انتخاب‌های محدود برای فصل‌های خاص سال.","image":"/images/lifestyle-beach.jpg"}],"searchSuggestions":["حوله حمام","دست و صورت","استخری","تن‌پوش","کودک"]},"$56","$b6",1]]
+7f:D"$b9"
+bd:D"$bf"
+bd:D"$be"
+bd:D"$c5"
+bd:D"$c0"
+bd:D"$c7"
+bd:["$","$L71",null,{"href":"/","aria-label":"پریما — صفحه اصلی","className":"flex items-center gap-2.5","children":[["$","svg",null,{"width":"34","height":"34","viewBox":"0 0 34 34","fill":"none","aria-hidden":true,"className":"shrink-0","children":[["$","rect",null,{"x":"4","y":"6","width":"26","height":"6.5","rx":"2.5","fill":"var(--color-terracotta)"},"$be","$c9",1],["$","rect",null,{"x":"4","y":"14","width":"26","height":"6.5","rx":"2.5","fill":"var(--color-sand)"},"$be","$ca",1],["$","rect",null,{"x":"4","y":"22","width":"26","height":"6.5","rx":"2.5","fill":"#303A35"},"$be","$cb",1]]},"$be","$c8",1],["$","span",null,{"className":"flex flex-col leading-none text-deep","children":[["$","span",null,{"className":"text-lg font-bold tracking-tight","children":"پریما"},"$be","$cd",1],["$","span",null,{"className":"mt-0.5 text-[9px] font-medium tracking-[0.35em] opacity-60","children":"PRIMA"},"$be","$ce",1]]},"$be","$cc",1]]},"$c0","$c6",1]
+d2:D"$d4"
+d2:D"$d3"
+d2:D"$d6"
+d2:D"$d5"
+d2:D"$d8"
+d2:["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":24,"height":24,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-phone size-4","aria-hidden":true,"children":[["$","path","9njp5v",{"d":"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"},"$d5","$d9",0],"$undefined"]},"$d5","$d7",1]
+db:D"$dd"
+db:D"$dc"
+db:D"$df"
+db:D"$de"
+db:D"$e1"
+db:["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":24,"height":24,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-mail size-4","aria-hidden":true,"children":[["$","path","132q7q",{"d":"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"},"$de","$e2",0],["$","rect","izxlao",{"x":"2","y":"4","width":"20","height":"16","rx":"2"},"$de","$e3",0],"$undefined"]},"$de","$e0",1]
+e5:D"$e7"
+e5:D"$e6"
+e5:D"$e9"
+e5:D"$e8"
+e5:D"$eb"
+e5:["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":24,"height":24,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-map-pin mt-0.5 size-4 shrink-0","aria-hidden":true,"children":[["$","path","1r0f0z",{"d":"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"},"$e8","$ec",0],["$","circle","ilqhr7",{"cx":"12","cy":"10","r":"3"},"$e8","$ed",0],"$undefined"]},"$e8","$ea",1]
+f2:D"$f4"
+f2:D"$f3"
+f2:D"$f6"
+f2:["$","$L71",null,{"href":"/shop/bath-towels","className":"transition-colors hover:text-foreground","children":"حوله حمام"},"$f3","$f5",1]
+f8:D"$fa"
+f8:D"$f9"
+f8:D"$fc"
+f8:["$","$L71",null,{"href":"/shop/hand-face","className":"transition-colors hover:text-foreground","children":"دست و صورت"},"$f9","$fb",1]
+fe:D"$100"
+fe:D"$ff"
+fe:D"$102"
+fe:["$","$L71",null,{"href":"/shop/pool","className":"transition-colors hover:text-foreground","children":"استخری"},"$ff","$101",1]
+104:D"$106"
+104:D"$105"
+104:D"$108"
+104:["$","$L71",null,{"href":"/shop/bathrobes","className":"transition-colors hover:text-foreground","children":"تن‌پوش"},"$105","$107",1]
+10a:D"$10c"
+10a:D"$10b"
+10a:D"$10e"
+10a:["$","$L71",null,{"href":"/shop/kids","className":"transition-colors hover:text-foreground","children":"کودک"},"$10b","$10d",1]
+110:D"$112"
+110:D"$111"
+110:D"$114"
+110:["$","$L71",null,{"href":"/shop/sets","className":"transition-colors hover:text-foreground","children":"ست‌ها"},"$111","$113",1]
+119:D"$11b"
+119:D"$11a"
+119:D"$11d"
+119:["$","$L71",null,{"href":"/collections/premium","className":"transition-colors hover:text-foreground","children":"پریمیوم"},"$11a","$11c",1]
+11f:D"$121"
+11f:D"$120"
+11f:D"$123"
+11f:["$","$L71",null,{"href":"/collections/everyday","className":"transition-colors hover:text-foreground","children":"روزمره"},"$120","$122",1]
+125:D"$127"
+125:D"$126"
+125:D"$129"
+125:["$","$L71",null,{"href":"/collections/spa","className":"transition-colors hover:text-foreground","children":"اسپا"},"$126","$128",1]
+12b:D"$12d"
+12b:D"$12c"
+12b:D"$12f"
+12b:["$","$L71",null,{"href":"/collections/gift","className":"transition-colors hover:text-foreground","children":"هدیه"},"$12c","$12e",1]
+131:D"$133"
+131:D"$132"
+131:D"$135"
+131:["$","$L71",null,{"href":"/collections/seasonal","className":"transition-colors hover:text-foreground","children":"فصلی"},"$132","$134",1]
+13a:D"$13c"
+13a:D"$13b"
+13a:D"$13e"
+13a:["$","$L71",null,{"href":"/faq","className":"transition-colors hover:text-foreground","children":"سؤالات پرتکرار"},"$13b","$13d",1]
+140:D"$142"
+140:D"$141"
+140:D"$144"
+140:["$","$L71",null,{"href":"/shipping","className":"transition-colors hover:text-foreground","children":"ارسال و تحویل"},"$141","$143",1]
+146:D"$148"
+146:D"$147"
+146:D"$14a"
+146:["$","$L71",null,{"href":"/returns","className":"transition-colors hover:text-foreground","children":"مرجوعی و تعویض"},"$147","$149",1]
+14c:D"$14e"
+14c:D"$14d"
+14c:D"$150"
+14c:["$","$L71",null,{"href":"/journal/how-to-wash-towels","className":"transition-colors hover:text-foreground","children":"راهنمای نگهداری"},"$14d","$14f",1]
+152:D"$154"
+152:D"$153"
+152:D"$156"
+152:["$","$L71",null,{"href":"/order-tracking","className":"transition-colors hover:text-foreground","children":"پیگیری سفارش"},"$153","$155",1]
+15b:D"$15d"
+15b:D"$15c"
+15b:D"$15f"
+15b:["$","$L71",null,{"href":"/about","className":"transition-colors hover:text-foreground","children":"داستان برند"},"$15c","$15e",1]
+161:D"$163"
+161:D"$162"
+161:D"$165"
+161:["$","$L71",null,{"href":"/contact","className":"transition-colors hover:text-foreground","children":"تماس با ما"},"$162","$164",1]
+167:D"$169"
+167:D"$168"
+167:D"$16b"
+167:["$","$L71",null,{"href":"/journal","className":"transition-colors hover:text-foreground","children":"ژورنال"},"$168","$16a",1]
+16d:D"$16f"
+16d:D"$16e"
+16d:D"$171"
+16d:["$","$L71",null,{"href":"/privacy","className":"transition-colors hover:text-foreground","children":"حریم خصوصی"},"$16e","$170",1]
+173:D"$175"
+173:D"$174"
+173:D"$177"
+173:["$","$L71",null,{"href":"/terms","className":"transition-colors hover:text-foreground","children":"شرایط استفاده"},"$174","$176",1]
+17b:D"$17d"
+17b:D"$17c"
+17b:D"$17f"
+17b:D"$17e"
+17b:D"$181"
+17b:["$","svg",null,{"ref":"$undefined","xmlns":"http://www.w3.org/2000/svg","width":24,"height":24,"viewBox":"0 0 24 24","fill":"none","stroke":"currentColor","strokeWidth":2,"strokeLinecap":"round","strokeLinejoin":"round","className":"lucide lucide-instagram size-4","aria-hidden":true,"children":[["$","rect","2e1cvw",{"width":"20","height":"20","x":"2","y":"2","rx":"5","ry":"5"},"$17e","$182",0],["$","path","9exkf1",{"d":"M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"},"$17e","$183",0],["$","line","r4j83e",{"x1":"17.5","x2":"17.51","y1":"6.5","y2":"6.5"},"$17e","$184",0],"$undefined"]},"$17e","$180",1]
+7f:["$","footer",null,{"className":"mt-auto border-t border-line bg-surface pb-[env(safe-area-inset-bottom)]","children":["$","div",null,{"className":"container-brand","children":[["$","div",null,{"className":"grid grid-cols-2 gap-x-6 gap-y-10 py-12 md:grid-cols-4 lg:grid-cols-6 lg:py-16","children":[["$","div",null,{"className":"col-span-2 flex flex-col gap-4 lg:col-span-2","children":["$bd",["$","p",null,{"className":"max-w-xs text-[13px] leading-6 text-muted-foreground","children":"حوله‌هایی با تمرکز بر کیفیت، نرمی و تجربه‌ای که هر روز لمس می‌کنید. پریما از پنبه شانه‌شده و بافت حلقه‌ای متراکم ساخته می‌شود."},"$80","$cf",1],["$","div",null,{"className":"flex flex-col gap-2.5 text-[13px] text-muted-foreground","children":[["$","a",null,{"href":"tel:021-91009100","className":"flex items-center gap-2 transition-colors hover:text-foreground","children":["$d2","۰۲۱-۹۱۰۰۹۱۰۰"]},"$80","$d1",1],["$","a",null,{"href":"mailto:hello@prima-towel.ir","className":"flex items-center gap-2 transition-colors hover:text-foreground","children":["$db","hello@prima-towel.ir"]},"$80","$da",1],["$","p",null,{"className":"flex items-start gap-2","children":["$e5","تهران، خیابان ولیعصر، برج مرکزی، طبقه ۹"]},"$80","$e4",1]]},"$80","$d0",1]]},"$80","$bc",1],["$","nav",null,{"aria-label":"فروشگاه","children":[["$","h3",null,{"className":"text-sm font-semibold","children":"فروشگاه"},"$80","$ef",1],["$","ul",null,{"className":"mt-4 flex flex-col gap-2.5 text-[13px] text-muted-foreground","children":[["$","li","bath-towels",{"children":"$f2"},"$80","$f1",0],["$","li","hand-face",{"children":"$f8"},"$80","$f7",0],["$","li","pool",{"children":"$fe"},"$80","$fd",0],["$","li","bathrobes",{"children":"$104"},"$80","$103",0],["$","li","kids",{"children":"$10a"},"$80","$109",0],["$","li","sets",{"children":"$110"},"$80","$10f",0]]},"$80","$f0",1]]},"$80","$ee",1],["$","nav",null,{"aria-label":"کالکشن‌ها","children":[["$","h3",null,{"className":"text-sm font-semibold","children":"کالکشن‌ها"},"$80","$116",1],["$","ul",null,{"className":"mt-4 flex flex-col gap-2.5 text-[13px] text-muted-foreground","children":[["$","li","premium",{"children":"$119"},"$80","$118",0],["$","li","everyday",{"children":"$11f"},"$80","$11e",0],["$","li","spa",{"children":"$125"},"$80","$124",0],["$","li","gift",{"children":"$12b"},"$80","$12a",0],["$","li","seasonal",{"children":"$131"},"$80","$130",0]]},"$80","$117",1]]},"$80","$115",1],["$","nav",null,{"aria-label":"راهنما","children":[["$","h3",null,{"className":"text-sm font-semibold","children":"راهنما"},"$80","$137",1],["$","ul",null,{"className":"mt-4 flex flex-col gap-2.5 text-[13px] text-muted-foreground","children":[["$","li",null,{"children":"$13a"},"$80","$139",1],["$","li",null,{"children":"$140"},"$80","$13f",1],["$","li",null,{"children":"$146"},"$80","$145",1],["$","li",null,{"children":"$14c"},"$80","$14b",1],["$","li",null,{"children":"$152"},"$80","$151",1]]},"$80","$138",1]]},"$80","$136",1],["$","nav",null,{"aria-label":"پریما","children":[["$","h3",null,{"className":"text-sm font-semibold","children":"پریما"},"$80","$158",1],["$","ul",null,{"className":"mt-4 flex flex-col gap-2.5 text-[13px] text-muted-foreground","children":[["$","li",null,{"children":"$15b"},"$80","$15a",1],["$","li",null,{"children":"$161"},"$80","$160",1],["$","li",null,{"children":"$167"},"$80","$166",1],["$","li",null,{"children":"$16d"},"$80","$16c",1],["$","li",null,{"children":"$173"},"$80","$172",1]]},"$80","$159",1]]},"$80","$157",1]]},"$80","$bb",1],["$","div",null,{"className":"flex flex-col items-center justify-between gap-4 border-t border-line py-6 sm:flex-row","children":[["$","p",null,{"className":"text-xs text-muted-foreground","children":["© ","۱۴۰۵"," پریما — همه حقوق محفوظ است."]},"$80","$179",1],["$","a",null,{"href":"https://instagram.com/prima.towel","target":"_blank","rel":"noopener noreferrer","className":"flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground","children":["$17b","@prima.towel"]},"$80","$17a",1]]},"$80","$178",1]]},"$80","$ba",1]},"$80","$b8",1]

@@ -1,0 +1,19 @@
+=== baseline (بدون کوکی) /admin/staff ===
+307 → http://localhost:3000/admin/login?next=%2Fadmin%2Fstaff
+=== baseline SUPPORT_AGENT ===
+307 → http://localhost:3000/admin/no-access
+staff/ → 308|http://localhost:3000/admin/staff 
+//admin/staff → 308|http://localhost:3000/admin/staff 
+/admin/./staff → 307|http://localhost:3000/admin/no-access 
+/admin//staff → 308|http://localhost:3000/admin/staff 
+/./admin/staff → 307|http://localhost:3000/admin/no-access 
+/admin/%2fstaff → 404| 
+/admin/staff%2f → 404| 
+/admin/STAFF → 404| 
+/admin/Staff → 404| 
+/admin/staff/.. → 308|http://localhost:3000/admin 
+/admin/staff/x → 404| 
+/admin%2Fstaff → 404| 
+/%61dmin/staff → 404| 
+query+fragment → 307|http://localhost:3000/admin/no-access 
+staff(ç) → 404| 

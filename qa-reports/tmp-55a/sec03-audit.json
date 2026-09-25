@@ -1,0 +1,9 @@
+{
+ "total": 11,
+ "summary": {
+  "auth.login.failed": 5,
+  "auth.login.rate_limited": 5,
+  "auth.login.rate_limited:scope=per-email": 1
+ }
+}
+per-email scoped rows: 1 {"action":"auth.login.rate_limited","after":{"scope":"per-email"},"ip":null,"createdAt":"2026-09-25T21:32:09.201Z"}

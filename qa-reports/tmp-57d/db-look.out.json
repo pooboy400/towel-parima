@@ -1,0 +1,32 @@
+{
+  "variantTotal": 60,
+  "variantsReservedPositive": 0,
+  "variantsStockNegative": 0,
+  "activeReservationsTotal": 0,
+  "activeReservationsWithoutOrder": 0,
+  "mintedUsers": 0,
+  "mintedUsersSample": [],
+  "mintedSessions": 0,
+  "testRoles": 1,
+  "testRolesSample": [
+    "test_role_NO_ACCESS/NO_ACCESS"
+  ],
+  "testAuditRows": 0,
+  "testAuditSample": [],
+  "mockPayments": 7,
+  "mockPaymentsSample": [
+    "MOCK-8639d06dc1696fc8597b3558/PAID",
+    "MOCK-d556d4ca833ee2a78b2881d3/PAID",
+    "MOCK-25d6fe0cb650e41998000ebb/FAILED",
+    "MOCK-77082ec75e4d25e6a2389610/FAILED",
+    "MOCK-1e70f11ab4e0a9fb33f1c214/FAILED",
+    "MOCK-d9054ce85d293b6e8537cce9/PAID",
+    "MOCK-c7bc4f38c5fad063d322783c/PENDING"
+  ],
+  "mockOrdersLinked": 7,
+  "guestTestOrdersToday": 0,
+  "totalUsers": 22,
+  "totalSessions": 0,
+  "totalOrders": 7,
+  "totalPayments": 7
+}

@@ -4,6 +4,7 @@ import { formatPrice, faDigits } from "@/lib/format";
 import { getStoreConfig } from "@/services/settings-service";
 import { storeConfig as fallbackConfig } from "@/lib/config";
 import { PrintButton } from "./print-button";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +17,7 @@ export default async function InvoicePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requirePageAccess("orders");
   const { id } = await params;
   const order = await db.order.findUnique({
     where: { id },

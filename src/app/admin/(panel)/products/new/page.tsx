@@ -1,10 +1,12 @@
 import { PageHeader } from "@/components/admin/page-header";
 import { adminGetProductFormOptions } from "@/lib/repositories/admin-repository";
 import { ProductForm } from "@/components/admin/product-form";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewProductPage() {
+  await requirePageAccess("products");
   const options = await adminGetProductFormOptions();
 
   return (

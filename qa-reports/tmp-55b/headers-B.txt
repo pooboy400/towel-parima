@@ -1,0 +1,17 @@
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+Content-Security-Policy-Report-Only: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'; report-uri /api/csp-report; report-to csp-endpoint
+Reporting-Endpoints: csp-endpoint="/api/csp-report"
+Vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding
+Cache-Control: no-cache, must-revalidate
+Set-Cookie: prima_pay_proof=08392ea2b32e6abc2d1e7659b74a7fa686f82015e43a55fbccb3b9a760663e08; Path=/; Expires=Fri, 25 Sep 2026 21:47:22 GMT; Max-Age=900; HttpOnly; SameSite=lax
+x-action-revalidated: 1
+Content-Type: text/x-component
+Date: Fri, 25 Sep 2026 21:32:22 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+Transfer-Encoding: chunked
+

@@ -47,6 +47,29 @@ export async function adminLoginAction(input: {
   }
 
   const meta = await requestMeta();
+
+  // ── سقف مستقل per-email (SEC-03) — مستقل از IP؛ brute-force رمز ادمین حتی
+  // با چرخش IP/XFF هم بعد از ۱۰ تلاش در ساعت قفل می‌شود. پیام generic.
+  const emailRl = await rateLimiter.hit(
+    rateKey("admin-signin-email", parsed.data.email),
+    RATE_RULES.signInPerEmail,
+  );
+  if (!emailRl.ok) {
+    await safeAudit({
+      action: "auth.login.rate_limited",
+      entityType: "auth",
+      entityId: parsed.data.email,
+      ip: meta.ip,
+      userAgent: meta.userAgent,
+      after: { scope: "per-email" },
+    });
+    const minutes = Math.max(1, Math.ceil(emailRl.retryAfterMs / 60_000));
+    return {
+      ok: false,
+      error: { code: "RATE_LIMITED", message: `تلاش‌های زیاد. ${minutes} دقیقه دیگر دوباره امتحان کنید.` },
+    };
+  }
+
   const key = rateKey("admin-signin", meta.ip, parsed.data.email);
 
   // ── rate limit — ۵ تلاش / ۱۵ دقیقه (سیاست signIn §9.4)
@@ -58,6 +81,7 @@ export async function adminLoginAction(input: {
       entityId: parsed.data.email,
       ip: meta.ip,
       userAgent: meta.userAgent,
+      after: { scope: "per-ip" }, // CR-10/55-c — قرینهٔ ردیف per-email برای تحلیل بعد از واقعه
     });
     const minutes = Math.max(1, Math.ceil(rl.retryAfterMs / 60_000));
     return {

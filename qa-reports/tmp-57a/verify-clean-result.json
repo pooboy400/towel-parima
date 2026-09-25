@@ -1,0 +1,10 @@
+{
+ "orderLeft": 0,
+ "paymentLeft": 0,
+ "variantsWithReservedNotZero": 0,
+ "activeReservationsLeft": 0,
+ "mintedUsersLeft": 0,
+ "mintedSessionsLeft": 0,
+ "auditLeft": 0,
+ "realAdminIntact": true
+}

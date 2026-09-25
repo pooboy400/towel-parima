@@ -23,7 +23,7 @@ import {
   Mail,
   ArrowLeft,
 } from "lucide-react";
-import { getPanelContext } from "@/core/auth/session-service";
+import { requirePageAccess } from "@/lib/admin/page-guard";
 import { PERMISSIONS } from "@/core/auth/permissions";
 import { db } from "@/lib/db";
 import { formatNumber, formatDate, formatPrice, faDigits } from "@/lib/format";
@@ -49,8 +49,11 @@ const CHART_COLORS = [
 ];
 
 export default async function AdminDashboardPage() {
-  const ctx = await getPanelContext();
-  const can = (p: string) => ctx?.actor.permissions.includes(p) ?? false;
+  // CR-1/55-c — داشبورد KPI تجمیعی فروش/انبار دارد؛ فقط با analyticsRead
+  // (SUPPORT_AGENT به no-access می‌رود؛ no-access لینک شرطی داشبورد را از قبل
+  // با analyticsRead فرض کرده بود — یعنی طراحی اصلی همین گیت را پیش‌بینی کرده بود)
+  const ctx = await requirePageAccess("dashboard");
+  const can = (p: string) => ctx.actor.permissions.includes(p);
 
   // ── شمارش‌ها
   const [
