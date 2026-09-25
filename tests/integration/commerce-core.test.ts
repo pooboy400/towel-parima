@@ -15,6 +15,7 @@ import {
 import { placeOrder } from "../../src/core/commerce/checkout-service";
 import { evaluateCoupon } from "../../src/core/commerce/coupon-service";
 import { startPayment, confirmPayment, failPayment } from "../../src/core/commerce/payment-service";
+import { requestRefund } from "../../src/core/commerce/refund-service";
 import { transitionOrder, assertTransition } from "../../src/core/commerce/order-service";
 import { DomainError } from "../../src/core/errors";
 
@@ -490,6 +491,61 @@ describe("PaymentService — تأیید idempotent (§10.2)", () => {
       where: { type: "PaymentSucceeded", payload: { path: ["orderId"], equals: placed.orderId } },
     });
     expect(paid).toHaveLength(0);
+  });
+
+  // ─── رگرسیون استرداد همزمان (MEDIUM-2 گزارش 47-a) ───
+
+  it("دو استرداد کامل همزمان: فقط یکی نهایی می‌شود — سقف هرگز نقض نمی‌شود", async () => {
+    const variant = await makeVariantWithStock(5);
+    const placed = await placeOrder({
+      userId: null,
+      lines: [{ productId: variant.productId, colorId: null, sizeId: null, quantity: 1 }],
+      address: {
+        fullName: "تست تست",
+        phone: "09121112233",
+        province: "تهران",
+        city: "تهران",
+        postalCode: "1965843111",
+        line: "خیابان تست پلاک ۱",
+      },
+      shippingMethod: "standard",
+    });
+    created.orderIds.push(placed.orderId);
+
+    const { paymentId } = await startPayment({ orderId: placed.orderId, userId: null });
+    const payment = await db.payment.findUnique({ where: { id: paymentId } });
+    await confirmPayment(payment!.authority); // PAID + PROCESSING
+
+    // دو ادمین همزمان (دو تب / دابل‌کلیک) استرداد کامل می‌زنند
+    const results = await Promise.allSettled([
+      requestRefund({
+        orderId: placed.orderId,
+        amountIrt: payment!.amount,
+        reason: "استرداد تست همزمان ۱",
+        actorId: null,
+      }),
+      requestRefund({
+        orderId: placed.orderId,
+        amountIrt: payment!.amount,
+        reason: "استرداد تست همزمان ۲",
+        actorId: null,
+      }),
+    ]);
+
+    const succeeded = results.filter(
+      (r) => r.status === "fulfilled" && r.value.status === "SUCCEEDED",
+    );
+    const rejected = results.filter((r) => r.status === "rejected");
+    expect(succeeded).toHaveLength(1);
+    expect(rejected).toHaveLength(1); // دومی: CONFLICT یا سقف صفر — هر دو صحیح
+
+    // نامتغیر سقف: مجموع استردادهای موفق ≤ پرداخت موفق
+    const refunds = await db.refund.findMany({ where: { orderId: placed.orderId } });
+    const sum = refunds
+      .filter((r) => r.status === "SUCCEEDED")
+      .reduce((s, r) => s + r.amount, 0);
+    expect(sum).toBeLessThanOrEqual(payment!.amount);
+    expect(sum).toBe(payment!.amount); // دقیقاً یک استرداد کامل
   });
 });
 

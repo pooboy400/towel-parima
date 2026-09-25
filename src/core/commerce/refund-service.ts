@@ -50,57 +50,76 @@ export async function requestRefund(input: {
     },
   });
   if (!order) throw new DomainError("NOT_FOUND", "سفارش یافت نشد.");
-  if (order.status === "CANCELLED") {
-    throw new DomainError(
-      "INVALID_TRANSITION",
-      "سفارش لغوشده از مسیر لغو می‌رود — استرداد مستقل ندارد.",
+
+  // ── tx ۱: پذیرش اتمیک (رفع MEDIUM-2 گزارش 47-a — استرداد همزمان)
+  // قفل ردیف سفارش → بازخوانی کامل پرداخت/استرداد → اعتبارسنجی سقف → Refund PROCESSING.
+  // دو درخواست همزمان روی قفل سریال می‌شوند؛ دومی وضعیت کامل اولی را می‌بیند —
+  // نه دو PROCESSING همزمان، نه عبور مجموع از سقف.
+  const { refundId, payment, refundedTotal, paidTotal } = await db.$transaction(async (tx) => {
+    // قفل pessimistic — درخواست‌های رقیب تا commit این tx صبر می‌کنند
+    await tx.$queryRaw`SELECT "id" FROM "Order" WHERE "id" = ${order.id} FOR UPDATE`;
+
+    const freshOrder = await tx.order.findUnique({
+      where: { id: order.id },
+      select: { status: true },
+    });
+    if (!freshOrder || freshOrder.status === "CANCELLED") {
+      throw new DomainError(
+        "INVALID_TRANSITION",
+        "سفارش لغوشده از مسیر لغو می‌رود — استرداد مستقل ندارد.",
+      );
+    }
+
+    const freshPayments = await tx.payment.findMany({
+      where: { orderId: order.id },
+      orderBy: { createdAt: "asc" },
+    });
+    const freshRefunds = await tx.refund.findMany({ where: { orderId: order.id } });
+
+    const paidPayments = freshPayments.filter(
+      (p) => p.status === "PAID" || p.status === "PARTIALLY_REFUNDED",
     );
-  }
+    const paidTotal = freshPayments
+      .filter((p) => p.status === "PAID" || p.status === "PARTIALLY_REFUNDED" || p.status === "REFUNDED")
+      .reduce((s, p) => s + p.amount, 0);
+    const refunded = freshRefunds
+      .filter((r) => r.status === "SUCCEEDED")
+      .reduce((s, r) => s + r.amount, 0);
 
-  // ── سقف مالی — از رکوردهای واقعی
-  const paidPayments = order.payments.filter((p) => p.status === "PAID" || p.status === "PARTIALLY_REFUNDED");
-  const paidTotal = order.payments
-    .filter((p) => p.status === "PAID" || p.status === "PARTIALLY_REFUNDED" || p.status === "REFUNDED")
-    .reduce((s, p) => s + p.amount, 0);
-  const refundedTotal = order.refunds
-    .filter((r) => r.status === "SUCCEEDED")
-    .reduce((s, r) => s + r.amount, 0);
+    if (paidPayments.length === 0 || paidTotal === 0) {
+      throw new DomainError("INVALID_TRANSITION", "این سفارش پرداخت موفقی برای استرداد ندارد.");
+    }
+    if (freshRefunds.some((r) => r.status === "PROCESSING")) {
+      throw new DomainError(
+        "CONFLICT",
+        "یک درخواست بازگشت وجه دیگر برای این سفارش در جریان است — منتظر نتیجه بمانید.",
+      );
+    }
+    const remaining = paidTotal - refunded;
+    if (amount > remaining) {
+      throw new DomainError(
+        "VALIDATION_ERROR",
+        `مبلغ بازگشت بیشتر از باقی‌ماندهٔ قابل استرداد است (${remaining} تومان).`,
+      );
+    }
 
-  if (paidPayments.length === 0 || paidTotal === 0) {
-    throw new DomainError("INVALID_TRANSITION", "این سفارش پرداخت موفقی برای استرداد ندارد.");
-  }
-  const inFlight = order.refunds.some((r) => r.status === "PROCESSING");
-  if (inFlight) {
-    throw new DomainError(
-      "CONFLICT",
-      "یک درخواست بازگشت وجه دیگر برای این سفارش در جریان است — منتظر نتیجه بمانید.",
-    );
-  }
-  const remaining = paidTotal - refundedTotal;
-  if (amount > remaining) {
-    throw new DomainError(
-      "VALIDATION_ERROR",
-      `مبلغ بازگشت بیشتر از باقی‌ماندهٔ قابل استرداد است (${remaining} تومان).`,
-    );
-  }
+    const payment = [...paidPayments].reverse().find((p) => p.transactionId);
+    if (!payment) {
+      throw new DomainError("INTERNAL", "پرداخت موفق بدون شناسه تراکنش درگاه — استرداد ممکن نیست.");
+    }
 
-  // پرداخت مبدأ — آخرین پرداخت موفق با transactionId
-  const payment = [...paidPayments].reverse().find((p) => p.transactionId);
-  if (!payment) {
-    throw new DomainError("INTERNAL", "پرداخت موفق بدون شناسه تراکنش درگاه — استرداد ممکن نیست.");
-  }
-
-  // ── tx ۱: پذیرش — Refund PROCESSING
-  const refund = await db.refund.create({
-    data: {
-      paymentId: payment.id,
-      orderId: order.id,
-      amount,
-      reason,
-      status: "PROCESSING",
-      actorId: input.actorId,
-    },
-    select: { id: true },
+    const refund = await tx.refund.create({
+      data: {
+        paymentId: payment.id,
+        orderId: order.id,
+        amount,
+        reason,
+        status: "PROCESSING",
+        actorId: input.actorId,
+      },
+      select: { id: true },
+    });
+    return { refundId: refund.id, payment, refundedTotal: refunded, paidTotal };
   });
 
   // ── فراخوانی درگاه — خارج از tx (قانون طلایی §10.3)
@@ -112,11 +131,11 @@ export async function requestRefund(input: {
   // ── tx ۲: نتیجه
   if (!providerRes.ok) {
     await db.refund.update({
-      where: { id: refund.id },
+      where: { id: refundId },
       data: { status: "FAILED", error: providerRes.message?.slice(0, 300) ?? null },
     });
     return {
-      refundId: refund.id,
+      refundId,
       status: "FAILED",
       refundedTotal,
       paymentStatus: payment.status,
@@ -124,12 +143,13 @@ export async function requestRefund(input: {
     };
   }
 
+  // سقف از دادهٔ tx پذیرش (اتمیک خوانده‌شده زیر قفل) — نه از خواندن قدیمی
   const newRefundedTotal = refundedTotal + amount;
   const paymentStatus = newRefundedTotal >= paidTotal ? "REFUNDED" : "PARTIALLY_REFUNDED";
 
   await db.$transaction(async (tx) => {
     await tx.refund.update({
-      where: { id: refund.id },
+      where: { id: refundId },
       data: {
         status: "SUCCEEDED",
         providerRef: providerRes.providerRef ?? null,
@@ -155,7 +175,7 @@ export async function requestRefund(input: {
   await invalidateStorefrontForOrder(order.id);
 
   return {
-    refundId: refund.id,
+    refundId,
     status: "SUCCEEDED",
     refundedTotal: newRefundedTotal,
     paymentStatus,
