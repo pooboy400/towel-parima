@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { formatPrice, faDigits } from "@/lib/format";
+import { formatPrice, faDigits, toLatinDigits } from "@/lib/format";
 import {
   transitionOrderAction,
   shipOrderAction,
@@ -70,7 +70,8 @@ export function OrdersManager({ orders }: { orders: AdminOrderRow[] }) {
   const [pending, startTransition] = useTransition();
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    // جستجو با ارقام فارسی هم مچ می‌شود — جدول با faDigits نمایش می‌دهد (47-f MEDIUM)
+    const q = toLatinDigits(query.trim().toLowerCase());
     return orders.filter((o) => {
       if (filter !== "ALL" && o.status !== filter) return false;
       if (q && !o.code.includes(q) && !o.phone.includes(q)) return false;
