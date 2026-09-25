@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { InMemoryRateLimiter } from "../../src/core/rate-limit/in-memory";
 import { RATE_RULES, rateKey } from "../../src/core/rate-limit/policies";
-import { DomainError, toErrorBody } from "../../src/core/errors";
+import { DomainError, toErrorBody, toInternalError } from "../../src/core/errors";
 
 describe("InMemoryRateLimiter — پنجره لغزان", () => {
   it("تا سقف مجاز است، بعدش رد می‌کند", async () => {
@@ -104,5 +104,23 @@ describe("استاندارد خطا — بخش ۲۴ سند", () => {
 
   it("override status کار می‌کند (مثل verify → 409)", () => {
     expect(new DomainError("PAYMENT_VERIFY_FAILED", "x", 409).status).toBe(409);
+  });
+
+  it("toInternalError خطای دامنه را بلعیده و INTERNAL نمی‌کند (رفع 500→401)", () => {
+    const auth = new DomainError("UNAUTHENTICATED", "ورود لازم است.");
+    const passthrough = toInternalError(auth, "req_test_1");
+    expect(passthrough.code).toBe("UNAUTHENTICATED");
+    expect(passthrough.status).toBe(401); // نه 500
+    expect(passthrough.message).toBe("ورود لازم است.");
+    expect(passthrough.meta?.requestId).toBe("req_test_1"); // همان الگوی INTERNAL
+
+    const forbidden = toInternalError(new DomainError("FORBIDDEN", "دسترسی ندارید."), "req_t2");
+    expect(forbidden.status).toBe(403);
+
+    // خطای واقعاً ناشناخته همچنان INTERNAL امن می‌شود
+    const internal = toInternalError(new Error("boom"), "req_t3");
+    expect(internal.code).toBe("INTERNAL");
+    expect(internal.status).toBe(500);
+    expect(internal.message).not.toContain("boom"); // پیام فنی به کلاینت نمی‌رسد
   });
 });

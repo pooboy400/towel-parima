@@ -106,10 +106,31 @@ export function toErrorBody(e: DomainError): StandardErrorBody {
 }
 
 /**
- * تبدیل هر خطای ناشناخته به INTERNAL امن — پیام اصلی فقط در لاگ سرور می‌ماند.
+ * تبدیل خطای ناشناخته به INTERNAL امن — پیام اصلی فقط در لاگ سرور می‌ماند.
  * در M0 لاگ = console (JSON یک‌خطی)؛ در M6 به error tracking وصل می‌شود.
+ *
+ * خطاهای دامنه (DomainError) عمدی و امن‌اند: با همان کد/وضعیت/پیام فارسی
+ * عبور می‌کنند — UNAUTHENTICATED باید 401 بماند نه اینکه با 500 بلعیده شود
+ * (رفع یافتهٔ MEDIUM گزارش‌های 47-b/47-c). رفتار موردانتظار با «warn» لاگ
+ * می‌شود، نه «error» (درس Task 43: خطای موردانتظار کاربر غیرفنی را نمی‌ترساند).
  */
 export function toInternalError(e: unknown, requestId: string): DomainError {
+  if (isDomainError(e)) {
+    if (!e.requestId) {
+      console.warn(
+        JSON.stringify({
+          level: "warn",
+          type: "domain_error",
+          requestId,
+          code: e.code,
+          message: e.message,
+          ts: new Date().toISOString(),
+        }),
+      );
+      return new DomainError(e.code, e.message, e.status, { ...e.meta, requestId });
+    }
+    return e;
+  }
   const err = e instanceof Error ? e : new Error(String(e));
   console.error(
     JSON.stringify({
