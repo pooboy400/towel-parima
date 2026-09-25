@@ -533,3 +533,65 @@ Stage Summary:
 - فقط ci.yml لوکال ماند (بازگشتش با توکن workflow-scope)
 - توکن نزد کاربر می‌ماند = کلید بازگردانی در چت/سرور جدید؛ بعد از پوش از config پاک شد
 - فلو چت جدید: clone با توکن → scripts/restore-from-github.sh → خواندن worklog + ARCHITECTURE
+
+---
+Task ID: 46
+Agent: main (Super Z)
+Task: بازگردانی پروژه در محیط تازه از گیت‌هاب (درخواست مالک: «این پروژه رو بالا بیار و ستاپش کن»)
+
+Work Log:
+- کلون عمومی https://github.com/pooboy400/towel-parima به /home/z/my-project/towel-parima (بدون توکن — مخزن قابل دسترس بود)
+- خواندن README، worklog (Task 1..45) و اسکریپت‌های pg.sh/setup-pg.sh/restore-from-github.sh طبق «راهنمای چت جدید»
+- bun install: ۸۲۹ پکیج بدون خطا (bun 1.3.14)
+- setup-pg.sh: zonky PostgreSQL 16.4 در /home/z/my-project/.pg → pg.sh init + start (پورت 5432، دیتابیس prima)
+- .env ساخته شد با DATABASE_URL پرتابل (فایل در gitignore است — استاندارد امنیتی حفظ شد)
+- prisma generate + migrate deploy: هر ۸ مهاجرت اعمال شد
+- seed: ۶ نقش · ۱۲ محصول · ۶۰ واریانت · ۲۰ نظر · ۵ ژورنال · ۷ FAQ · ۵ settings
+- create-admin: SUPER_ADMIN ساخته شد (admin@prima-store.ir — رمز یک‌بار چاپ شده و به مالک اعلام شد)
+- سرور dev (bun run dev، پورت 3000) با setsid در پس‌زمینه — کارگرهای outbox/انقضای رزرو هم روشن شدند
+- راستی‌آزمایی: ماتریس ۱۸ مسیر همگی 200 (صفحه اصلی/فروشگاه/دسته/محصول/کالکشن/ژورنال/سبد/چک‌اوت/ادمین/...) · /api/health سبز (db connected، ۱۲ محصول) · محتوای فارسی RTL رندر می‌شود · لاگ dev بدون خطا
+
+Stage Summary:
+- محیط تازه کاملاً بازگردانی شد: کد + پکیج‌ها + دیتابیس + اسکیما + seed + ادمین — بدون نیاز به فایل‌های محیط قبلی
+- درگاه پرداخت در حالت خودکار mock است (ZARINPAL_MERCHANT_ID تنظیم نشده) — مطابق طراحی برای دمو
+- نکته محیطی: pg.sh و setup-pg.sh مسیر /home/z/my-project/.pg را سفت کد کرده‌اند و با کلون در زیرپوشه towel-parima هم سازگار است
+
+---
+Task ID: 47
+Agent: main (Super Z) + ۶ ساب‌ایجنت موازی
+Task: ممیزی جامع ۶‌جانبه — برنامه‌نویس (47-a) / تستر (47-b) / مهندس امنیت (47-c) / خریدار (47-d) / کاربر محتوا (47-e) / مالک/ادمین (47-f)
+
+Work Log:
+- ۶ ساب‌ایجنت موازی (ایجنت‌های خریدار و ادمین پس از سقف نوبت با استراتژی دستور زنجیده دوباره اجرا شدند؛ گزارش خریدار با شواهد DB/لاگ/VLM توسط main تکمیل شد)
+- CI سبز کامل: lint 0 · tsc 0 · unit 145/145 · integration 36/36 · ماتریس ۳۰ مسیر (۲۹×200 + گارد ادمین + 404)
+- سفر خرید E2E زنده: ۲ سفارش موفق + مسیر ناموفق + استرداد + OTP + پیگیری + موبایل — همه سبز
+- پنل ادمین ۱۶/۱۶ بخش فقط-خواندنی + گارد خروج + فاکتور چاپی
+- لاگ سرور و کنسول مرورگر: صفر خطای اپ (به‌جز موارد زیر)
+
+Stage Summary:
+- یافته‌های کلیدی: ۰ CRITICAL اپ · HIGH: (۱) TOCTOU کاهش مضاعف reserved در inventory-service (۲) rate-limitهای تعریف‌شده به validateCoupon/startPayment/search وصل نیستند (۳) ۹۰ advisory وابستگی bun audit — next<16.2.5 + next-auth مرده (۴) جدول سفارش‌های ادمین در موبایل بریده می‌شود (۵) OOM-kill مکرر سرور dev (RSS~2.2GB) + ۲ Prisma panic
+- MEDIUM مهم: ۵۰۰ به‌جای ۴۰۱ در APIهای ادمین (toInternalError می‌بلعد) · XSS بالقوه JSON-LD (stringify خام) · rate-limit با X-Forwarded-For قابل دورزدن · deleteMedia فایل .orig یتیم · دیالوگ سفارش اقلام را نشان نمی‌دهد · سرچ ادمین ارقام فارسی را مچ نمی‌کند · کتابخانه رسانه خالی (۲۸ تصویر سایت خارج از media) · breadcrumb کالکشن‌ها غلط · خبرنامه فقط صفحه اول · تاریخ مقالات ۱۴۰۴
+- گزارش‌های کامل: /home/z/my-project/qa/report-47-{a,b,c,d,e,f}.md + شات‌ها در qa/shots-47*/
+- کنترل‌های سالم تأییدشده: گارد ادمین/OTP هش‌شده/کوکی httpOnly/idempotency پرداخت/جیل traversal/بدون SQLi/RTL و فارسی‌سازی کامل/بدون لینک مرده
+
+---
+Task ID: 48
+Agent: main (Super Z)
+Task: رفع یافته‌های ممیزی ۶‌ایجینتی Task 47 — هر فیکس جدا + تست کامل رگرسیون + کامیت جدا (۱۳ کامیت)
+
+Work Log:
+- d0a97da HIGH-1: claim اتمیک updateMany+قید status در release/convert/expire رزرو — رفع TOCTOU double-decrement؛ +۳ تست integration رگرسیون
+- 9b8df38 HIGH-2: وصل rate-limitهای couponApply (10/10min) و paymentStart (5/10min) و search (30/min+سقف طول q) — تست زنده: ۴۲۹ بعد از سقف؛ E2E خرید موفق
+- eb74e13 MEDIUM-1: race لغو×تأیید پرداخت — updateMany شرطی به‌جای update (رفع P2025) + مسیر بازپرداخت خودکار (درگاه خارج tx، Refund+REFUNDED+RefundSucceeded) + تست شبیه‌سازی دقیق درهم‌تنیدگی
+- 9b86ac6 MEDIUM-2: پذیرش استرداد در tx با SELECT FOR UPDATE + بازخوانی + ایندکس یکتای جزئی Refund(orderId) WHERE PROCESSING (migration دستی) + تست دو استرداد همزمان
+- da7a7da: toInternalError دیکرت DomainError را رد می‌کند — APIهای ادمین ۴۰۱ واقعی (زنده تأیید شد) + تست unit
+- cadf82f: escape امن JSON-LD (<> & U+2028/9) — بستن مسیر XSS محتوا + ۳ تست
+- 2e42be6: جدول سفارش‌های ادمین در موبایل — overflow-x-auto + مخفی‌سازی ستون‌های کم‌اهمیت (تأیید VLM در 390px)
+- 1224ec3: next 16.1.3→16.3.6 + حذف next-auth مرده — audit از ۹۰ (۳ critical) به ۴۲ (۰ critical؛ فقط ابزار dev)؛ ۲ هشدار lint ناوبری هم فیکس (router.push)؛ build production موفق
+- ea7f8dd: تاریخ مقالات/نظرات نسبی daysAgo در seed + backdate-content-dates.ts برای DB زنده (۱۴۰۵ شد) — کش ISR دیسکی .next باید کامل پاک شود (درس: پاک کردن .next/cache کافی نیست)
+- 887c46f/98f2406/58e4d0e/335ee55: breadcrumb کالکشن‌ها · سرچ ادمین با ارقام فارسی · بنر صادقانه خبرنامه تکراری · backfill ۲۸ تصویر سایت در کتابخانه رسانه (از pipeline امن، idempotent)
+
+Stage Summary:
+- رگرسیون نهایی کامل: lint 0 · tsc 0 · unit 149/149 · integration 41/41 (۵ تست رگرسیون جدید) · build production ✓ · ماتریس ۲۹/۲۹ مسیر 200 · گاردها 401/404 · E2E خرید سبز (سفارش 2328841705) · کنسول صفر خطا
+- نکته محیطی: OOM سرور dev ریشه‌یافت شد — جلسات مرورگر ساب‌ایجنت‌ها (~1.1GB) باز مانده بودند؛ بسته شدند
+- باقی‌مانده عمدی برای M6: zarinpal.refundPayment بدون transactionId (قبل از فعال‌سازی زرین‌پال)، rate-limit تک‌پروسه‌ای (Redis برای multi-instance)، XFF bypass نیازمند trusted-proxy در دیپلوی، ESLint قواعد خاموش، stale PROCESSING refund recovery
