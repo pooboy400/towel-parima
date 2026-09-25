@@ -8,6 +8,7 @@
 
 import { randomBytes } from "node:crypto";
 import { DomainError } from "@/core/errors";
+import { allowMocksInProduction } from "@/core/env";
 import type {
   PaymentProvider,
   ParsedCallback,
@@ -21,6 +22,11 @@ export class MockPaymentProvider implements PaymentProvider {
   readonly name = "mock";
 
   async startPayment(input: StartPaymentInput): Promise<StartPaymentResult> {
+    // گارد یکسان با verify/refund — بدون این، سفارش ساخته می‌شد و مسیر بعدی
+    // (gateway 404 / verify throw) کاربر را در بن‌بست رها می‌کرد.
+    if (process.env.NODE_ENV === "production" && !allowMocksInProduction()) {
+      throw new DomainError("INTERNAL", "درگاه mock در تولید غیرفعال است.");
+    }
     const authority = `MOCK-${randomBytes(12).toString("hex")}`;
     // صفحه درگاه mock داخلی — دکمه «پرداخت موفق» و «پرداخت ناموفق» دارد
     const redirectUrl = `/mock-gateway?authority=${encodeURIComponent(authority)}`;
@@ -31,7 +37,7 @@ export class MockPaymentProvider implements PaymentProvider {
     authority: string;
     amountIrt: number;
   }): Promise<VerifyPaymentResult> {
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === "production" && !allowMocksInProduction()) {
       throw new DomainError("INTERNAL", "درگاه mock در تولید غیرفعال است.");
     }
     if (!input.authority.startsWith("MOCK-")) {
@@ -51,7 +57,7 @@ export class MockPaymentProvider implements PaymentProvider {
     transactionId: string;
     amountIrt: number;
   }): Promise<RefundPaymentResult> {
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === "production" && !allowMocksInProduction()) {
       throw new DomainError("INTERNAL", "درگاه mock در تولید غیرفعال است.");
     }
     return { ok: true, providerRef: `MOCKRF-${randomBytes(6).toString("hex")}` };

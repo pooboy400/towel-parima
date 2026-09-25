@@ -12,6 +12,7 @@
 import "server-only";
 import { db } from "@/lib/db";
 import { DomainError } from "@/core/errors";
+import { allowMocksInProduction } from "@/core/env";
 import { smsProvider } from "@/providers/sms";
 import { rateLimiter } from "@/core/rate-limit";
 import { RATE_RULES, rateKey } from "@/core/rate-limit/policies";
@@ -110,7 +111,10 @@ export async function sendOtp(input: {
 
   return {
     cooldownSeconds: Math.ceil(OTP_POLICY.resendCooldownMs / 1000),
-    ...(process.env.NODE_ENV !== "production" ? { devCode: code } : {}),
+    // devCode فقط برای تست — در production واقعی هرگز (مگر دموی صریح §ALLOW_MOCKS_IN_PRODUCTION)
+    ...(process.env.NODE_ENV !== "production" || allowMocksInProduction()
+      ? { devCode: code }
+      : {}),
   };
 }
 

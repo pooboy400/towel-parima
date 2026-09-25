@@ -595,3 +595,25 @@ Stage Summary:
 - رگرسیون نهایی کامل: lint 0 · tsc 0 · unit 149/149 · integration 41/41 (۵ تست رگرسیون جدید) · build production ✓ · ماتریس ۲۹/۲۹ مسیر 200 · گاردها 401/404 · E2E خرید سبز (سفارش 2328841705) · کنسول صفر خطا
 - نکته محیطی: OOM سرور dev ریشه‌یافت شد — جلسات مرورگر ساب‌ایجنت‌ها (~1.1GB) باز مانده بودند؛ بسته شدند
 - باقی‌مانده عمدی برای M6: zarinpal.refundPayment بدون transactionId (قبل از فعال‌سازی زرین‌پال)، rate-limit تک‌پروسه‌ای (Redis برای multi-instance)، XFF bypass نیازمند trusted-proxy در دیپلوی، ESLint قواعد خاموش، stale PROCESSING refund recovery
+
+---
+Task ID: 49
+Agent: main (Super Z)
+Task: سوییچ به اجرای production — ریشه‌ای‌کردن رفع OOM + فلگ دموی صریح برای mockها
+
+Work Log:
+- محیط sandbox بازسازی شد (فایل‌سیستم پاک شده بود): clone از GitHub → pg.sh init/start → migrate deploy (۴ مایگریشن) → seed کامل → create-admin
+- کشف: sandbox متغیر DATABASE_URL=file:... سراسری دارد که .env را override می‌کند — export صریح قبل از هر prisma/bun run
+- src/core/env.ts جدید: allowMocksInProduction() — فلگ ALLOW_MOCKS_IN_PRODUCTION=1
+- گاردهای mock بازطراحی شدند: NODE_ENV=production + !فلگ → throw/404 (پیش‌فرض قفل مثل قبل) · NODE_ENV=production + فلگ=1 → فعال (دموی staging)
+  - mock-payment: گارد startPayment هم اضافه شد (قبلاً گم بود! سفارش ساخته می‌شد و کاربر در بن‌بست gateway/verify رها می‌شد) + verify/refund
+  - mock-sms، mock-gateway route، otp-auth-service (devCode) — همگی همان الگو
+  - instrumentation.ts: هشدار بلند JSON هنگام بوت با فلگ در production ([MOCKS-IN-PRODUCTION])
+- .env.example مستند شد · tests/unit/mock-flag.test.ts: ۷ تست جدید (قفل پیش‌فرض، فلگ صریح، dev دست‌نخورده)
+- اجرای production: bun run build (SSG: ۱۲ محصول + ۵ ژورنال) → standalone server روی 3000
+
+Stage Summary:
+- رگرسیون کامل در production: ماتریس صفحات عمومی 200 · سفر خرید کامل E2E (سفارش 0174469698 → PAYMENT PAID → رزرو CONVERTED → stock 4→3، reserved=0) · SMS mock در server.log · ادمین: لاگین/داشبورد/سفارش‌ها · موبایل 375px بدون overflow (تأیید VLM) · API ادمین بدون لاگین 401 (نه 500) · search سبز
+- حافظه: idle 157MB → زیر ۴۸ درخواست همزمان 431MB و پایدار (سرور dev: ~2.2GB و OOM-kill) — ریشه‌یافته
+- ۱۵۶/۱۵۶ تست unit (۷ جدید) · شات‌ها در qa/prod49-*.png (خارج از ریپو)
+- admin@prima-store.ir با رمز دستی Prima!Demo-2026 برای این محیط ساخته شد

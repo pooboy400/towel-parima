@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { paymentProvider } from "@/providers/payment";
+import { allowMocksInProduction } from "@/core/env";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +11,10 @@ export const dynamic = "force-dynamic";
  */
 
 export async function GET(request: Request) {
-  if (process.env.NODE_ENV === "production" || paymentProvider.name !== "mock") {
+  if (
+    (process.env.NODE_ENV === "production" && !allowMocksInProduction()) ||
+    paymentProvider.name !== "mock"
+  ) {
     return new Response("Not Found", { status: 404 });
   }
 

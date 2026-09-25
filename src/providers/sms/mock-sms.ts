@@ -4,13 +4,14 @@
  */
 
 import { DomainError } from "@/core/errors";
+import { allowMocksInProduction } from "@/core/env";
 import type { SmsProvider, SmsSendInput } from "./index";
 
 export class MockSmsProvider implements SmsProvider {
   readonly name = "mock";
 
   async send(input: SmsSendInput): Promise<{ ok: true; providerId: string | null }> {
-    if (process.env.NODE_ENV === "production") {
+    if (process.env.NODE_ENV === "production" && !allowMocksInProduction()) {
       throw new DomainError("INTERNAL", "سرویس پیامک mock در تولید غیرفعال است.");
     }
     console.log(
