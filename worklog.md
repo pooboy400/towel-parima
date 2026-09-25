@@ -474,3 +474,23 @@ Stage Summary:
 - commit fc010d5 (fix(settings)) — unstable_cache خطا را کش نمی‌کند پس هر خواندن بعد از ساخت ردیف مستقیم موفق است
 - درس: خطاهای موردانتظار (not-found اول راه‌اندازی) نباید با console.error لاگ شوند — کاربر غیرفنی را می‌ترساند
 - وضعیت: دیتابیس زنده ردیف دارد؛ نصب‌های تازه از seed می‌گیرند؛ دو لایهٔ دفاعی (ردیف seed + info به‌جای error)
+
+---
+Task ID: 44
+Agent: main (Super Z)
+Task: آماده‌سازی پروژه برای انتشار روی گیت‌هاب (پشتیبان کامل)
+
+Work Log:
+- کاربر خواست «کل پروژه روی گیت‌هاب» — gh CLI و توکن در محیط نیست؛ نیاز به PAT از کاربر
+- بازرسی امنیتی: .env تاریخی فقط DATABASE_URL=file... (بدون کلید واقعی)؛ فایل فعلی gitignore است؛ تک password در تست‌ها ساختگی است
+- کشف: 1076 از 1482 فایلِ track شده پوشهٔ skills/ (ابزار جانبی) + examples/download/upload — .git حجم 56MB (عمدتاً قالب‌های سنگین design)
+- اقدام: bundle کامل تاریخچهٔ قدیمی در .data/prima-legacy-history.bundle (44MB، بیمهٔ لوکال)
+- untrack پوشه‌های غیرپروژه‌ای (+gitignore) — 401 فایل پروژه باقی ماند
+- تاریخچهٔ تمیز: شاخهٔ orphan با یک commit ریشه → main جدید؛ تاریخچهٔ کامل → شاخهٔ legacy-history (فقط لوکال؛ تگ‌های m0..m2 هم لوکال می‌مانند)
+- scripts/github-init.sh: ساخت مخزن خصوصی از روی توکن + push main + پاک‌کردن توکن از remote
+- سلامت: dev server 200، فایل‌های دیسک دست‌نخورده، درخت git تمیز
+
+Stage Summary:
+- وضعیت: آمادهٔ پوش — فقط منتظر توکن گیت‌هاب از کاربر (دستورالعمل ساده داده شد)
+- بعد از توکن: bash scripts/github-init.sh <TOKEN> [name] → مخزن خصوصی prima-towel-store
+- توصیه به کاربر: مخزن private بماند؛ توکن را محفوظ نگه دارد یا بعد از پوش revoke کند
