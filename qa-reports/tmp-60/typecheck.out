@@ -1,0 +1,9 @@
+$ tsc --noEmit
+qa-reports/tmp-56/cleanup-56.ts(9,34): error TS18047: 'u.email' is possibly 'null'.
+qa-reports/tmp-57a/db-facts.ts(11,107): error TS18046: 'reservedN' is of type 'unknown'.
+qa-reports/tmp-57b/cleanup-57b.ts(24,59): error TS2353: Object literal may only specify known properties, and 'phone' does not exist in type 'SmsLogWhereInput'.
+qa-reports/tmp-60/attack1-coupon.ts(147,7): error TS2867: Cannot find name 'Bun'. Do you need to install type definitions for Bun? Try `npm i --save-dev @types/bun`.
+qa-reports/tmp-60/attack2-cancel.ts(8,17): error TS2867: Cannot find name 'Bun'. Do you need to install type definitions for Bun? Try `npm i --save-dev @types/bun`.
+qa-reports/tmp-60/attack2-setup.ts(80,7): error TS2867: Cannot find name 'Bun'. Do you need to install type definitions for Bun? Try `npm i --save-dev @types/bun`.
+qa-reports/tmp-60/attack2-verify.ts(10,17): error TS2867: Cannot find name 'Bun'. Do you need to install type definitions for Bun? Try `npm i --save-dev @types/bun`.
+qa-reports/tmp-60/attack2-verify.ts(73,7): error TS2867: Cannot find name 'Bun'. Do you need to install type definitions for Bun? Try `npm i --save-dev @types/bun`.

@@ -191,10 +191,15 @@ describe("BUG-03 — لغو همزمان سفارش × callback ناموفق", (
     if (claimRes.count === 1) {
       // confirm برنده شد — failPayment نباید آن را FAILED کند
       expect(payment?.status).toBe("PAID");
+      // سفارش دست نخورده باقی می‌ماند (فقط claim پرداخت رقابت کرده)
+      const order = await db.order.findUnique({ where: { id: orderId }, select: { status: true } });
+      expect(order?.status).toBe("PENDING");
     } else {
       expect(payment?.status).toBe("FAILED");
+      // مسیر شکست برنده شده — سفارش باید لغو شده باشد (همگرایی failPayment)
+      const order = await db.order.findUnique({ where: { id: orderId }, select: { status: true } });
+      expect(order?.status).toBe("CANCELLED");
     }
-    expect(orderId).toBeTruthy(); // سفارش سالم مانده
   });
 });
 

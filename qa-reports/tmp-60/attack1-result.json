@@ -1,0 +1,35 @@
+{
+ "RUN": "h60amuidu3fk",
+ "A": {
+  "attempts": 20,
+  "ok": 2,
+  "errA": {
+   "COUPON_INVALID": 18
+  },
+  "guestRedemptions": 2,
+  "usedCount": 2
+ },
+ "B": {
+  "attempts": 20,
+  "okUsers": 10,
+  "okGuests": 3,
+  "total": 13,
+  "maxPerUser": 3,
+  "guestRedemptions": 3
+ },
+ "C": {
+  "secondConsume": "OK",
+  "thirdConsume": "OK",
+  "fourthConsume": "COUPON_INVALID",
+  "victimRedemptions": 3
+ },
+ "verdicts": {
+  "A_exact2": true,
+  "B_guest_le3": true,
+  "B_users_le1each": true,
+  "B_total_le13": true,
+  "C_cap3_serial": true,
+  "usedCountMatches": true
+ },
+ "BREACHED": false
+}

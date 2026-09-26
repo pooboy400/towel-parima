@@ -74,7 +74,9 @@ export async function adminListProducts(opts: {
         category: { select: { name: true } },
         images: { orderBy: { sortOrder: "asc" }, take: 1, select: { storageKey: true } },
         variants: {
-          where: { deletedAt: null },
+          // BUG-05 پیگیری باتری ۶۰: موجودی/قیمت ادمین هم فقط واریانت فعال —
+          // هم‌راستا با ویترین (ADR 011 «UI هرگز جعل نمی‌کند»؛ جزئیات در adminGetProduct)
+          where: { deletedAt: null, isActive: true },
           select: { price: true, stock: true, reserved: true },
         },
       },

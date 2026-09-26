@@ -1,0 +1,65 @@
+(pass) RBAC ماتریس روی DB واقعی > read-matrix صفحات ادمین (SEC-01) — هر نقش فقط صفحات مجاز read را می‌بیند 
+(pass) RBAC ماتریس روی DB واقعی > هر نقش با requirePermission دقیقاً مطابق ROLE_DEFINITIONS رفتار می‌کند 
+(pass) RBAC ماتریس روی DB واقعی > نشست ادمین idle-منقضی revoke و 401 می‌گیرد 
+(pass) RBAC ماتریس روی DB واقعی > AuditWriter دیتابیسی append می‌کند و داده حساس را scrub می‌کند 
+(pass) RBAC ماتریس روی DB واقعی > توکن کوتاه/ناموجود → UNAUTHENTICATED 
+(pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > هر دو مسیر همزمان → Payment=FAILED + PaymentFailed در Outbox + رزرو آزاد 
+(pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > callback دوم (بعد از بسته شدن) بدون خطا و بدون رخداد تکراری 
+(pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > رقابت تأیید × شکست — فقط یک claim برنده می‌شود 
+(pass) admin-signin per-email rate limit (SEC-03) > ۱۰ تلاش (حتی با فرض چرخش IP) → یازدهمی قفل — کلید per-email است (CR-9) 
+(pass) SEC-05 — سقف /api/csp-report > بدنهٔ ~110KB با Content-Length → 204 بدون هیچ لاگ 
+(pass) SEC-05 — سقف /api/csp-report > بدنهٔ chunked ۱۰۰KB بدون Content-Length → 204 بدون لاگ (خواندن bounded — CR-5) 
+(pass) SEC-05 — سقف /api/csp-report > بدنهٔ سالم کوچک → 204 با دقیقاً یک لاگ csp_violation 
+(pass) SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After > health: دقیقاً 120 پاسخ سالم سپس 429 با Retry-After ≥ 1 
+(pass) SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After > media-file: bucket مستقل، سقف 120 سپس 429 با Retry-After 
+(pass) SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After > search: سقف 30/min سپس 429 با Retry-After 
+(pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > بدون کوکی → «تراکنش یافت نشد» بدون مبلغ و کد سفارش 
+(pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > کوکی اثبات درست (sha256 authority) → مبلغ + کد سفارش 
+(pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > کوکی جعلی → «تراکنش یافت نشد» 
+(pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > authority ناموجود → «تراکنش یافت نشد» (بدون نشت تفاوت) 
+(pass) BUG-01 — قفل رقابتی perUserLimit (TOCTOU) > ۱۰ مصرف موازی یک کاربر با سقف perUser=۱ → دقیقاً ۱ Redemption 
+(pass) BUG-01 — قفل رقابتی perUserLimit (TOCTOU) > مصرف دوم سریالی همان کاربر با COUPON_INVALID رد می‌شود 
+(pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > مهمان با ۳ شمارهٔ مختلف و سقف perUser=۱ → فقط ۱ مصرف موفق 
+(pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > پس از پر شدن سبد گمنام، پیش‌نمایش مهمان هم با پیام شفاف رد می‌شود 
+(pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > کاربر لاگین از سبد گمنام جدا شمرده می‌شود 
+(pass) رگرسیون — سقف کلی usageLimit همچنان اتمیک > ۱۰ مصرف موازی با سقف کلی ۳ → دقیقاً ۳ Redemption 
+(pass) SEC-04 — پیگیری سفارش با فاکتور دوم > کد درست + موبایل درست → سفارش؛ موبایل غلط/نامعتبر → null؛ کد غلط → null 
+(pass) SEC-04 — پیگیری سفارش با فاکتور دوم > success: کوکی اثبات درست → سفارش؛ بدون اثبات/اثبات غلط → null 
+(pass) SEC-04 — پیگیری سفارش با فاکتور دوم > success: مالک نشست بدون کوکی → سفارش؛ نشست غیرمالک → null 
+(pass) InventoryService — رزرو اتمیک (§13) > رزرو موفق reserved را زیاد می‌کند و رکورد ACTIVE می‌سازد 
+(pass) InventoryService — رزرو اتمیک (§13) > رزرو بیش از موجودی → OUT_OF_STOCK و هیچ تغییری نمی‌کند 
+(pass) InventoryService — رزرو اتمیک (§13) > race: دو tx همزمان روی ۱ موجودی — فقط یکی برنده است 
+(pass) InventoryService — رزرو اتمیک (§13) > release فقط reserved را کم می‌کند؛ convert هر دو را کم می‌کند 
+(pass) InventoryService — رزرو اتمیک (§13) > worker انقضا رزروهای منقضی را EXPIRED و موجودی را آزاد می‌کند 
+(pass) InventoryService — رزرو اتمیک (§13) > رفع TOCTOU: release دوم روی رزرو RELEASED → no-op (reserved یک‌بار کم می‌شود) 
+(pass) InventoryService — رزرو اتمیک (§13) > رفع TOCTOU: convert بعد از release → no-op (رقابت لغو×پرداخت) 
+(pass) InventoryService — رزرو اتمیک (§13) > رفع TOCTOU: انقضای worker روی رزروِ قبلاً CONVERTED → موجودی خراب نمی‌شود 
+(pass) CheckoutService — ثبت تراکنشی (§10.1) > سفارش کامل می‌سازد: snapshot + رزرو + کد رهگیری ۱۰ رقمی 
+(pass) CheckoutService — ثبت تراکنشی (§10.1) > خطای موجودی در رزرو → rollback کامل: هیچ سفارشی باقی نمی‌ماند 
+(pass) Coupon — سقف تراکنشی > تخفیف PERCENT با سقف maxDiscount محاسبه می‌شود 
+(pass) Coupon — سقف تراکنشی > usageLimit پر شده → COUPON_INVALID 
+(pass) PaymentService — تأیید idempotent (§10.2) > confirm → PAID + Order PROCESSING + رزرو CONVERTED؛ callback تکراری بدون اثر مضاعف 
+(pass) PaymentService — تأیید idempotent (§10.2) > پرداخت ناموفق → Payment FAILED + Order CANCELLED + رزرو RELEASED 
+(pass) PaymentService — تأیید idempotent (§10.2) > رقابت لغو×تأیید: سفارش لحظهٔ پرداخت لغو شد → بازپرداخت خودکار نه کرش P2025 
+(pass) PaymentService — تأیید idempotent (§10.2) > دو استرداد کامل همزمان: فقط یکی نهایی می‌شود — سقف هرگز نقض نمی‌شود 
+(pass) OrderService — ماشین وضعیت (§5.1) > گذارهای غیرمجاز رد می‌شوند 
+(pass) OrderService — ماشین وضعیت (§5.1) > ship → DELIVERED مسیر کامل مجاز است؛ SHIPPED→CANCELLED ممنوع 
+(pass) media pipeline — WebP تبدیل خودکار > JPG آپلودی → WebP ذخیره می‌شود + thumb + رکورد 
+(pass) media pipeline — WebP تبدیل خودکار > PNG با شفافیت → WebP شفاف 
+(pass) media pipeline — WebP تبدیل خودکار > WebP ورودی → بدون recode مستقیم ذخیره (خواسته مالک) 
+(pass) media pipeline — WebP تبدیل خودکار > dedupe: آپلود دوباره همان فایل → همان رکورد 
+(pass) media pipeline — WebP تبدیل خودکار > حجم بیش از ۵MB و SVG رد می‌شوند 
+(pass) OTP — سیاست §9.4 > ارسال موفق کد ۶ رقمی + ساخت خودکار اکانت در verify 
+(pass) OTP — سیاست §9.4 > cooldown ۹۰ ثانیه — ارسال دوم بلافاصله رد می‌شود 
+(pass) OTP — سیاست §9.4 > کد اشتباه تلاش می‌سوزاند؛ بعد از ۵ تلاش TOO_MANY 
+(pass) OTP — سیاست §9.4 > کد منقضی رد می‌شود 
+(pass) OTP — سیاست §9.4 > کد یک‌بار مصرف است — verify دوم با همان کد رد می‌شود 
+(pass) OTP — سیاست §9.4 > rate limit: بیش از ۳ ارسال در ۱۰ دقیقه برای یک شماره رد می‌شود 
+(pass) AddressBook — قاعده تک‌پیش‌فرض > اولین آدرس خودکار پیش‌فرض می‌شود 
+(pass) AddressBook — قاعده تک‌پیش‌فرض > افزودن آدرس دوم (isDefault:false) پیش‌فرض را عوض نمی‌کند 
+(pass) AddressBook — قاعده تک‌پیش‌فرض > setDefault پیش‌فرض را جابه‌جا می‌کند — همیشه دقیقاً یکی 
+(pass) AddressBook — قاعده تک‌پیش‌فرض > حذف پیش‌فرض → جدیدترین باقی‌مانده ارتقا می‌یابد 
+(pass) AddressBook — قاعده تک‌پیش‌فرض > ویرایش با isDefault:true پیش‌فرض را جابه‌جا می‌کند 
+(pass) AddressBook — قاعده تک‌پیش‌فرض > سقف ۱۰ آدرس — آدرس ۱۱ رد می‌شود 
+(pass) CartMerge — ادغام بدون گم شدن > ادغام مهمان + سروری: تجمعی، سقف موجودی، رد واریانت مرده 
+(pass) CartMerge — ادغام بدون گم شدن > getServerCartLines اقلام مرده را از DB پاک می‌کند 

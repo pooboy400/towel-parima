@@ -1,0 +1,17 @@
+$ eslint .
+
+/home/z/my-project/towel-parima/qa-reports/tmp-57a/checkout-action-chunk.js
+    35:1    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1249:159  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1265:163  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  1314:1    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+/home/z/my-project/towel-parima/qa-reports/tmp-57a/login-action-chunk.js
+   15:1    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  225:1    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  259:162  warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  288:1    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+  618:1    warning  Expected an assignment or function call and instead saw an expression  @typescript-eslint/no-unused-expressions
+
+✖ 9 problems (0 errors, 9 warnings)
+

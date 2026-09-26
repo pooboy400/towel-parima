@@ -1,0 +1,228 @@
+bun test v1.3.14 (0d9b296a)
+
+tests/unit/rbac.test.ts:
+(pass) فهرست کانونی مجوزها — بخش ۶.۲ سند > دقیقاً ۲۸ مجوز دارد [0.22ms]
+(pass) فهرست کانونی مجوزها — بخش ۶.۲ سند > بدون تکرار [0.06ms]
+(pass) فهرست کانونی مجوزها — بخش ۶.۲ سند > همه با الگوی entity.action هستند [0.18ms]
+(pass) ماتریس RBAC — هر نقش × هر مجوز > ۶ نقش سیستمی تعریف شده است [0.02ms]
+(pass) ماتریس RBAC — هر نقش × هر مجوز > SUPER_ADMIN: دقیقاً مجوزهای سند [0.15ms]
+(pass) ماتریس RBAC — هر نقش × هر مجوز > STORE_MANAGER: دقیقاً مجوزهای سند [0.04ms]
+(pass) ماتریس RBAC — هر نقش × هر مجوز > ORDER_MANAGER: دقیقاً مجوزهای سند
+(pass) ماتریس RBAC — هر نقش × هر مجوز > CONTENT_MANAGER: دقیقاً مجوزهای سند [0.01ms]
+(pass) ماتریس RBAC — هر نقش × هر مجوز > SUPPORT_AGENT: دقیقاً مجوزهای سند
+(pass) ماتریس RBAC — هر نقش × هر مجوز > MARKETING_MANAGER: دقیقاً مجوزهای سند
+(pass) ماتریس RBAC — هر نقش × هر مجوز > هیچ نقشی مجوز خارج از فهرست کانونی ندارد [0.08ms]
+(pass) ماتریس RBAC — هر نقش × هر مجوز > نقش‌های غیر SUPER_ADMIN هرگز users/audit ندارند [0.12ms]
+(pass) ماتریس RBAC — هر نقش × هر مجوز > roleHas برای customer (null) همیشه false است [0.04ms]
+(pass) ماتریس RBAC — هر نقش × هر مجوز > نمونه‌های سند: ORDER_MANAGER refund دارد اما CONTENT_MANAGER ندارد [0.06ms]
+
+tests/unit/m2-auth-media.test.ts:
+(pass) TOTP — RFC 6238 > base32 decode/encode رفت‌وبرگشت [0.71ms]
+(pass) TOTP — RFC 6238 > بردار T=59 (counter=1) → 287082 [0.72ms]
+(pass) TOTP — RFC 6238 > بردار T=1111111109 (counter=37037036) → 081804 [0.11ms]
+(pass) TOTP — RFC 6238 > verifyTotpCode کد درست را می‌پذیرد و غلط را رد می‌کند [0.32ms]
+(pass) TOTP — RFC 6238 > secret تصادفی ۳۲ کاراکتر base32 و URI otpauth درست [0.19ms]
+(pass) sniffImageMime > JPEG [0.17ms]
+(pass) sniffImageMime > PNG [0.03ms]
+(pass) sniffImageMime > WEBP [0.04ms]
+(pass) sniffImageMime > GIF [0.03ms]
+(pass) sniffImageMime > فایل متنی قلابی رد می‌شود [0.12ms]
+(pass) sniffImageMime > SVG قلابی رد می‌شود [0.02ms]
+(pass) password policy > رمز معتبر [0.08ms]
+(pass) password policy > کوتاه ۹ کاراکتر رد
+(pass) password policy > بدون رقم رد [0.01ms]
+(pass) password policy > بدون حرف رد
+(pass) password policy > رمز تولیدی همیشه policy را پاس می‌کند [0.27ms]
+(pass) admin schemas > ارقام فارسی قیمت → عدد [4.59ms]
+(pass) admin schemas > اسلاگ فارسی رد می‌شود [0.27ms]
+(pass) admin schemas > SKU نرمال‌سازی به حروف بزرگ [0.03ms]
+(pass) admin schemas > compareAtPrice کوچکتر از price رد می‌شود [0.21ms]
+(pass) admin schemas > بدون واریانت رد می‌شود [0.08ms]
+
+tests/unit/client-ip.test.ts:
+(pass) extractClientIp — حالت دسترسی مستقیم (بدون TRUSTED_PROXY_CIDR) > هیچ هدری معتبر نیست — حتی XFF و x-real-ip جعلی [0.28ms]
+(pass) extractClientIp — حالت دسترسی مستقیم (بدون TRUSTED_PROXY_CIDR) > bucket اشتراکی ثابت است (DIRECT_IP_BUCKET) [0.01ms]
+(pass) extractClientIp — حالت پروکسی معتمد > CIDR تنظیم‌شده + XFF تک‌عضوی (semantics جایگزینی Caddy) → واقعی کلاینت [0.48ms]
+(pass) extractClientIp — حالت پروکسی معتمد > XFF چندعضوی → آخرین هاپ (نزدیک‌ترین به ما، پروکسی معتمد دیده) [0.07ms]
+(pass) extractClientIp — حالت پروکسی معتمد > عضو آخر داخل CIDR معتمد → رد؛ سپس x-real-ip معتبر → پذیرش [0.10ms]
+(pass) extractClientIp — حالت پروکسی معتمد > ورودی غیر-IP → null (بدون کرش) [0.36ms]
+(pass) extractClientIp — حالت پروکسی معتمد > CIDR /32 — تطبیق دقیق IPv4 [0.14ms]
+(pass) extractClientIp — حالت پروکسی معتمد > چند CIDR با فاصله — همگی parse می‌شوند [0.17ms]
+[client-ip] ⚠️ 1 عضو نامعتبر در TRUSTED_PROXY_CIDR نادیده گرفته شد — پیش‌وند صفر («/0»)، اسلش انتهایی و شکل‌های خراب پذیرفته نمی‌شوند (IPv4: 1-32، IPv6: 1-128). پیکربندی را اصلاح کنید؛ تا آن‌موقع رفتار fail-closed حفظ می‌شود.
+(pass) extractClientIp — حالت پروکسی معتمد > CIDR نامعتبر عضو حذف می‌شود — بقیه معتبر می‌مانند [0.25ms]
+[client-ip] ⚠️ 1 عضو نامعتبر در TRUSTED_PROXY_CIDR نادیده گرفته شد — پیش‌وند صفر («/0»)، اسلش انتهایی و شکل‌های خراب پذیرفته نمی‌شوند (IPv4: 1-32، IPv6: 1-128). پیکربندی را اصلاح کنید؛ تا آن‌موقع رفتار fail-closed حفظ می‌شود.
+(pass) extractClientIp — حالت پروکسی معتمد > 0.0.0.0/0 تنظیم منگن است — همه IPها «معتمد» و هیچ کلاینتی پذیرفته نمی‌شود (fail-closed) [0.07ms]
+(pass) extractClientIp — حالت پروکسی معتمد > IPv6 — تطبیق دقیق رشته [0.46ms]
+(pass) extractClientIp — سخت‌سازی CR-2/CR-3/CR-4 (بازبینی 55-c / Task 56) > شکل‌های جعلی IPv6/پورت‌دار/براکت‌دار/نامشخص IP حساب نمی‌شوند (CR-2) [0.29ms]
+(pass) extractClientIp — سخت‌سازی CR-2/CR-3/CR-4 (بازبینی 55-c / Task 56) > کانونی‌سازی باینری IPv6 — شکل متفاوتِ همان آدرس معتمد است (CR-3) [0.16ms]
+(pass) extractClientIp — سخت‌سازی CR-2/CR-3/CR-4 (بازبینی 55-c / Task 56) > prefix کامل IPv6 پشتیبانی می‌شود — دیگر فقط /128 نیست (CR-3/CR-4) [0.15ms]
+[client-ip] ⚠️ 1 عضو نامعتبر در TRUSTED_PROXY_CIDR نادیده گرفته شد — پیش‌وند صفر («/0»)، اسلش انتهایی و شکل‌های خراب پذیرفته نمی‌شوند (IPv4: 1-32، IPv6: 1-128). پیکربندی را اصلاح کنید؛ تا آن‌موقع رفتار fail-closed حفظ می‌شود.
+[client-ip] ⚠️ 1 عضو نامعتبر در TRUSTED_PROXY_CIDR نادیده گرفته شد — پیش‌وند صفر («/0»)، اسلش انتهایی و شکل‌های خراب پذیرفته نمی‌شوند (IPv4: 1-32، IPv6: 1-128). پیکربندی را اصلاح کنید؛ تا آن‌موقع رفتار fail-closed حفظ می‌شود.
+[client-ip] ⚠️ 1 عضو نامعتبر در TRUSTED_PROXY_CIDR نادیده گرفته شد — پیش‌وند صفر («/0»)، اسلش انتهایی و شکل‌های خراب پذیرفته نمی‌شوند (IPv4: 1-32، IPv6: 1-128). پیکربندی را اصلاح کنید؛ تا آن‌موقع رفتار fail-closed حفظ می‌شود.
+(pass) extractClientIp — سخت‌سازی CR-2/CR-3/CR-4 (بازبینی 55-c / Task 56) > پیش‌وند صفر و اسلش انتهایی رد می‌شوند — بدون trust-all و بدون سکوت (CR-4) [0.12ms]
+[client-ip] ⚠️ 1 عضو نامعتبر در TRUSTED_PROXY_CIDR نادیده گرفته شد — پیش‌وند صفر («/0»)، اسلش انتهایی و شکل‌های خراب پذیرفته نمی‌شوند (IPv4: 1-32، IPv6: 1-128). پیکربندی را اصلاح کنید؛ تا آن‌موقع رفتار fail-closed حفظ می‌شود.
+(pass) extractClientIp — سخت‌سازی CR-2/CR-3/CR-4 (بازبینی 55-c / Task 56) > عضو خراب بین عضوهای سالم — بقیه همچنان کار می‌کنند [0.12ms]
+
+tests/unit/json-ld.test.ts:
+(pass) JsonLd — escape امن اسکریپت (گزارش 47-c) > توکن خروج از اسکریپت escape می‌شود — </script> در خروجی خام وجود ندارد [0.11ms]
+(pass) JsonLd — escape امن اسکریپت (گزارش 47-c) > JSON پس از escape همچنان معتبر است و داده اصلی برمی‌گردد (round-trip) [0.09ms]
+(pass) JsonLd — escape امن اسکریپت (گزارش 47-c) > جداکننده‌های خط یونیکد (U+2028/U+2029) هم امن می‌شوند [0.05ms]
+
+tests/unit/schemas.test.ts:
+(pass) phoneSchema — ارقام فارسی پذیرفته و نرمال می‌شوند > قالب استاندارد [0.16ms]
+(pass) phoneSchema — ارقام فارسی پذیرفته و نرمال می‌شوند > ارقام فارسی → لاتین [0.12ms]
+(pass) phoneSchema — ارقام فارسی پذیرفته و نرمال می‌شوند > قالب‌های نامعتبر رد می‌شوند [0.96ms]
+(pass) sendOtp / verifyOtp > sendOtp فقط phone می‌گیرد [0.42ms]
+(pass) sendOtp / verifyOtp > verifyOtp کد ۶ رقمی فارسی را هم می‌پذیرد [0.37ms]
+(pass) sendOtp / verifyOtp > کد ۵ رقمی رد می‌شود [0.15ms]
+(pass) addressV2Schema > آدرس کامل قبول می‌شود [0.64ms]
+(pass) addressV2Schema > کدپستی با ارقام فارسی قبول می‌شود [0.14ms]
+(pass) addressV2Schema > آدرس خیلی کوتاه رد می‌شود [0.16ms]
+(pass) checkoutSchema > checkout سالم [1.05ms]
+(pass) checkoutSchema > کد کوپن خودکار uppercase می‌شود [0.12ms]
+(pass) checkoutSchema > quantity > 20 رد می‌شود (ERD سند) [0.18ms]
+(pass) checkoutSchema > سبد خالی رد می‌شود [0.13ms]
+(pass) applyCouponSchema + submitReviewSchema > کوپن uppercase + subtotal [0.43ms]
+(pass) applyCouponSchema + submitReviewSchema > امتیاز خارج از 1..5 رد می‌شود [0.73ms]
+
+tests/unit/settings.test.ts:
+(pass) settings-service — اعتبارسنجی مرز خواندن (بخش ۱۸ سند) > storeConfig سید‌شده از schema عبور می‌کند [1.32ms]
+(pass) settings-service — اعتبارسنجی مرز خواندن (بخش ۱۸ سند) > ایمیل/URL نامعتبر رد می‌شود [0.20ms]
+(pass) settings-service — اعتبارسنجی مرز خواندن (بخش ۱۸ سند) > مبالغ منفی رد می‌شوند (IRT Integer — بخش ۱۲ سند) [0.05ms]
+(pass) settings-service — اعتبارسنجی مرز خواندن (بخش ۱۸ سند) > امتیاز تستیمونیال خارج از 1..5 رد می‌شود [0.52ms]
+
+tests/unit/mock-flag.test.ts:
+(pass) allowMocksInProduction > پیش‌فرض: false — هر مقداری جز رشته‌ی دقیق '1' [0.10ms]
+(pass) allowMocksInProduction > فلگ صریح = true [0.04ms]
+(pass) allowMocksInProduction > در production بدون فلگ: startPayment/verify/refund همگی throw [0.52ms]
+(pass) allowMocksInProduction > در production با فلگ: مسیر کامل mock کار می‌کند [0.17ms]
+(pass) allowMocksInProduction > در production بدون فلگ: sms mock هم throw [0.14ms]
+{"level":"info","provider":"mock-sms","to":"09120000000","tag":"test","text":"x","at":"2026-09-26T12:46:08.048Z"}
+(pass) allowMocksInProduction > در production با فلگ: sms mock ارسال می‌کند [0.20ms]
+(pass) allowMocksInProduction > در development بدون فلگ: همه چیز آزاد (رفتار قدیمی حفظ شود) [0.09ms]
+
+tests/unit/session-policy.test.ts:
+(pass) Session policy — بخش ۹.۳ سند > مشتری: انقضا دقیقاً ۳۰ روز بعد [0.05ms]
+(pass) Session policy — بخش ۹.۳ سند > ادمین: انقضای مطلق ۸ ساعت [0.04ms]
+(pass) Session policy — بخش ۹.۳ سند > idle ادمین بعد از ۳۰ دقیقه منقضی می‌شود [0.05ms]
+(pass) Session policy — بخش ۹.۳ سند > مشتری idle-timeout ندارد [0.06ms]
+(pass) Session policy — بخش ۹.۳ سند > revoked session نامعتبر است [0.04ms]
+(pass) Session policy — بخش ۹.۳ سند > session منقضی نامعتبر است [0.03ms]
+(pass) Session policy — بخش ۹.۳ سند > ادمین با idle طولانی نامعتبر است حتی اگر مطلق معتبر باشد [0.03ms]
+
+tests/unit/money.test.ts:
+(pass) calcSubtotal — Integer محض > جمع ساده [0.14ms]
+(pass) calcSubtotal — Integer محض > سبد خالی = 0 [0.04ms]
+(pass) calcCouponDiscount — بخش ۱۲ سند (گرد کردن floor به نفع مشتری) > PERCENT با گرد کردن floor [0.09ms]
+(pass) calcCouponDiscount — بخش ۱۲ سند (گرد کردن floor به نفع مشتری) > PERCENT غیر رند → floor (335,000 × 3% = 10050) [0.03ms]
+(pass) calcCouponDiscount — بخش ۱۲ سند (گرد کردن floor به نفع مشتری) > سقف maxDiscount اعمال می‌شود [0.03ms]
+(pass) calcCouponDiscount — بخش ۱۲ سند (گرد کردن floor به نفع مشتری) > FIXED هرگز از subtotal بیشتر نمی‌شود [0.02ms]
+(pass) calcCouponDiscount — بخش ۱۲ سند (گرد کردن floor به نفع مشتری) > درصد خارج از 1..100 رد می‌شود [0.07ms]
+(pass) calcCouponDiscount — بخش ۱۲ سند (گرد کردن floor به نفع مشتری) > Float مطلقاً رد می‌شود — اصل پول Integer [0.04ms]
+(pass) calcGrandTotal — فرمول سند > grandTotal = subtotal − discount + shipping + tax [0.05ms]
+(pass) calcGrandTotal — فرمول سند > مجموع منفی رد می‌شود [0.03ms]
+(pass) calcShipping > بالای آستانه → رایگان [0.03ms]
+(pass) calcShipping > زیر آستانه → هزینه ثابت [0.02ms]
+(pass) assertMoney > منفی و اعشاری رد می‌شوند [0.06ms]
+
+tests/unit/normalize-fa.test.ts:
+(pass) normalizePersian — بخش ۱۷ سند معماری > ي و ك عربی به فارسی تبدیل می‌شود [0.13ms]
+(pass) normalizePersian — بخش ۱۷ سند معماری > ارقام فارسی و عربی به لاتین تبدیل می‌شوند [0.07ms]
+(pass) normalizePersian — بخش ۱۷ سند معماری > نیم‌فاصله به فاصله تبدیل می‌شود [0.03ms]
+(pass) normalizePersian — بخش ۱۷ سند معماری > فاصله‌های تکراری فشرده و trim می‌شوند [0.05ms]
+(pass) normalizePersian — بخش ۱۷ سند معماری > لاتین lowercase می‌شود [0.02ms]
+(pass) normalizePersian — بخش ۱۷ سند معماری > ترکیبی: عربی + رقم فارسی + نیم‌فاصله همزمان [0.02ms]
+(pass) normalizePersian — بخش ۱۷ سند معماری > رشته خالی و بدون ورودی امن است [0.02ms]
+(pass) normalizeFaDigits — فقط ارقام > حروف دست‌نخورده می‌مانند [0.02ms]
+(pass) tokenizePersian > توکن‌های تمیز برمی‌گرداند [0.10ms]
+(pass) tokenizePersian > ورودی خالی → آرایه خالی [0.03ms]
+(pass) buildSearchKey — تطبیق substring > نیم‌فاصله و فاصله یکسان می‌شوند [0.06ms]
+
+tests/unit/state-machines.test.ts:
+(pass) Order state machine — جدول بخش ۵.۱ سند > مسیر خوش‌مسیر: PENDING → PROCESSING → SHIPPED → DELIVERED [0.08ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > لغو از PENDING و PROCESSING مجاز، از SHIPPED/DELIVERED ممنوع [0.09ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > مرجوعی فقط از DELIVERED [0.05ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > گذار رو به عقب ممنوع است [0.05ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > assertOrderTransition مجری اشتباه را با FORBIDDEN رد می‌کند [0.17ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > assertOrderTransition گذار ناشناخته با 409 [0.06ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > گذارهای ادمین permission درست دارند [0.04ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > BUG-04: لغو ادمین از PENDING مجاز است (قبلاً 403 می‌خورد) [0.04ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > BUG-04: لغو مشتری از PENDING همچنان مجاز و rule درست برمی‌گردد [0.02ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > BUG-04: بازیگر بی‌مجاز روی گذار موجود → 403 [0.08ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > BUG-04: گذار خارج از توپولوژی → 409 (تفکیک از 403 حفظ شده) [0.06ms]
+(pass) Order state machine — جدول بخش ۵.۱ سند > BUG-04: system هم بازیگر شناخته‌شده است (PENDING→PROCESSING) [0.03ms]
+(pass) Payment state machine — بخش ۵.۲ > PENDING → PAID و PENDING → FAILED مجاز [0.04ms]
+(pass) Payment state machine — بخش ۵.۲ > FAILED حالت پایانی است — گذار خروجی ندارد [0.03ms]
+(pass) Payment state machine — بخش ۵.۲ > مسیر refund کامل و جزئی [0.04ms]
+(pass) Shipment · Reservation · Refund · Review · Content > Shipment مسیر خطی + FAILED → RETURNED [0.06ms]
+(pass) Shipment · Reservation · Refund · Review · Content > Reservation فقط از ACTIVE خروج دارد [0.04ms]
+(pass) Shipment · Reservation · Refund · Review · Content > Refund: REQUESTED → PROCESSING → SUCCEEDED|FAILED [0.05ms]
+(pass) Shipment · Reservation · Refund · Review · Content > Review: فقط PENDING → APPROVED|REJECTED [0.02ms]
+(pass) Shipment · Reservation · Refund · Review · Content > Content: DRAFT هرگز مستقیم ARCHIVED نمی‌شود [0.05ms]
+
+tests/unit/mappers.test.ts:
+(pass) mapProductToDomain — تجمیع Product+Variant > قیمت = حداقل قیمت واریانت‌ها و sku = واریانت اصلی [0.37ms]
+(pass) mapProductToDomain — تجمیع Product+Variant > موجودی = Σ(stock − reserved) و رزرو منفی نمی‌شود [0.09ms]
+(pass) mapProductToDomain — تجمیع Product+Variant > واریانت غیرفعال/حذف‌شده از محاسبات خارج می‌شود [0.07ms]
+(pass) mapProductToDomain — تجمیع Product+Variant > رنگ‌ها/سایزها متمایز و با حفظ ترتیب واریانت‌ها [0.15ms]
+(pass) mapProductToDomain — تجمیع Product+Variant > تصاویر با sortOrder مرتب می‌شوند و کالکشن‌ها به slug نگاشت می‌شوند [0.13ms]
+(pass) mapProductToDomain — تجمیع Product+Variant > بدون واریانت: مقادیر پیش‌فرض امن (کاتالوگ خراب نمی‌کند) [0.05ms]
+(pass) buildProductSearchKey — نرمال‌سازی index-time (بخش ۱۷ سند) > ي عربی→ی، ك→ک، ارقام فارسی→لاتین، فاصله‌های تکراری فشرده [0.19ms]
+(pass) buildProductSearchKey — نرمال‌سازی index-time (بخش ۱۷ سند) > trim و فشرده‌سازی فاصله [0.04ms]
+(pass) buildTsQueryString — tsquery امن با prefix > توکن‌ها OR می‌شوند با :* [0.86ms]
+(pass) buildTsQueryString — tsquery امن با prefix > کاراکترهای خاص حذف می‌شوند (ضد SQL/ tsquery injection) [0.22ms]
+(pass) buildTsQueryString — tsquery امن با prefix > خالی → null و سقف ۸ توکن [0.05ms]
+(pass) mapJournalToDomain و mapReviewToDomain > پاراگراف‌ها با 
+
+ جدا می‌شوند [0.12ms]
+(pass) mapJournalToDomain و mapReviewToDomain > نظر: تاریخ منتشرشده و وضعیت خرید تاییدشده [0.07ms]
+(pass) BUG-05 (فاز ۲) — واریانت‌های همه غیرفعال → موجودی نمایشی صفر (ADR 011) > دو واریانت غیرفعال → stock=0، بدون رنگ/سایز نمایشی، قیمت 0 [0.17ms]
+(pass) BUG-05 (فاز ۲) — واریانت‌های همه غیرفعال → موجودی نمایشی صفر (ADR 011) > واریانت حذف‌شده (deletedAt) هم مثل غیرفعال شمرده نمی‌شود [0.07ms]
+(pass) BUG-05 (فاز ۲) — واریانت‌های همه غیرفعال → موجودی نمایشی صفر (ADR 011) > میخ: واریانت فعال + غیرفعال → فقط فعال شمرده می‌شود [0.08ms]
+
+tests/unit/rate-limit-and-errors.test.ts:
+(pass) InMemoryRateLimiter — پنجره لغزان > تا سقف مجاز است، بعدش رد می‌کند [0.42ms]
+(pass) InMemoryRateLimiter — پنجره لغزان > کلیدهای جدا سهمیه جدا دارند [0.13ms]
+(pass) InMemoryRateLimiter — پنجره لغزان > پنجره لغزان: بعد از گذر زمان دوباره باز می‌شود [60.29ms]
+(pass) InMemoryRateLimiter — پنجره لغزان > peek بدون مصرف است [0.32ms]
+(pass) InMemoryRateLimiter — پنجره لغزان > reset سهمیه را آزاد می‌کند [0.15ms]
+(pass) جدول سقف‌ها — مطابقت با بخش ۹.۴ سند > مقادیر کانونی [0.05ms]
+(pass) جدول سقف‌ها — مطابقت با بخش ۹.۴ سند > rateKey اجزای undefined را می‌پرد [0.06ms]
+(pass) استاندارد خطا — بخش ۲۴ سند > toErrorBody شکل استاندارد بدون stack می‌سازد [0.11ms]
+(pass) استاندارد خطا — بخش ۲۴ سند > نگاشت پیش‌فرض کد → HTTP درست است [0.06ms]
+(pass) استاندارد خطا — بخش ۲۴ سند > override status کار می‌کند (مثل verify → 409) [0.02ms]
+{"level":"warn","type":"domain_error","requestId":"req_test_1","code":"UNAUTHENTICATED","message":"ورود لازم است.","ts":"2026-09-26T12:46:08.125Z"}
+{"level":"warn","type":"domain_error","requestId":"req_t2","code":"FORBIDDEN","message":"دسترسی ندارید.","ts":"2026-09-26T12:46:08.125Z"}
+{"level":"error","type":"internal_error","requestId":"req_t3","message":"boom","stack":"Error: boom\n    at <anonymous> (/home/z/my-project/towel-parima/tests/unit/rate-limit-and-errors.test.ts:121:42)","ts":"2026-09-26T12:46:08.125Z"}
+(pass) استاندارد خطا — بخش ۲۴ سند > toInternalError خطای دامنه را بلعیده و INTERNAL نمی‌کند (رفع 500→401) [0.21ms]
+
+tests/unit/otp-policy.test.ts:
+(pass) normalizePhone > قالب‌های رایج به 09xxxxxxxxx می‌رسند [0.30ms]
+(pass) normalizePhone > شماره نامعتبر همان دigitهای تمیز را برمی‌گرداند [0.05ms]
+(pass) generateOtpCode + hash > کد ۶ رقمی عددی تولید می‌کند [0.06ms]
+(pass) generateOtpCode + hash > hash پایدار و حساس به کد است [0.81ms]
+(pass) verifyOtpAttempt — سیاست بخش ۹.۴ سند > کد درست → ok [0.31ms]
+(pass) verifyOtpAttempt — سیاست بخش ۹.۴ سند > کد اشتباه → MISMATCH با attemptsLeft [0.18ms]
+(pass) verifyOtpAttempt — سیاست بخش ۹.۴ سند > کد منقضی → EXPIRED حتی اگر کد درست باشد [0.11ms]
+(pass) verifyOtpAttempt — سیاست بخش ۹.۴ سند > کد مصرف‌شده → ALREADY_USED (مصرف یک‌بار) [0.09ms]
+(pass) verifyOtpAttempt — سیاست بخش ۹.۴ سند > سقف ۵ تلاش → TOO_MANY_ATTEMPTS [0.11ms]
+(pass) verifyOtpAttempt — سیاست بخش ۹.۴ سند > در تلاش پنجم (4 تلاش قبل) هنوز بررسی می‌شود [0.10ms]
+(pass) timingSafeEqual > رشته‌های برابر true و نامساوی false [0.02ms]
+
+tests/unit/policies.test.ts:
+(pass) Inventory policy — بخش ۱۳ سند > available = stock − reserved [0.05ms]
+(pass) Inventory policy — بخش ۱۳ سند > رزرو تا سقف available مجاز است [0.05ms]
+(pass) Inventory policy — بخش ۱۳ سند > واریانت غیرفعال/حذف‌شده رزرو نمی‌شود [0.02ms]
+(pass) Inventory policy — بخش ۱۳ سند > qty نامعتبر رزرو نمی‌شود [0.01ms]
+(pass) Inventory policy — بخش ۱۳ سند > TTL رزرو = ۲۰ دقیقه [0.07ms]
+(pass) Return window > داخل بازه مجاز، بیرون آن ممنوع [0.06ms]
+(pass) Cache tags — بخش ۱۶.۱ سند > invalidation محصول گروه کامل تگ‌ها را می‌دهد [0.12ms]
+(pass) Cache tags — بخش ۱۶.۱ سند > تگ‌های پایه [0.02ms]
+(pass) Settings + Snapshot helpers > کلید تنظیمات فروشگاه
+(pass) Settings + Snapshot helpers > toShippingSnapshot آدرس زنده را به snapshot تبدیل می‌کند [0.06ms]
+(pass) Settings + Snapshot helpers > شکل StoreSettings با سند (بخش ۱۸) هم‌خوان است [0.05ms]
+
+ 180 pass
+ 0 fail
+ 546 expect() calls
+Ran 180 tests across 15 files. [301.00ms]

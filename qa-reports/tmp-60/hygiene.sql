@@ -1,0 +1,12 @@
+SELECT 'coupon_CC' AS k, COUNT(*)::int AS n FROM "Coupon" WHERE "code" LIKE 'CC-%'
+UNION ALL SELECT 'coupon_cc_lowercase', COUNT(*)::int FROM "Coupon" WHERE "code" LIKE 'cc-%'
+UNION ALL SELECT 'redemption_of_CC_coupons', COUNT(*)::int FROM "CouponRedemption" r JOIN "Coupon" c ON c.id=r."couponId" WHERE c."code" LIKE 'CC-%'
+UNION ALL SELECT 'order_code_CC_or_PF', COUNT(*)::int FROM "Order" WHERE "code" LIKE 'CC%' OR "code" LIKE 'PF%'
+UNION ALL SELECT 'order_test_phones', COUNT(*)::int FROM "Order" WHERE "phone" IN ('09140000001','09140000002','09140000003','09150000001','09160000001','09160000002','09180000001') OR "phone" LIKE '0917%'
+UNION ALL SELECT 'order_CC_shippingAddr', COUNT(*)::int FROM "Order" WHERE "shippingAddress"->>'fullName' = 'تست کوپن' OR "shippingAddress"->>'fullName' = 'تست race'
+UNION ALL SELECT 'product_pfr', COUNT(*)::int FROM "Product" WHERE "slug" LIKE 'pfr-%' OR "slug" LIKE 'pfr/test race%'
+UNION ALL SELECT 'variant_PFR_sku', COUNT(*)::int FROM "Variant" WHERE "sku" LIKE 'PFR%'
+UNION ALL SELECT 'payment_auth_pfr', COUNT(*)::int FROM "Payment" WHERE "authority" LIKE 'auth-pfr-%'
+UNION ALL SELECT 'user_0913_0916', COUNT(*)::int FROM "User" WHERE "phone" LIKE '0913%' OR "phone" LIKE '0916%'
+UNION ALL SELECT 'outbox_PaymentFailed_recent30m', COUNT(*)::int FROM "OutboxEvent" WHERE "type"='PaymentFailed' AND "createdAt" > now() - interval '30 minutes'
+UNION ALL SELECT 'reservation_ACTIVE_pfr_orders', COUNT(*)::int FROM "InventoryReservation" ir JOIN "Order" o ON o.id=ir."orderId" WHERE (o."code" LIKE 'CC%' OR o."code" LIKE 'PF%') AND ir."status"='ACTIVE';

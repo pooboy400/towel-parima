@@ -1143,7 +1143,7 @@ Work Log:
 Stage Summary:
 - سرور فعال و سبز: / (200) · /shop (200) · /admin/login (200) · /api/health (200)
 - دیتابیس تازه: ۱۲ محصول، ۱ کاربر (ادمین)، ۰ سفارش — داده‌های تستی QA دورهٔ قبل پاک شده (در گیت نبودند و تستی بودند)
-- رمز جدید ادمین: admin@prima-store.ir / tgCRoA9MXheCbTSZ (رمز قدیمی دیگر کار نمی‌کند)
+- رمز جدید ادمین: admin@prima-store.ir / [REDACTED-ROTATED] (رمز قدیمی دیگر کار نمی‌کند)
 - نکته: پوش گیت‌هاب قبلی دقیقاً همین‌جا نجات‌مان داد؛ برای فازهای بعدی checkpointهای محلی می‌سازیم
 
 ---
@@ -1164,3 +1164,163 @@ Stage Summary:
 - فاز ۲ رسماً بسته شد — هر ۵ معیار پذیرش tasks.md با تست خودکار پوشش داده شد
 - فیکسچرها با sku یونیک در مقیاس ران‌ها + پاکسازی مقاوم FK (درس P2002 بین-ران)
 - گام بعدی: باتری ۸ ایجنت روی فاز ۲ → commit+tag phase-2-complete → فاز ۳
+
+---
+Task ID: 60-fe
+Agent: sub — متخصص فرانت‌اند
+Task: بازبینی سخت‌گیرانهٔ اثر فیکس‌های فاز ۲ (BUG-01..05) روی UI/UX فروشگاه
+
+Work Log:
+- کد: product-card/badges/card-actions، product/[slug] (page/gallery/product-info/tabs)، shop-view، cart-store، checkout-client+actions، coupon-service، admin orders actions+action-helpers+orders-manager، state-machines، mappers، format/rating
+- زنده: /product/test-inactive-all-variants (200) → دقیقاً ۱ «ناموجود» (CTA disabled درست) ولی «۰ تومان» در بلاک قیمت PDP و کارت /shop؛ JSON-LD صادق OutOfStock؛ صفر «تنها X عدد»؛ ارقام فارسی fa-IR سالم
+- یافته‌ها: 🟡F-1 «۰ تومان» برای ناموجود (product-info:80, product-card:121) · 🟡F-2 افزودن سریع/علاقه‌مندی بدون گارد stock → خط صفرتایی سبد (خانوادهٔ BUG-07؛ سرور تمیز رد می‌کند: «یکی از کالاهای سبد قابل خرید نیست») · 🔵F-3 سکشن رنگ/سایز خالی PDP · 🔵F-4 محصول تست QA عمومی در /shop · 🔵F-5 خطای کوپن فقط toast، بدون inline/لینک ورود مهمان · 🔵F-6 پیام گذار با توکن انگلیسی وضعیت
+- تأییدها: پیام مهمان کوپن تا toast می‌رسد (coupon-service:95,173 → actions:128-132 → checkout-client:140)؛ گذارهای 403/409 در withAdminAction به ActionResult فارسی تمیز تبدیل می‌شوند، بدون 500 خام (action-helpers:61-90 → orders-manager:188-198 toast)؛ RTL دست‌نخورده (layout:69)؛ حالت‌های خالی گرید/سفارش‌ها/علاقه‌مندی/نظرات همه موجود؛ UX-12 alt گالری توصیفی شده ✅؛ UX-05 terracotta #c88f72 پابرجا (ثبوت تأیید، رفع فاز ۴)
+Stage Summary:
+- گزارش کامل: qa-reports/60-fe-frontend.md — هیچ یافتهٔ بلوکه‌کننده؛ فیکس‌های فاز ۲ در UI صادق رندر می‌شوند
+- رأی: PASS — پیشنهاد: افزودن F-1 (پنهان‌سازی قیمت ۰) و گارد F-2 به فاز ۳/۴
+
+---
+Task ID: 60-sec
+Agent: security-auditor
+Task: ممیزی سخت‌گیرانهٔ امنیتی فاز ۲ (دیف e2791da) — BUG-01..05 + رگرسیون فاز ۱ + پروب زندهٔ مجاز (بدون تغییر کد)
+Work Log:
+- 🔴 F-60-1: رمز خام زندهٔ SUPER_ADMIN در worklog.md داخل خودِ کامیت e2791da (ورودی Task 59) — گرپ تجویزی «password|secret|token» چیزی نگرفت چون با «رمز» فارسی نوشته شده؛ git log -S تأیید. هنوز پوش نشده (ahead 1) → پیش از push/tag باید خط پاک و رمز چرخانده شود؛ تست‌های جدید و seed از نظر راز/PII پاک
+- BUG-01/02: consumeCouponInTx زیر FOR UPDATE سالم؛ دورزدن evaluate/consume ندارد؛ باقی‌ماندهٔ 🟡 LOW: دوبار‌دستی «لاگین→سهمیهٔ خودش + logout→سبد گمنام» (کران‌دار با اتمام سبد گمنام؛ ADR صریح نگفته — ثبت پیشنهادی)
+- BUG-03: callback تکراری/گمنام پاسخ یکنواخت redirect؛ reason فقط در metadata/Outbox — صفر reflection؛ فلگ mock = ALLOW_MOCKS_IN_PRODUCTION در src/core/env.ts (فایل mock-flag.ts وجود خارجی ندارد) با گارد دوبل
+- BUG-04: پیام 403 «مجری‌های مجاز» جدول actor را لو می‌دهد ولی فقط به ادمینِ orders.update؛ مسیر کاربر عادی وجود ندارد → 🟡 LOW برای فاز ۳ (پیام generic)
+- رگرسیون فاز ۱: صفر — گاردهای client-ip/rate-limit/SEC-04/05/06/07 در دیف لمس نشده و زنده پاس‌اند
+- پروب‌ها: health 125→429+Retry-After:41 (سقف 120 صحیح؛ ۳۵ تنها درست است 429 ندهد) · csp-report 100KB→204 با صفر خط لاگ (before=after=0) · order-tracking دو جفت غلط→«یافت نشد» یکسان بدون رندر سفارش · search با XFF/X-Real-IP جعلیِ تازه در حالت سقف→429 می‌ماند (bucket unknown fail-closed)
+Stage Summary:
+- رأی امنیتی: FAIL مشروط — فقط به‌خاطر F-60-1 (پاک‌سازی کامیت + چرخش رمز پیش از پوش)؛ منطق پول فاز ۲ سالم و بدون رگرسیون فاز ۱ است
+- گزارش: qa-reports/60-sec-security.md
+
+---
+Task ID: 60-be
+Agent: backend/db reviewer (ساب‌ایجنت بازبینی سخت‌گیرانهٔ فاز ۲)
+Task: بازبینی صحت همزمانی و دیتا در کامیت e2791da (BUG-01..05) — قفل کوپن/ترتیب قفل‌ها، failPayment رقابتی، ماشین گذار، mappers، تست‌های رقابت و دیتای DB (بدون هیچ تغییر کد/داده)
+Work Log:
+- BUG-01 تأیید: قفل FOR UPDATE + بازخوانی زیر قفل در READ COMMITTED کافی است؛ تعامل دو گارد (usageLimit شرطی + perUser زیر قفل) بدون واگرایی چون throw بعدی کل tx چک‌اوت را rollback می‌کند
+- تحلیل ددلاک: ترتیب قفل در کل src یکنواخت است — checkout واریانت‌ها را (reserveVariant، حلقه 294) قبل از کوپن (306) قفل می‌کند؛ فقط دو سایت FOR UPDATE در کدبیس (Order در refund-service:60، Coupon در coupon-service:125) و refund بعد از Order سراغ Variant/Coupon نمی‌رود → چرخه‌ای بین چک‌اوت‌های کوپن‌متفاوت/واریانت‌مشترک ممکن نیست؛ یافتهٔ حاشیه‌ای: ترتیب واریانت‌ها پیرو سبد کلاینت است → ددلاک 40P01 دو سبد معکوس (F-1، 🔵)
+- BUG-03 تأیید: claim اتمیک + لغو شرطی بدون P2025 + idempotency دوم (زودعود یا claim=0 داخل tx) + دفاع دولایهٔ releaseReservation (claim شرطی) ریسک snapshot قدیمی و double-release را می‌بندد؛ همهٔ ترتیب‌ها به CANCELLED+FAILED همگرا می‌شوند
+- BUG-04 تأیید: filter(from,to)+actor با 409/403؛ permission «orders.update» در لایهٔ action با withAdminAction→requireAdminContext (orders/actions.ts:39,74)؛ adminPermission ماشین فقط مستند است (F-10)؛ دو کورراه تأیید شد: RETURN_REQUESTED customer و لغو customer هیچ consumer ندارند و دکمهٔ canReturn ادمین روی وضعیت غیرقابل‌رسیدن است (F-4، 🟡)
+- BUG-05 تأیید (دولایه: مپر + productInclude) و پایین‌دست سازگار (ناموجود/JSON-LD/کارت)؛ یافتهٔ اصلی: فیلتر «فقط کالاهای موجود» (product-repository.ts:109) isActive/deletedAt/reserved را نمی‌بیند → محصول stock-نمایشی-0 در «موجود» می‌آید (F-5، 🟡) + کارت «۰ تومان» بدون بج ناموجود (F-6، 🔵)
+- تست رقابت کوپن: pool پیش‌فرض = 2×2+1=۵ اتصال (nproc=2) → رقابت واقعی ۵-راهه، کافی برای فشار؛ دو نقطه‌ضعف: stress است نه proof، و connection_limit=1 آینده تست را کور می‌کند → pool صریح پیشنهاد شد (F-8)؛ پاک‌سازی تست فقط RUN جاری است → ۳۰ کوپن CC-* فعالِ لاشه در DB (F-7، 🟡)
+- oversell: گارد INACTIVE در خود SQL رزرو (inventory-service.ts:38-48) → همه-غیرفعال حتی با stock نمایشی مثبتِ قدیم رد می‌شد و حالا با stock=0 زودتر رد می‌شود — بسته
+- دیتا (فقط SELECT): ۳۰/۳۰ کوپن = لاشهٔ تست CC-* با perUserLimit=1/usedCount 1-2/صفر Redemption؛ هیچ کوپن seed/واقعی وجود ندارد → اثر ADR سبد گمنام روی دیتای فعلی: صفر
+- unit اجرا شد: 180/180 (integration اجرا نشد — قید فقط-SELECT؛ ادعای 245/245 با شواهد ردیفی DB سازگار است)
+- یافته‌ها: ۱۰ قلم (۰ 🔴/🟠، ۴ 🟡، ۶ 🔵) — مهم‌ترین: F-2 (تخفیف از خواندن بی‌قفل کوپن؛ هم‌خانوادهٔ BUG-08) و F-5 و F-7 و F-4
+Stage Summary:
+- رأی: PASS — هر ۵ فیکس فاز ۲ درست، همگرا و بدون رگرسیون فاز ۱ است؛ هیچ یافته‌ای بلوکه‌کننده نیست
+- پیشنهاد فاز ۳: انتقال محاسبهٔ تخفیف به کوپنِ زیر قفل (ادغام با BUG-08)، فیلتر in-memory برای onlyAvailable، cleanup بین-رانی CC-* + پاک‌سازی ۳۰ لاشه، pool صریح تست، حذف/غیرفعال‌سازی دکمهٔ canReturn تا سیم‌کشی مرجوعی، ADR سوزاندن سهمیهٔ کوپن در لغو
+- گزارش: qa-reports/60-be-backend.md · اسکرچ فقط-خواندنی: qa-reports/tmp-60/
+
+---
+Task ID: 60-u1
+Agent: user-1-guest
+Task: فلوی کامل خرید مهمان (E2E سخت‌گیر) + راستی‌آزمایی زندهٔ BUG-05
+
+Work Log:
+- فلوی اصلی shop→واریانت→cart→checkout→درگاه mock→success→tracking→سبد خالی همه PASS؛ ریاضی دقیق (۲×۷۴۵٬۰۰۰+۸۹٬۰۰۰=۱٬۵۷۹٬۰۰۰)؛ سفارش واقعی 1298089477 ثبت و پیگیری شد (PROCESSING/«در حال آماده‌سازی» + پرداخت‌شده، درست پس از پرداخت)؛ UX-04 (ردیف تخفیف بدون کوپن) و UX-10 (سبد خالی پس از پرداخت) هر دو تأیید
+- BUG-05 زنده: قبول — صفحهٔ محصول disabled «ناموجود»، صفر عدد موجودی مثبت؛ اما یافتهٔ جدید 🟠: quick-add محصول تستی ردیف ۰عدد/۰تومانی به سبد تزریق و تا گام آخر چک‌اوت پیش می‌رود (سرور در پایان با پیام تمیز رد کرد — سفارش رایگان ناممکن) + 🟡 نشت محصول تست به /shop و پیشنهادها با اسپم خطای کنسول Image src="" + 🟡 بازخورد کوپن فقط توست گذرا + 🔵 ارقام ناهماهنگ بج/placeholder
+- گزارش: qa-reports/60-u1-user.md · شواهد: qa-reports/tmp-60/u1-01..17*.png
+Stage Summary:
+- فلوی مهمان سالم است؛ امتیاز UX ۷.۵/۱۰ — پیشنهاد فیکس: گارد quick-add برای محصول بدون واریانت فعال + حذف ردیف ۰تایی از سبد + بستن ورود checkout با مبلغ ۰
+
+---
+Task ID: 60-fs
+Agent: بازبین فول‌استک (subagent)
+Task: بازبینی سخت‌گیرانهٔ فاز ۲ (commit e2791da — BUG-01..05 + ۱۷ تست) — بدون هیچ ویرایش کد
+Work Log:
+- اجرای مستقل: unit 180/180 · integration 65/65 (دو فایل جدید 9/9) · typecheck صفر خطا در src/tests → ادعای ۲۴۵/۲۴۵ تأیید؛ working tree = HEAD، تمیز
+- BUG-01 تأیید: تنها نویسندهٔ CouponRedemption خودِ consumeCouponInTx است → count زیر قفل بسته؛ ترتیب قفل Variant→Coupon یک‌طرفه (ABBA منتفی)؛ نگرانی timeout 5s رد شد — checkout tx صریحاً timeout:15s دارد (checkout-service.ts:323) و قفل فقط دنبالهٔ سبک tx را می‌پوشاند
+- BUG-02 تأیید: ADR در کامنت هدر + تعامل onDelete:SetNull صریح مستند (coupon-service.ts:22-25 ↔ schema.prisma:423)؛ call-site پیش‌نمایش (checkout/actions.ts:126) هم‌قاعده با مصرف
+- BUG-03 تأیید: claim اتمیک + لغو شرطی + idempotent؛ اسنپ‌شات کهنهٔ رزرو با releaseReservation اتمیک بی‌خطر؛ متادیتای Json نویسندهٔ دیگری ندارد؛ تداخل با refundRacedPayment/confirm خوانده و همگرا
+- BUG-04 تأیید: grep کامل — هیچ caller تولیدیِ assertTransition قدیمی نمانده (فقط تست قدیمی)؛ UI ادمین فقط DELIVERED/RETURNED/CANCELLED می‌دهد → سخت‌گیری actor چیزی را نمی‌شکند؛ canCancel PENDING الان واقعاً کار می‌کند؛ as never حذف
+- BUG-05 تأیید: کارت/صفحهٔ محصول حالت ناموجود دارند؛ sitemap بی‌تأثیر؛ JSON-LD حالا OutOfStock صحیح ولی price:0 می‌دهد
+- یافته‌های جدید: 🟡 (۱) پنجرهٔ «verify موفق ولی claim باخته» در confirm → پول گرفته‌شده بدون refund (payment-service.ts:176-188 — پیش‌موجود، پیشنهاد مسیر به refundRacedPayment) 🟡 (۲) فیلتر onlyAvailable با isActive ناهم‌تراز (product-repository.ts:109) → محصول همه-غیرفعال در «فقط موجودهارا» با stock=0 🟡 (۳) پاکسازی تست با پیشوند تلفن 0913/0916 کاربر واقعی را هم حذف می‌کند (coupon-concurrency.test.ts:221-222)؛ 🔵: deleteMany پهن Outbox، typecheck حالا ۴ خطای اسکرچ (tmp-60 خودش +QA-HYG-01)، تخفیف/minSubtotal بیرون قفل (BUG-08 هم‌خانواده)
+- بهداشت DB پس از ران من: cc-*/pfr-*/Redemption/reserved/Outbox تازه = صفر — فیکسچرها خودپاک‌اند؛ دو سفارش بدون‌کاربر متعلق به ران‌های زندهٔ خود Task 60 است
+- گاردهای SEC-01..07: هیچ فایل امنیتی در commit نیست؛ تست‌های فاز ۱ در ران من سبز — فاز ۱ دست‌نخورده
+Stage Summary:
+- آمار: 🔴 ۰ · 🟠 ۰ · 🟡 ۳ · 🔵 ۸ — رأی نهایی فاز ۲: PASS (بسته می‌شود)
+- سه 🟡 به بک‌لاگ فاز ۳: FS-1 refund مسیر confirm-باخته · FS-2 هم‌ترازی فیلتر onlyAvailable · FS-3 پاکسازی id-محور کاربر در تست کوپن
+- گزارش کامل: qa-reports/60-fs-fullstack.md (شواهد اجرا: qa-reports/tmp-60/db-hygiene.ts / db-look.ts)
+
+---
+Task ID: 60-ts
+Agent: test-engineer (مهندس تست)
+Task: ممیزی سخت‌گیرانهٔ سوئیت تست فاز ۲ — دو دور integration بایت‌به‌بایت، نگاشت معیار BUG-01..05 به ۱۷ تست، بهداشت DB، typecheck/lint، QA-HYG-01 (بدون تغییر کد)
+Work Log:
+- اجرا: integration دو دور کامل 65/65 (554 expect؛ ادعای 245/245 با unit 180 → مجموع 245/245 تأیید) + دو دور هدفمند ۴ فایل فاز ۲ (45/45) — توالی pass/fail بعد از حذف مدت‌زمان‌ها بایت‌به‌بایت یکسان؛ تفاوت خام فقط ms/timestamp/CUID فیکسچر/ترتیب بافر لاگ revalidateTag؛ رأی flaky: خیر (حتی هم‌زمان با ترافیک زندهٔ ایجنت‌های موازی روی همان DB)
+- نگاشت معیارها: BUG-01 ✅ (۱۰ موازی→۱ Redemption با triple-assert) · BUG-02 ✅ (۳ شماره مهمان→۱) · BUG-03 ✅ (FAILED+failReason+Outbox دقیقاً۱+RELEASED / callback دوم بدون‌throw و بدون رخداد) · BUG-04 ✅ (admin cancel PENDING مجاز + تفکیک 403/409 + customer/system) · BUG-05 ✅ (stock=0 + میخ فعال/غیرفعال + deletedAt؛ جزء «صفحهٔ محصول» فقط-زنده) — ۵/۵؛ میانگین کیفی ۱۷ تست ≈7.9/10؛ یک assert مرده در pfr تست ۳ (expect(orderId).toBeTruthy)
+- شکاف‌ها: ① بازخوانی بعد از FOR UPDATE بدون تست (حذفش هیچ تستی را قرمز نمی‌کند) ② evaluateCoupon مسیر usageLimit غایب — ظریف: placeOrder فقط consume را صدا می‌زند، تست commerce-core مسیر مصرف را می‌پوشاند نه پیش‌نمایش ③ تعامل BUG-03×refundRacedPayment بدون نگهبان ④ perUser=2 مهمان ⑤ لغو ادمین از مسیر cancelOrder فقط-unit
+- بهداشت DB: ❌ نشت سیستماتیک کوپن — afterAll کوپن با پیشوند lowercase (cc-) پاک می‌کند ولی کد uppercase (CC-) ذخیره شده ⇒ ۵ نشت در هر ران؛ شواهد: ۳۵=۷ران×۵ و سپس زنده +۱۵=۳ران×۵ → ۵۰ ردیف؛ سایر شمارش‌ها (سفارش مهمان، pfr، پرداخت، رزرو، outbox، کاربر 0913/0916) همگی صفر ✅؛ دو ریسک الگویی: deleteMany پیشوندی کاربر با پیشوندهای واقعی ایران + پنجرهٔ ۳۰ دقیقه‌ای پاکسازی Outbox
+- typecheck: ۸ خطا — ۳ baseline مجاز (tmp-56/57a/57b) + ۵ جدید از attack*.ts ایجنت موازی 60-sec در tmp-60 (مال من نیست؛ src/tests=صفر) — دومین اثبات زندهٔ QA-HYG-01؛ lint: 0 خطا/۹ هشدار قدیمی tmp-57a
+- tsconfig exclude فعلی: node_modules/skills/examples/tests/scripts — «qa-reports» غایب؛ eslint ignores هم فاقد آن
+- رأی QUALITY: B — مسیر A: فیکس یک‌خطی پسوند پاکسازی کوپن + DELETE ۵۰ ردیف، حذف assert مرده، ۳ تست شکاف، tsconfig/eslint exclude
+- گزارش: qa-reports/60-ts-testsuite.md · شواهد: qa-reports/tmp-60/ (فایل‌های int-run*/cases-run*/p2-run*/all-run/unit-run1 مال این ممیزی)
+Stage Summary:
+- فاز ۲ از دید تست‌پذیری سالم و قابل‌بسته‌شدن است: ۵/۵ معیار پوشش، غیر-flaky در ۴ اجرا — تنها بدهی: نشت ۵ کوپن/ران در afterAll (تک‌خطی) و ۵ شکاف نگهبانی کوچک برای فاز ۳
+---
+Task ID: 60-u2
+Agent: user-2-registered
+Task: E2E کاربر ثبت‌نام‌شده — ورود OTP تا خروج (تستر سخت‌گیر UX)
+
+Work Log:
+- ورود OTP 09123456789 موفق (کد dev روی صفحه: «کد آزمایشی (فقط توسعه)»)؛ حساب خودکار ساخته شد
+- ۴ بدهی شناخته‌شده همگی تأیید: UX-02 (خطای جنریک آدرس با کدپستی غلط)، UX-13 (توست انگلیسی خام Zod «Too big…<=2000» در فرم تماس)، UX-09 (هیچ راهی برای ثبت نام پروفایل)، UX-03 (علاقه‌مندی فقط localStorage — بج پس از رفرش و حتی خروج باقی می‌ماند)
+- یافتهٔ جدید مهم: فرم ثبت نظر روی صفحهٔ محصول وجود خارجی ندارد (فقط لیست) — فلوی «در انتظار تأیید» غیرقابل‌تست
+- /account/orders → 404 برنددار (روت موجود نیست)؛ /wishlist و /faq سالم؛ فرم تماس سالم (ردیف واقعی DB)
+- خروج: revoke واقعی سشن در DB ✓ اما بج علاقه‌مندی هدر پاک نشد (رفتار ثبت شد)
+- هشدار محیطی: دو بار ردیف Session مشتری از DB حذف شد در حالی که هیچ کدی Session را حذف نمی‌کند — interference ایجنت‌های هم‌زمان روی DB مشترک؛ بهداشت پاکسازی رعایت شود (جزئیات F-9 گزارش)
+- گزارش: qa-reports/60-u2-user.md · شواهد: qa-reports/tmp-60/u2-*.png · امتیاز UX: 6/10
+
+---
+Task ID: 60-hack
+Agent: redteam (هکر قرمزتیم)
+Task: حملهٔ سخت‌گیرانه به فیکس‌های فاز ۲ (BUG-01..05 در e2791da) — ۵ سناریو، فقط دیتای خودم، cleanup کامل
+Work Log:
+- حملهٔ ۱ (رقابت کوپن، سرویس‌لول): دو دور مستقل؛ A: perUser=2 + ۲۰ مهمان موازی → دقیقاً ۲ موفق/۱۸ COUPON_INVALID/usedCount=2 · B: perUser=3 + ۱۰ کاربر+۱۰ مهمان → مهمان=۳ (سبد گمنام)، کاربر=۱۰، جمع=۱۳ = سقف انتظار · C: سقف سریالی کاربر (دوم/سوم OK، چهارم رد) — DEFENDED
+- حملهٔ ۲ (callback): ۳۰ curl موازی status=NOK همزمان با cancelOrder روی فیکسچر PENDING → ۳۰×307 صفر 500 · Payment=FAILED واحد + یک PaymentFailed در Outbox + رزرو RELEASED + reserved=0 · cancel دوم INVALID_TRANSITION تمیز · پروب برانگیختگی status=OK روی FAILED → همچنان FAILED/PaymentSucceeded=0 · بدون authority→307؟error · POST→405 · authority خیالی همان 307 (بدون اوراکل) · mock-gateway بدون اثبات → بدون نشت مبلغ/کد — DEFENDED (نکته: callback بدون rate-limit اختصاصی)
+- حملهٔ ۳ (گذار از بیرون): Server Action ID ادمین از chunkهای dev استخراج شد (بدترین حالت نشت) + encoding صحیح فراخوانی action کشف شد ([args] + Next-Action)؛ ۱۳ پروب (بدون نشست/کوکی جعلی/مسیرهای پوششی //،%2F،slash/صفحهٔ غیرادمین/id جعلی/API ادمین) → همیشه 307 login یا 401 یا 404 «Server action not found.» · DB: سفارش هدف PENDING ماند، صفر audit/shipment/outbox — DEFENDED
+- حملهٔ ۴ (mapper): سرویس‌لول + Server Action عمومی با lineId دستکاری‌شدهٔ واریانت غیرفعال → هر دو OUT_OF_STOCK «یکی از کالاهای سبد دیگر قابل خرید نیست.» · صفر رزرو/سفارش/reserved=0 · صفحهٔ محصول «ناموجود» — DEFENDED
+- حملهٔ ۵ (راز در دیف): اسکن gستردهٔ ۹۶۹ خط → ۲×URL dev دیتابیس در fallback تست‌ها (INFO) + 🔴 رمز plaintext ادمین در worklog.md داخل همین کامیت (مدخل Task-59)؛ ریپوی گیت‌هاب عمومی و دیف هنوز push نشده (ahead-1) — BREACHED (بهداشت راز، خارج از فیکس‌های پول): چرخش رمز + پاک‌سازی خط قبل از push
+- cleanup: اسکریپت tmp-60/cleanup.ts با مارکرهای اختصاصی؛ تمام ۴۸ سفارش/کوپن/کاربر/پرداخت/رزرو/Outbox/SMS خودم = صفر؛ سید و فیکسچر QA قبلی و سفارش‌های ایجنت‌های موازی دست نخورد؛ health=200
+Stage Summary:
+- ۴ حملهٔ فعال DEFENDED با اعداد دقیق روی مرز انتظار (جزئیات: qa-reports/60-hack-redteam.md · شواهد tmp-60/)
+- ۱ یافتهٔ قرمز فراتر از فیکس‌ها: نشت رمز ادمین در کامیت — اقدام فوری: چرخش رمز و scrub قبل از push
+---
+Task ID: 60-u3
+Agent: user-3-admin
+Task: تست سخت‌گیرانهٔ پنل ادمین فاز ۲ — راستی‌آزمایی زندهٔ BUG-04 + گشت ۸ صفحه
+
+Work Log:
+- ورود admin@prima-store.ir → داشبورد KPIها سبز؛ ۸ صفحه (products/orders/reviews/messages/faq/staff/audit/login-guard) همگی بدون خطا رندر شد؛ /admin/settings طبق ممنوعیت باز نشد؛ خروج→دسترسی مستقیم /admin/orders=307 به login با next
+- BUG-04 زنده PASS: خرید مهمان (09130000000) → سفارش 4550433833/PENDING (درگاه mock رها شد، چون NOK طبق BUG-03 لغو می‌کند) → لغو ادمین از دیالوگ سفارش: توست «انجام شد»، UI «لغو شده»، DB: CANCELLED+رزرو RELEASED+audit order.transition — بدون 403/409
+- یافته MEDIUM (F-01): لیست ادمین برای «حولهٔ تست — همه واریانت‌ها غیرفعال» موجودی آزاد=۸ کهربایی نشان می‌دهد (admin-repository.ts:99 بدون فیلتر isActive — رسوب BUG-05 در مسیر خواندن ادمین)؛ ویترین درست «ناموجود» است
+- یافته محیطی HIGH (F-02): دو نشست ادمین در ~۲ دقیقه بدون audit مُرد (dev.log: UNAUTHENTICATED 12:47–12:53) + revoke session مهمان 12:55:16 — مظنون: دست‌کاری مستقیم DB توسط ایجنت‌های موازی (آثار hygiene.sql/cleanup.ts/attack* در tmp-60)؛ نشست سوم با polling زنده ماند
+- جزئیات: F-03 confirm بومی/توست generic · F-04 سلکت رنگ/سایز «—» برای واریانت‌های سفارشی · F-05 Payment PENDING پس از لغو + کپی «پرداخت بازگردانده می‌شود» · F-06/F-07 رسوب ۴۴ سفارش H۶ و ۲۶ کاربر تستی
+
+Stage Summary:
+- BUG-04 رسماً تأیید زنده شد (نه فقط تست خودکار) · BUG-05 در ویترین درست، در لیست ادمین ناقص
+- نمرهٔ پنل ادمین ۷٫۵/۱۰ · گزارش: qa-reports/60-u3-admin.md · شواهد: tmp-60/u3-01…u3-19.png
+- گام بعدی: فیکس F-01 (یک‌خطی) + پروتکل هماهنگی DB بین ایجنت‌ها
+
+---
+Task ID: 60-fix (باتری ۸ ایجنت + رفع یافته‌ها)
+Agent: main (Super Z — مهندس کل)
+Task: وریفیکیشن سخت‌گیرانهٔ فاز ۲ با ۸ ایجنت موازی (۳ کاربر عادی agent-browser + فول‌استک + فرانت + بک‌اند + امنیت + هکر + مهندس تست) و رفع یافته‌های بلوکه‌کننده
+
+Work Log:
+- رأی ایجنت‌ها: فول‌استک PASS (۵×FIXED-CONFIRMED) · بک‌اند PASS (۰🔴/۰🟠) · فرانت PASS · هکر: ۴ حملهٔ فعال DEFENDED (رقابت کوپن ۲۰×، فلود callback ۳۰×، گذار بیرونی ۱۳ پروب، رزرو INACTIVE) · مهندس تست QUALITY B (۲۴۵/۲۴۵ دو دور پایدار) · امنیت FAIL مشروط روی یک یافتهٔ خارج از کد
+- 🔴 حاد و رفع‌شده: رمز ادمین تازه در worklog داخل کامیت e2791da (ریپوی عمومی!) → فوراً چرخش شد (رمز جدید فقط در /home/z/my-project/.secrets خارج از ریپو) + redact از همهٔ فایل‌های tracked + یادداشت: ریپو باید private شود
+- رفع F-01/u3: freeStock ادمین بدون فیلتر isActive → admin-repository.ts حالا فقط واریانت فعال (هم‌راستا BUG-05)
+- رفع F-5/be: فیلتر onlyAvailable ویتترین isActive+deletedAt نمی‌دید → product-repository.ts اصلاح شد
+- رفع F-7/ts: نشت ۵ کوپن در هر ران تست (cleanup lowercase vs code uppercase) → پاکسازی id-محور + حذف ۵۰ ردیف نشتی از DB
+- رفع FS-3/ts: پاکسازی پیشوندیِ کاربر (0913/0916 پیشوند ایران واقعی — ریسک حذف کاربر OTP) → userIds آرایه‌ای
+- رفع assert مردهٔ pfr تست ۳ → assert واقعی همگرایی سفارش در هر دو شاخهٔ رقابت
+- حذف محصول تستی BUG-05 از ویترین (nشت «۰ تومان» به /shop — یافتهٔ u1/fe)؛ شواهد زنده در اسکرین‌شات‌ها محفوظ
+- تست مجدد کامل: ۲۴۵/۲۴۵ سبز · typecheck فقط baseline tmp · lint ۰ خطا
+
+Stage Summary:
+- فاز ۲ با رأی اکثریت قاطع باتری بسته شد؛ یافته‌های 🟡 باقی‌مانده به بک‌لاگ فاز ۳ رفت: FS-1 (refund مسیر confirm-باخته)، UX-04/07 (ردیف تخفیف/توست)، BUG-07 (خط صفرتایی quick-add)، F-4/be (canReturn روی وضعیت دست‌نیافتنی)، ریت-لیمیت /checkout/callback، حذف fallback URL از تست‌ها
+- درس عملیاتی: ایجنت‌های موازی DB-تاچر نباید همزمان session/کاربر پاک کنند (نشست ادمین u3 دوبار افتاد) — باتری بعدی: user-agents متوالی یا DB جدا

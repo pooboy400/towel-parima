@@ -19,9 +19,11 @@ const DATABASE_URL =
 const db = new PrismaClient({ datasources: { db: { url: DATABASE_URL } } });
 
 const RUN = `cc-${Date.now()}`;
-const cleanupIds: { coupon?: string; userId?: string; orderIds: string[] } = {
-  orderIds: [],
-};
+const cleanupIds: {
+  couponIds: string[];
+  userIds: string[];
+  orderIds: string[];
+} = { couponIds: [], userIds: [], orderIds: [] };
 
 /** سفارش PENDING حداقلی — فقط برای FK ردیف Redemption */
 async function makeGuestOrder(phone: string, userId?: string): Promise<{ id: string }> {
@@ -61,7 +63,7 @@ async function makeCoupon(input: {
     },
     select: { id: true, code: true },
   });
-  cleanupIds.coupon = coupon.id;
+  cleanupIds.couponIds.push(coupon.id);
   return coupon;
 }
 
@@ -71,7 +73,7 @@ describe("BUG-01 — قفل رقابتی perUserLimit (TOCTOU)", () => {
     const user = await db.user.create({
       data: { phone: `0912${Math.floor(1e7 + Math.random() * 9e7)}`.slice(0, 11), roleId: role.id },
     });
-    cleanupIds.userId = user.id;
+    cleanupIds.userIds.push(user.id);
 
     const coupon = await makeCoupon({ perUserLimit: 1 });
     const orders = await Promise.all(
@@ -103,6 +105,7 @@ describe("BUG-01 — قفل رقابتی perUserLimit (TOCTOU)", () => {
     const user = await db.user.create({
       data: { phone: `0913${Math.floor(1e7 + Math.random() * 9e7)}`.slice(0, 11), roleId: role.id },
     });
+    cleanupIds.userIds.push(user.id);
     const coupon = await makeCoupon({ perUserLimit: 1 });
     const o1 = await makeGuestOrder(`09130000001`.slice(0, 11), user.id);
     const o2 = await makeGuestOrder(`09130000002`.slice(0, 11), user.id);
@@ -169,6 +172,7 @@ describe("BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR)", 
     const user = await db.user.create({
       data: { phone: `0916${Math.floor(1e7 + Math.random() * 9e7)}`.slice(0, 11), roleId: role.id },
     });
+    cleanupIds.userIds.push(user.id);
     const coupon = await makeCoupon({ perUserLimit: 1 });
     const oGuest = await makeGuestOrder(`09160000001`);
     const oUser = await makeGuestOrder(`09160000002`, user.id);
@@ -212,14 +216,15 @@ describe("رگرسیون — سقف کلی usageLimit همچنان اتمیک", 
 /** کمک‌ساز حذف شد — کد کوپن مستقیماً از makeCoupon برگردانده می‌شود */
 
 afterAll(async () => {
-  // پاکسازی به ترتیب FK
-  await db.couponRedemption.deleteMany({ where: { OR: [{ couponId: cleanupIds.coupon ?? "" }, { orderId: { in: cleanupIds.orderIds } }] } });
-  if (cleanupIds.coupon) await db.coupon.deleteMany({ where: { id: cleanupIds.coupon } });
+  // پاکسازی id-محور (یافتهٔ باتری ۶۰/FS-3: پاکسازی پیشوندیِ شمارهٔ ایران واقعی
+  // می‌توانست کاربر واقعی OTP را حذف کند — ممنوع). کد کوپن uppercase ذخیره
+  // می‌شود (یافتهٔ 60-ts: پیشوند lowercase یعنی صفر حذف و نشت per-ran)
+  await db.couponRedemption.deleteMany({
+    where: { OR: [{ couponId: { in: cleanupIds.couponIds } }, { orderId: { in: cleanupIds.orderIds } }] },
+  });
+  await db.coupon.deleteMany({ where: { id: { in: cleanupIds.couponIds } } });
+  await db.coupon.deleteMany({ where: { code: { startsWith: RUN.toUpperCase() } } }); // بدنهٔ حذف‌نشدهٔ احتمالی
   await db.order.deleteMany({ where: { id: { in: cleanupIds.orderIds } } });
-  if (cleanupIds.userId) await db.user.deleteMany({ where: { id: cleanupIds.userId } });
-  // کاربران بدون cleanup-id (تست‌های میانی)
-  await db.user.deleteMany({ where: { phone: { startsWith: "0913" } } });
-  await db.user.deleteMany({ where: { phone: { startsWith: "0916" } } });
-  await db.coupon.deleteMany({ where: { code: { startsWith: `${RUN}-` } } });
+  await db.user.deleteMany({ where: { id: { in: cleanupIds.userIds } } });
   await db.$disconnect();
 });

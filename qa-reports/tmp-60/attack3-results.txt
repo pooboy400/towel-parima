@@ -1,0 +1,24 @@
+## 1 transitionOrderAction→CANCELLED بدون نشست
+http=307 ct=
+/admin/login?next=%2Fadmin%2Forders
+--
+## 2 transitionOrderAction→DELIVERED بدون نشست
+http=307 ct=
+/admin/login?next=%2Fadmin%2Forders
+--
+## 3 shipOrderAction بدون نشست
+http=307 ct=
+/admin/login?next=%2Fadmin%2Forders
+--
+## 4 refundOrderAction بدون نشست
+http=307 ct=
+/admin/login?next=%2Fadmin%2Forders
+--
+## 5 transitionOrderAction با کوکی جلسهٔ جعلی
+http=307 ct=
+/admin/login?next=%2Fadmin%2Forders
+--
+## 6 transitionOrderAction مسیر جایگزین /checkout
+http=200 ct=application/json; charset=utf-8
+{}
+--

@@ -1,0 +1,56 @@
+{
+ "vector1_serviceLevel": {
+  "reached": false,
+  "code": "OUT_OF_STOCK",
+  "message": "یکی از کالاهای سبد دیگر قابل خرید نیست."
+ },
+ "vector1b_serviceLevel_qty2": {
+  "reached": false,
+  "code": "OUT_OF_STOCK",
+  "message": "یکی از کالاهای سبد دیگر قابل خرید نیست."
+ },
+ "db": {
+  "before": {
+   "reservations": 0,
+   "variantState": [
+    {
+     "sku": "QA-INACT-1",
+     "reserved": 0,
+     "stock": 5,
+     "isActive": false
+    },
+    {
+     "sku": "QA-INACT-2",
+     "reserved": 0,
+     "stock": 3,
+     "isActive": false
+    }
+   ],
+   "ordersForProduct": 0
+  },
+  "after": {
+   "reservations": 0,
+   "variantState": [
+    {
+     "sku": "QA-INACT-1",
+     "reserved": 0,
+     "stock": 5,
+     "isActive": false
+    },
+    {
+     "sku": "QA-INACT-2",
+     "reserved": 0,
+     "stock": 3,
+     "isActive": false
+    }
+   ],
+   "ordersForProduct": 0,
+   "pendingOrdersMine": 0
+  }
+ },
+ "verdict": {
+  "rejectedClean": true,
+  "noMutation": true,
+  "BREACHED": false
+ }
+}

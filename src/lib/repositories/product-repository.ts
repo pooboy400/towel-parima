@@ -106,7 +106,11 @@ export const productRepository = {
       ...(filters.sizes?.length
         ? { variants: { some: { sizeId: { in: filters.sizes } } } }
         : {}),
-      ...(filters.onlyAvailable ? { variants: { some: { stock: { gt: 0 } } } } : {}),
+      // BUG-05 پیگیری باتری ۶۰: «فقط کالاهای موجود» یعنی واریانت فعالِ موجود —
+      // واریانت غیرفعال هرگز قابل خرید نیست، پس شمارشش فریبنده است
+      ...(filters.onlyAvailable
+        ? { variants: { some: { stock: { gt: 0 }, isActive: true, deletedAt: null } } }
+        : {}),
     };
 
     // کوئری DB برای فیلترهای ساختاری؛ فیلترهای محاسباتی (قیمت تجمیعی، امتیاز)

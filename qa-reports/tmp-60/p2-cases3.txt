@@ -1,0 +1,45 @@
+(pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > هر دو مسیر همزمان → Payment=FAILED + PaymentFailed در Outbox + رزرو آزاد 
+(pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > callback دوم (بعد از بسته شدن) بدون خطا و بدون رخداد تکراری 
+(pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > رقابت تأیید × شکست — فقط یک claim برنده می‌شود 
+(pass) BUG-01 — قفل رقابتی perUserLimit (TOCTOU) > ۱۰ مصرف موازی یک کاربر با سقف perUser=۱ → دقیقاً ۱ Redemption 
+(pass) BUG-01 — قفل رقابتی perUserLimit (TOCTOU) > مصرف دوم سریالی همان کاربر با COUPON_INVALID رد می‌شود 
+(pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > مهمان با ۳ شمارهٔ مختلف و سقف perUser=۱ → فقط ۱ مصرف موفق 
+(pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > پس از پر شدن سبد گمنام، پیش‌نمایش مهمان هم با پیام شفاف رد می‌شود 
+(pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > کاربر لاگین از سبد گمنام جدا شمرده می‌شود 
+(pass) رگرسیون — سقف کلی usageLimit همچنان اتمیک > ۱۰ مصرف موازی با سقف کلی ۳ → دقیقاً ۳ Redemption 
+(pass) Order state machine — جدول بخش ۵.۱ سند > مسیر خوش‌مسیر: PENDING → PROCESSING → SHIPPED → DELIVERED 
+(pass) Order state machine — جدول بخش ۵.۱ سند > لغو از PENDING و PROCESSING مجاز، از SHIPPED/DELIVERED ممنوع 
+(pass) Order state machine — جدول بخش ۵.۱ سند > مرجوعی فقط از DELIVERED 
+(pass) Order state machine — جدول بخش ۵.۱ سند > گذار رو به عقب ممنوع است 
+(pass) Order state machine — جدول بخش ۵.۱ سند > assertOrderTransition مجری اشتباه را با FORBIDDEN رد می‌کند 
+(pass) Order state machine — جدول بخش ۵.۱ سند > assertOrderTransition گذار ناشناخته با 409 
+(pass) Order state machine — جدول بخش ۵.۱ سند > گذارهای ادمین permission درست دارند 
+(pass) Order state machine — جدول بخش ۵.۱ سند > BUG-04: لغو ادمین از PENDING مجاز است (قبلاً 403 می‌خورد) 
+(pass) Order state machine — جدول بخش ۵.۱ سند > BUG-04: لغو مشتری از PENDING همچنان مجاز و rule درست برمی‌گردد 
+(pass) Order state machine — جدول بخش ۵.۱ سند > BUG-04: بازیگر بی‌مجاز روی گذار موجود → 403 
+(pass) Order state machine — جدول بخش ۵.۱ سند > BUG-04: گذار خارج از توپولوژی → 409 (تفکیک از 403 حفظ شده) 
+(pass) Order state machine — جدول بخش ۵.۱ سند > BUG-04: system هم بازیگر شناخته‌شده است (PENDING→PROCESSING) 
+(pass) Payment state machine — بخش ۵.۲ > PENDING → PAID و PENDING → FAILED مجاز 
+(pass) Payment state machine — بخش ۵.۲ > FAILED حالت پایانی است — گذار خروجی ندارد 
+(pass) Payment state machine — بخش ۵.۲ > مسیر refund کامل و جزئی 
+(pass) Shipment · Reservation · Refund · Review · Content > Shipment مسیر خطی + FAILED → RETURNED 
+(pass) Shipment · Reservation · Refund · Review · Content > Reservation فقط از ACTIVE خروج دارد 
+(pass) Shipment · Reservation · Refund · Review · Content > Refund: REQUESTED → PROCESSING → SUCCEEDED|FAILED 
+(pass) Shipment · Reservation · Refund · Review · Content > Review: فقط PENDING → APPROVED|REJECTED 
+(pass) Shipment · Reservation · Refund · Review · Content > Content: DRAFT هرگز مستقیم ARCHIVED نمی‌شود 
+(pass) mapProductToDomain — تجمیع Product+Variant > قیمت = حداقل قیمت واریانت‌ها و sku = واریانت اصلی 
+(pass) mapProductToDomain — تجمیع Product+Variant > موجودی = Σ(stock − reserved) و رزرو منفی نمی‌شود 
+(pass) mapProductToDomain — تجمیع Product+Variant > واریانت غیرفعال/حذف‌شده از محاسبات خارج می‌شود 
+(pass) mapProductToDomain — تجمیع Product+Variant > رنگ‌ها/سایزها متمایز و با حفظ ترتیب واریانت‌ها 
+(pass) mapProductToDomain — تجمیع Product+Variant > تصاویر با sortOrder مرتب می‌شوند و کالکشن‌ها به slug نگاشت می‌شوند 
+(pass) mapProductToDomain — تجمیع Product+Variant > بدون واریانت: مقادیر پیش‌فرض امن (کاتالوگ خراب نمی‌کند) 
+(pass) buildProductSearchKey — نرمال‌سازی index-time (بخش ۱۷ سند) > ي عربی→ی، ك→ک، ارقام فارسی→لاتین، فاصله‌های تکراری فشرده 
+(pass) buildProductSearchKey — نرمال‌سازی index-time (بخش ۱۷ سند) > trim و فشرده‌سازی فاصله 
+(pass) buildTsQueryString — tsquery امن با prefix > توکن‌ها OR می‌شوند با :* 
+(pass) buildTsQueryString — tsquery امن با prefix > کاراکترهای خاص حذف می‌شوند (ضد SQL/ tsquery injection) 
+(pass) buildTsQueryString — tsquery امن با prefix > خالی → null و سقف ۸ توکن 
+(pass) mapJournalToDomain و mapReviewToDomain > پاراگراف‌ها با 
+(pass) mapJournalToDomain و mapReviewToDomain > نظر: تاریخ منتشرشده و وضعیت خرید تاییدشده 
+(pass) BUG-05 (فاز ۲) — واریانت‌های همه غیرفعال → موجودی نمایشی صفر (ADR 011) > دو واریانت غیرفعال → stock=0، بدون رنگ/سایز نمایشی، قیمت 0 
+(pass) BUG-05 (فاز ۲) — واریانت‌های همه غیرفعال → موجودی نمایشی صفر (ADR 011) > واریانت حذف‌شده (deletedAt) هم مثل غیرفعال شمرده نمی‌شود 
+(pass) BUG-05 (فاز ۲) — واریانت‌های همه غیرفعال → موجودی نمایشی صفر (ADR 011) > میخ: واریانت فعال + غیرفعال → فقط فعال شمرده می‌شود 

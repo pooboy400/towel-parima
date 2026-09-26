@@ -1,0 +1,232 @@
+4,7c4,7
+< (pass) RBAC ماتریس روی DB واقعی > read-matrix صفحات ادمین (SEC-01) — هر نقش فقط صفحات مجاز read را می‌بیند [47.32ms]
+< (pass) RBAC ماتریس روی DB واقعی > هر نقش با requirePermission دقیقاً مطابق ROLE_DEFINITIONS رفتار می‌کند [83.46ms]
+< (pass) RBAC ماتریس روی DB واقعی > نشست ادمین idle-منقضی revoke و 401 می‌گیرد [7.14ms]
+< (pass) RBAC ماتریس روی DB واقعی > AuditWriter دیتابیسی append می‌کند و داده حساس را scrub می‌کند [4.96ms]
+---
+> (pass) RBAC ماتریس روی DB واقعی > read-matrix صفحات ادمین (SEC-01) — هر نقش فقط صفحات مجاز read را می‌بیند [39.02ms]
+> (pass) RBAC ماتریس روی DB واقعی > هر نقش با requirePermission دقیقاً مطابق ROLE_DEFINITIONS رفتار می‌کند [45.61ms]
+> (pass) RBAC ماتریس روی DB واقعی > نشست ادمین idle-منقضی revoke و 401 می‌گیرد [14.98ms]
+> (pass) RBAC ماتریس روی DB واقعی > AuditWriter دیتابیسی append می‌کند و داده حساس را scrub می‌کند [4.84ms]
+11c11
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp1bf000rndb8525od4nv"}
+---
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpc0z000rndh5c31oiqmw"}
+15,16c15,16
+< (pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > هر دو مسیر همزمان → Payment=FAILED + PaymentFailed در Outbox + رزرو آزاد [95.30ms]
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp1dk0011ndb8oxzblyfq"}
+---
+> (pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > هر دو مسیر همزمان → Payment=FAILED + PaymentFailed در Outbox + رزرو آزاد [95.84ms]
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpc330011ndh5dzgbq7gd"}
+20,25c20,21
+< (pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > callback دوم (بعد از بسته شدن) بدون خطا و بدون رخداد تکراری [18.23ms]
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp1e2001bndb89u951hau"}
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: products"}
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: homepage"}
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: products"}
+< (pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > رقابت تأیید × شکست — فقط یک claim برنده می‌شود [17.10ms]
+---
+> (pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > callback دوم (بعد از بسته شدن) بدون خطا و بدون رخداد تکراری [32.46ms]
+> (pass) BUG-03 — لغو همزمان سفارش × callback ناموفق > رقابت تأیید × شکست — فقط یک claim برنده می‌شود [10.39ms]
+28c24
+< (pass) admin-signin per-email rate limit (SEC-03) > ۱۰ تلاش (حتی با فرض چرخش IP) → یازدهمی قفل — کلید per-email است (CR-9) [0.41ms]
+---
+> (pass) admin-signin per-email rate limit (SEC-03) > ۱۰ تلاش (حتی با فرض چرخش IP) → یازدهمی قفل — کلید per-email است (CR-9) [0.49ms]
+31,40c27,36
+< (pass) SEC-05 — سقف /api/csp-report > بدنهٔ ~110KB با Content-Length → 204 بدون هیچ لاگ [3.53ms]
+< (pass) SEC-05 — سقف /api/csp-report > بدنهٔ chunked ۱۰۰KB بدون Content-Length → 204 بدون لاگ (خواندن bounded — CR-5) [0.74ms]
+< (pass) SEC-05 — سقف /api/csp-report > بدنهٔ سالم کوچک → 204 با دقیقاً یک لاگ csp_violation [0.75ms]
+< (pass) SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After > health: دقیقاً 120 پاسخ سالم سپس 429 با Retry-After ≥ 1 [203.06ms]
+< (pass) SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After > media-file: bucket مستقل، سقف 120 سپس 429 با Retry-After [25.75ms]
+< (pass) SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After > search: سقف 30/min سپس 429 با Retry-After [0.85ms]
+< (pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > بدون کوکی → «تراکنش یافت نشد» بدون مبلغ و کد سفارش [23.52ms]
+< (pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > کوکی اثبات درست (sha256 authority) → مبلغ + کد سفارش [2.85ms]
+< (pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > کوکی جعلی → «تراکنش یافت نشد» [0.98ms]
+< (pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > authority ناموجود → «تراکنش یافت نشد» (بدون نشت تفاوت) [0.75ms]
+---
+> (pass) SEC-05 — سقف /api/csp-report > بدنهٔ ~110KB با Content-Length → 204 بدون هیچ لاگ [3.49ms]
+> (pass) SEC-05 — سقف /api/csp-report > بدنهٔ chunked ۱۰۰KB بدون Content-Length → 204 بدون لاگ (خواندن bounded — CR-5) [3.39ms]
+> (pass) SEC-05 — سقف /api/csp-report > بدنهٔ سالم کوچک → 204 با دقیقاً یک لاگ csp_violation [0.61ms]
+> (pass) SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After > health: دقیقاً 120 پاسخ سالم سپس 429 با Retry-After ≥ 1 [508.77ms]
+> (pass) SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After > media-file: bucket مستقل، سقف 120 سپس 429 با Retry-After [6.72ms]
+> (pass) SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After > search: سقف 30/min سپس 429 با Retry-After [1.01ms]
+> (pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > بدون کوکی → «تراکنش یافت نشد» بدون مبلغ و کد سفارش [78.40ms]
+> (pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > کوکی اثبات درست (sha256 authority) → مبلغ + کد سفارش [2.89ms]
+> (pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > کوکی جعلی → «تراکنش یافت نشد» [2.07ms]
+> (pass) SEC-07 — گارد درگاه mock (کوکی اثبات) > authority ناموجود → «تراکنش یافت نشد» (بدون نشت تفاوت) [1.09ms]
+43,48c39,44
+< (pass) BUG-01 — قفل رقابتی perUserLimit (TOCTOU) > ۱۰ مصرف موازی یک کاربر با سقف perUser=۱ → دقیقاً ۱ Redemption [84.50ms]
+< (pass) BUG-01 — قفل رقابتی perUserLimit (TOCTOU) > مصرف دوم سریالی همان کاربر با COUPON_INVALID رد می‌شود [12.88ms]
+< (pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > مهمان با ۳ شمارهٔ مختلف و سقف perUser=۱ → فقط ۱ مصرف موفق [18.39ms]
+< (pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > پس از پر شدن سبد گمنام، پیش‌نمایش مهمان هم با پیام شفاف رد می‌شود [8.07ms]
+< (pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > کاربر لاگین از سبد گمنام جدا شمرده می‌شود [34.60ms]
+< (pass) رگرسیون — سقف کلی usageLimit همچنان اتمیک > ۱۰ مصرف موازی با سقف کلی ۳ → دقیقاً ۳ Redemption [31.97ms]
+---
+> (pass) BUG-01 — قفل رقابتی perUserLimit (TOCTOU) > ۱۰ مصرف موازی یک کاربر با سقف perUser=۱ → دقیقاً ۱ Redemption [200.43ms]
+> (pass) BUG-01 — قفل رقابتی perUserLimit (TOCTOU) > مصرف دوم سریالی همان کاربر با COUPON_INVALID رد می‌شود [17.23ms]
+> (pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > مهمان با ۳ شمارهٔ مختلف و سقف perUser=۱ → فقط ۱ مصرف موفق [55.07ms]
+> (pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > پس از پر شدن سبد گمنام، پیش‌نمایش مهمان هم با پیام شفاف رد می‌شود [20.49ms]
+> (pass) BUG-02 — سقف مهمان (سبد گمنام مشترک — ADR) > کاربر لاگین از سبد گمنام جدا شمرده می‌شود [70.92ms]
+> (pass) رگرسیون — سقف کلی usageLimit همچنان اتمیک > ۱۰ مصرف موازی با سقف کلی ۳ → دقیقاً ۳ Redemption [89.55ms]
+51,53c47,49
+< (pass) SEC-04 — پیگیری سفارش با فاکتور دوم > کد درست + موبایل درست → سفارش؛ موبایل غلط/نامعتبر → null؛ کد غلط → null [26.99ms]
+< (pass) SEC-04 — پیگیری سفارش با فاکتور دوم > success: کوکی اثبات درست → سفارش؛ بدون اثبات/اثبات غلط → null [5.52ms]
+< (pass) SEC-04 — پیگیری سفارش با فاکتور دوم > success: مالک نشست بدون کوکی → سفارش؛ نشست غیرمالک → null [18.61ms]
+---
+> (pass) SEC-04 — پیگیری سفارش با فاکتور دوم > کد درست + موبایل درست → سفارش؛ موبایل غلط/نامعتبر → null؛ کد غلط → null [71.30ms]
+> (pass) SEC-04 — پیگیری سفارش با فاکتور دوم > success: کوکی اثبات درست → سفارش؛ بدون اثبات/اثبات غلط → null [21.39ms]
+> (pass) SEC-04 — پیگیری سفارش با فاکتور دوم > success: مالک نشست بدون کوکی → سفارش؛ نشست غیرمالک → null [16.98ms]
+56,60c52,56
+< (pass) InventoryService — رزرو اتمیک (§13) > رزرو موفق reserved را زیاد می‌کند و رکورد ACTIVE می‌سازد [10.30ms]
+< (pass) InventoryService — رزرو اتمیک (§13) > رزرو بیش از موجودی → OUT_OF_STOCK و هیچ تغییری نمی‌کند [4.57ms]
+< (pass) InventoryService — رزرو اتمیک (§13) > race: دو tx همزمان روی ۱ موجودی — فقط یکی برنده است [10.82ms]
+< (pass) InventoryService — رزرو اتمیک (§13) > release فقط reserved را کم می‌کند؛ convert هر دو را کم می‌کند [15.39ms]
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp1xy004nndb8qea45r16"}
+---
+> (pass) InventoryService — رزرو اتمیک (§13) > رزرو موفق reserved را زیاد می‌کند و رکورد ACTIVE می‌سازد [51.52ms]
+> (pass) InventoryService — رزرو اتمیک (§13) > رزرو بیش از موجودی → OUT_OF_STOCK و هیچ تغییری نمی‌کند [6.70ms]
+> (pass) InventoryService — رزرو اتمیک (§13) > race: دو tx همزمان روی ۱ موجودی — فقط یکی برنده است [8.48ms]
+> (pass) InventoryService — رزرو اتمیک (§13) > release فقط reserved را کم می‌کند؛ convert هر دو را کم می‌کند [76.41ms]
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpde1004nndh50lcryh9c"}
+64,68c60,64
+< (pass) InventoryService — رزرو اتمیک (§13) > worker انقضا رزروهای منقضی را EXPIRED و موجودی را آزاد می‌کند [12.28ms]
+< (pass) InventoryService — رزرو اتمیک (§13) > رفع TOCTOU: release دوم روی رزرو RELEASED → no-op (reserved یک‌بار کم می‌شود) [7.92ms]
+< (pass) InventoryService — رزرو اتمیک (§13) > رفع TOCTOU: convert بعد از release → no-op (رقابت لغو×پرداخت) [15.60ms]
+< (pass) InventoryService — رزرو اتمیک (§13) > رفع TOCTOU: انقضای worker روی رزروِ قبلاً CONVERTED → موجودی خراب نمی‌شود [6.66ms]
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp1z50057ndb8d4bxrznq"}
+---
+> (pass) InventoryService — رزرو اتمیک (§13) > worker انقضا رزروهای منقضی را EXPIRED و موجودی را آزاد می‌کند [23.56ms]
+> (pass) InventoryService — رزرو اتمیک (§13) > رفع TOCTOU: release دوم روی رزرو RELEASED → no-op (reserved یک‌بار کم می‌شود) [17.11ms]
+> (pass) InventoryService — رزرو اتمیک (§13) > رفع TOCTOU: convert بعد از release → no-op (رقابت لغو×پرداخت) [17.62ms]
+> (pass) InventoryService — رزرو اتمیک (§13) > رفع TOCTOU: انقضای worker روی رزروِ قبلاً CONVERTED → موجودی خراب نمی‌شود [50.44ms]
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdhg0057ndh5lkw1x90f"}
+72,75c68,71
+< (pass) CheckoutService — ثبت تراکنشی (§10.1) > سفارش کامل می‌سازد: snapshot + رزرو + کد رهگیری ۱۰ رقمی [18.68ms]
+< (pass) CheckoutService — ثبت تراکنشی (§10.1) > خطای موجودی در رزرو → rollback کامل: هیچ سفارشی باقی نمی‌ماند [5.89ms]
+< (pass) Coupon — سقف تراکنشی > تخفیف PERCENT با سقف maxDiscount محاسبه می‌شود [1.76ms]
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp1zw005mndb8kvvzmsjj"}
+---
+> (pass) CheckoutService — ثبت تراکنشی (§10.1) > سفارش کامل می‌سازد: snapshot + رزرو + کد رهگیری ۱۰ رقمی [50.49ms]
+> (pass) CheckoutService — ثبت تراکنشی (§10.1) > خطای موجودی در رزرو → rollback کامل: هیچ سفارشی باقی نمی‌ماند [46.48ms]
+> (pass) Coupon — سقف تراکنشی > تخفیف PERCENT با سقف maxDiscount محاسبه می‌شود [2.30ms]
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdjv005mndh59893lutx"}
+79,80c75,76
+< (pass) Coupon — سقف تراکنشی > usageLimit پر شده → COUPON_INVALID [20.76ms]
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp20g0062ndb8cwjvs6na"}
+---
+> (pass) Coupon — سقف تراکنشی > usageLimit پر شده → COUPON_INVALID [43.06ms]
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdl10062ndh52kr26a3g"}
+84c80
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp20g0062ndb8cwjvs6na"}
+---
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdl10062ndh52kr26a3g"}
+88,89c84,85
+< (pass) PaymentService — تأیید idempotent (§10.2) > confirm → PAID + Order PROCESSING + رزرو CONVERTED؛ callback تکراری بدون اثر مضاعف [44.43ms]
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp21o006endb8higo2hnh"}
+---
+> (pass) PaymentService — تأیید idempotent (§10.2) > confirm → PAID + Order PROCESSING + رزرو CONVERTED؛ callback تکراری بدون اثر مضاعف [87.92ms]
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdnh006endh54oo75398"}
+93c89
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp21o006endb8higo2hnh"}
+---
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdnh006endh54oo75398"}
+97,98c93,94
+< (pass) PaymentService — تأیید idempotent (§10.2) > پرداخت ناموفق → Payment FAILED + Order CANCELLED + رزرو RELEASED [19.71ms]
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp228006qndb8m4haj76y"}
+---
+> (pass) PaymentService — تأیید idempotent (§10.2) > پرداخت ناموفق → Payment FAILED + Order CANCELLED + رزرو RELEASED [81.85ms]
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdpr006qndh5cwvibtw9"}
+102,103c98,99
+< (pass) PaymentService — تأیید idempotent (§10.2) > رقابت لغو×تأیید: سفارش لحظهٔ پرداخت لغو شد → بازپرداخت خودکار نه کرش P2025 [21.35ms]
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp22u0074ndb8mqo2s0u5"}
+---
+> (pass) PaymentService — تأیید idempotent (§10.2) > رقابت لغو×تأیید: سفارش لحظهٔ پرداخت لغو شد → بازپرداخت خودکار نه کرش P2025 [94.58ms]
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdsm0074ndh5qelkufpg"}
+107c103
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp22u0074ndb8mqo2s0u5"}
+---
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdsm0074ndh5qelkufpg"}
+111c107
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp22u0074ndb8mqo2s0u5"}
+---
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdsm0074ndh5qelkufpg"}
+115,117c111,113
+< (pass) PaymentService — تأیید idempotent (§10.2) > دو استرداد کامل همزمان: فقط یکی نهایی می‌شود — سقف هرگز نقض نمی‌شود [28.35ms]
+< (pass) OrderService — ماشین وضعیت (§5.1) > گذارهای غیرمجاز رد می‌شوند [0.22ms]
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp23m007jndb8yug6rbk4"}
+---
+> (pass) PaymentService — تأیید idempotent (§10.2) > دو استرداد کامل همزمان: فقط یکی نهایی می‌شود — سقف هرگز نقض نمی‌شود [109.41ms]
+> (pass) OrderService — ماشین وضعیت (§5.1) > گذارهای غیرمجاز رد می‌شوند [0.17ms]
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdvf007jndh5z9m4k0ke"}
+121c117
+< {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidp23m007jndb8yug6rbk4"}
+---
+> {"level":"info","scope":"cache","msg":"revalidateTag خارج از زمینهٔ درخواست رد شد: product:cmuidpdvf007jndh5z9m4k0ke"}
+125c121
+< (pass) OrderService — ماشین وضعیت (§5.1) > ship → DELIVERED مسیر کامل مجاز است؛ SHIPPED→CANCELLED ممنوع [49.83ms]
+---
+> (pass) OrderService — ماشین وضعیت (§5.1) > ship → DELIVERED مسیر کامل مجاز است؛ SHIPPED→CANCELLED ممنوع [86.12ms]
+128,132c124,128
+< (pass) media pipeline — WebP تبدیل خودکار > JPG آپلودی → WebP ذخیره می‌شود + thumb + رکورد [69.13ms]
+< (pass) media pipeline — WebP تبدیل خودکار > PNG با شفافیت → WebP شفاف [22.77ms]
+< (pass) media pipeline — WebP تبدیل خودکار > WebP ورودی → بدون recode مستقیم ذخیره (خواسته مالک) [10.08ms]
+< (pass) media pipeline — WebP تبدیل خودکار > dedupe: آپلود دوباره همان فایل → همان رکورد [80.37ms]
+< (pass) media pipeline — WebP تبدیل خودکار > حجم بیش از ۵MB و SVG رد می‌شوند [2.91ms]
+---
+> (pass) media pipeline — WebP تبدیل خودکار > JPG آپلودی → WebP ذخیره می‌شود + thumb + رکورد [189.49ms]
+> (pass) media pipeline — WebP تبدیل خودکار > PNG با شفافیت → WebP شفاف [30.00ms]
+> (pass) media pipeline — WebP تبدیل خودکار > WebP ورودی → بدون recode مستقیم ذخیره (خواسته مالک) [13.22ms]
+> (pass) media pipeline — WebP تبدیل خودکار > dedupe: آپلود دوباره همان فایل → همان رکورد [341.55ms]
+> (pass) media pipeline — WebP تبدیل خودکار > حجم بیش از ۵MB و SVG رد می‌شوند [3.91ms]
+135,157c131,153
+< {"level":"info","provider":"mock-sms","to":"09357152484","tag":"otp-login","text":"کد ورود شما به پریما: 950812\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:15.873Z"}
+< {"level":"info","provider":"mock-sms","to":"09357152484","tag":"otp-login","text":"کد ورود شما به پریما: 399663\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:15.883Z"}
+< (pass) OTP — سیاست §9.4 > ارسال موفق کد ۶ رقمی + ساخت خودکار اکانت در verify [15.77ms]
+< {"level":"info","provider":"mock-sms","to":"09361947364","tag":"otp-login","text":"کد ورود شما به پریما: 738836\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:15.889Z"}
+< (pass) OTP — سیاست §9.4 > cooldown ۹۰ ثانیه — ارسال دوم بلافاصله رد می‌شود [3.67ms]
+< {"level":"info","provider":"mock-sms","to":"09340205250","tag":"otp-login","text":"کد ورود شما به پریما: 825546\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:15.892Z"}
+< (pass) OTP — سیاست §9.4 > کد اشتباه تلاش می‌سوزاند؛ بعد از ۵ تلاش TOO_MANY [9.78ms]
+< {"level":"info","provider":"mock-sms","to":"09332523440","tag":"otp-login","text":"کد ورود شما به پریما: 826352\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:15.901Z"}
+< (pass) OTP — سیاست §9.4 > کد منقضی رد می‌شود [3.43ms]
+< {"level":"info","provider":"mock-sms","to":"09322909934","tag":"otp-login","text":"کد ورود شما به پریما: 564611\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:15.904Z"}
+< (pass) OTP — سیاست §9.4 > کد یک‌بار مصرف است — verify دوم با همان کد رد می‌شود [6.95ms]
+< {"level":"info","provider":"mock-sms","to":"09310836816","tag":"otp-login","text":"کد ورود شما به پریما: 143123\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:15.911Z"}
+< {"level":"info","provider":"mock-sms","to":"09310836816","tag":"otp-login","text":"کد ورود شما به پریما: 800569\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:15.914Z"}
+< {"level":"info","provider":"mock-sms","to":"09310836816","tag":"otp-login","text":"کد ورود شما به پریما: 738061\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:15.916Z"}
+< (pass) OTP — سیاست §9.4 > rate limit: بیش از ۳ ارسال در ۱۰ دقیقه برای یک شماره رد می‌شود [7.39ms]
+< (pass) AddressBook — قاعده تک‌پیش‌فرض > اولین آدرس خودکار پیش‌فرض می‌شود [3.10ms]
+< (pass) AddressBook — قاعده تک‌پیش‌فرض > افزودن آدرس دوم (isDefault:false) پیش‌فرض را عوض نمی‌کند [4.19ms]
+< (pass) AddressBook — قاعده تک‌پیش‌فرض > setDefault پیش‌فرض را جابه‌جا می‌کند — همیشه دقیقاً یکی [3.92ms]
+< (pass) AddressBook — قاعده تک‌پیش‌فرض > حذف پیش‌فرض → جدیدترین باقی‌مانده ارتقا می‌یابد [3.96ms]
+< (pass) AddressBook — قاعده تک‌پیش‌فرض > ویرایش با isDefault:true پیش‌فرض را جابه‌جا می‌کند [6.53ms]
+< (pass) AddressBook — قاعده تک‌پیش‌فرض > سقف ۱۰ آدرس — آدرس ۱۱ رد می‌شود [13.04ms]
+< (pass) CartMerge — ادغام بدون گم شدن > ادغام مهمان + سروری: تجمعی، سقف موجودی، رد واریانت مرده [24.32ms]
+< (pass) CartMerge — ادغام بدون گم شدن > getServerCartLines اقلام مرده را از DB پاک می‌کند [12.00ms]
+---
+> {"level":"info","provider":"mock-sms","to":"09355485090","tag":"otp-login","text":"کد ورود شما به پریما: 103497\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:31.827Z"}
+> {"level":"info","provider":"mock-sms","to":"09355485090","tag":"otp-login","text":"کد ورود شما به پریما: 419619\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:31.850Z"}
+> (pass) OTP — سیاست §9.4 > ارسال موفق کد ۶ رقمی + ساخت خودکار اکانت در verify [74.63ms]
+> {"level":"info","provider":"mock-sms","to":"09367033234","tag":"otp-login","text":"کد ورود شما به پریما: 841304\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:31.865Z"}
+> (pass) OTP — سیاست §9.4 > cooldown ۹۰ ثانیه — ارسال دوم بلافاصله رد می‌شود [14.23ms]
+> {"level":"info","provider":"mock-sms","to":"09344422814","tag":"otp-login","text":"کد ورود شما به پریما: 769314\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:31.878Z"}
+> (pass) OTP — سیاست §9.4 > کد اشتباه تلاش می‌سوزاند؛ بعد از ۵ تلاش TOO_MANY [71.10ms]
+> {"level":"info","provider":"mock-sms","to":"09335516689","tag":"otp-login","text":"کد ورود شما به پریما: 410020\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:31.945Z"}
+> (pass) OTP — سیاست §9.4 > کد منقضی رد می‌شود [7.54ms]
+> {"level":"info","provider":"mock-sms","to":"09329794499","tag":"otp-login","text":"کد ورود شما به پریما: 923224\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:31.953Z"}
+> (pass) OTP — سیاست §9.4 > کد یک‌بار مصرف است — verify دوم با همان کد رد می‌شود [20.92ms]
+> {"level":"info","provider":"mock-sms","to":"09310895077","tag":"otp-login","text":"کد ورود شما به پریما: 117704\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:31.970Z"}
+> {"level":"info","provider":"mock-sms","to":"09310895077","tag":"otp-login","text":"کد ورود شما به پریما: 674199\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:31.972Z"}
+> {"level":"info","provider":"mock-sms","to":"09310895077","tag":"otp-login","text":"کد ورود شما به پریما: 551178\nاین کد ۵ دقیقه اعتبار دارد.","at":"2026-09-26T12:41:31.978Z"}
+> (pass) OTP — سیاست §9.4 > rate limit: بیش از ۳ ارسال در ۱۰ دقیقه برای یک شماره رد می‌شود [11.40ms]
+> (pass) AddressBook — قاعده تک‌پیش‌فرض > اولین آدرس خودکار پیش‌فرض می‌شود [6.54ms]
+> (pass) AddressBook — قاعده تک‌پیش‌فرض > افزودن آدرس دوم (isDefault:false) پیش‌فرض را عوض نمی‌کند [30.03ms]
+> (pass) AddressBook — قاعده تک‌پیش‌فرض > setDefault پیش‌فرض را جابه‌جا می‌کند — همیشه دقیقاً یکی [13.82ms]
+> (pass) AddressBook — قاعده تک‌پیش‌فرض > حذف پیش‌فرض → جدیدترین باقی‌مانده ارتقا می‌یابد [10.99ms]
+> (pass) AddressBook — قاعده تک‌پیش‌فرض > ویرایش با isDefault:true پیش‌فرض را جابه‌جا می‌کند [6.52ms]
+> (pass) AddressBook — قاعده تک‌پیش‌فرض > سقف ۱۰ آدرس — آدرس ۱۱ رد می‌شود [23.11ms]
+> (pass) CartMerge — ادغام بدون گم شدن > ادغام مهمان + سروری: تجمعی، سقف موجودی، رد واریانت مرده [61.57ms]
+> (pass) CartMerge — ادغام بدون گم شدن > getServerCartLines اقلام مرده را از DB پاک می‌کند [21.87ms]
+162c158
+< Ran 65 tests across 9 files. [1.92s]
+---
+> Ran 65 tests across 9 files. [4.23s]

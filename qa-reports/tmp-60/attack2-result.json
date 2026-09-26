@@ -1,0 +1,33 @@
+{
+ "paymentStatus": "FAILED",
+ "paymentFailReason": "پرداخت توسط کاربر لغو شد.",
+ "orderStatus": "CANCELLED",
+ "paymentFailedOutboxCount": 1,
+ "orderCancelledOutboxCount": 0,
+ "reservationStatus": "RELEASED",
+ "variant": {
+  "reserved": 0,
+  "stock": 5
+ },
+ "okProbe": {
+  "status": 307,
+  "location": "http://localhost:3000/checkout/failed",
+  "paymentAfter": "FAILED",
+  "paymentSucceededEvents": 0
+ },
+ "noAuthProbe": {
+  "status": 307,
+  "location": "http://localhost:3000/checkout?error=payment"
+ },
+ "postProbe": {
+  "status": 405
+ },
+ "ghostProbe": {
+  "status": 307,
+  "location": "http://localhost:3000/checkout/failed"
+ },
+ "mockGateway": {
+  "status": 200,
+  "leaksAmountOrCode": false
+ }
+}

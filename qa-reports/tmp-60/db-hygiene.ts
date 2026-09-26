@@ -1,0 +1,12 @@
+import { PrismaClient } from "@prisma/client";
+const db = new PrismaClient({ datasources: { db: { url: "postgresql://prima:prima_dev_only@127.0.0.1:5432/prima?schema=public" } } });
+const users = await db.user.count();
+const nullUserOrders = await db.order.count({ where: { userId: null } });
+const ccCoupons = await db.coupon.count({ where: { code: { startsWith: "cc-" } } });
+const pfrProducts = await db.product.count({ where: { slug: { startsWith: "pfr-" } } });
+const redemptions = await db.couponRedemption.count();
+const outbox = await db.outboxEvent.count({ where: { type: { in: ["PaymentFailed", "OrderCancelled"] }, createdAt: { gte: new Date(Date.now() - 30*60*1000) } } });
+const variantsReserved = await db.variant.count({ where: { reserved: { gt: 0 } } });
+const activeReservations = await db.inventoryReservation.count({ where: { status: "ACTIVE" } });
+console.log(JSON.stringify({ users, nullUserOrders, ccCoupons, pfrProducts, redemptions, recentOutbox: outbox, variantsReserved, activeReservations }));
+await db.$disconnect();

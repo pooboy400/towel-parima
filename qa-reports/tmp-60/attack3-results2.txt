@@ -1,0 +1,28 @@
+## A DELIVERED روی /admin/orders
+http=307 ct= loc=http://localhost:3000/admin/login?next=%2Fadmin%2Forders
+/admin/login?next=%2Fadmin%2Forders
+--
+## B SHIPPED روی /admin/orders
+http=307 ct= loc=http://localhost:3000/admin/login?next=%2Fadmin%2Forders
+/admin/login?next=%2Fadmin%2Forders
+--
+## C /admin/orders/ (slash انتهایی)
+http=308 ct= loc=http://localhost:3000/admin/orders
+/admin/orders
+--
+## D /admin%2Forders
+http=307 ct= loc=http://localhost:3000/admin/login?next=%2Fadmin%252Forders
+/admin/login?next=%2Fadmin%252Forders
+--
+## E //admin/orders
+http=308 ct= loc=http://localhost:3000/admin/orders
+/admin/orders
+--
+## F /admin/orders (کوکی جعلی)
+http=307 ct= loc=http://localhost:3000/admin/login?next=%2Fadmin%2Forders
+/admin/login?next=%2Fadmin%2Forders
+--
+## G id اکشن ناموجود روی /checkout
+http=404 ct=text/plain loc=
+Server action not found.
+--
