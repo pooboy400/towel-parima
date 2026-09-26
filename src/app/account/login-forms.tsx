@@ -239,7 +239,22 @@ function OtpLoginForm() {
             </p>
           )}
 
-          <div className="flex flex-col items-center gap-4">
+          {/* UX-08 (فاز ۴): دستگیرهٔ صریح paste — کد کپی‌شده با هر شکل
+              (ارقام فارسی/فاصله/خط‌تیره) پاکسازی و در فیلد می‌نشیند */}
+          <div
+            className="flex flex-col items-center gap-4"
+            onPaste={(e) => {
+              const raw = e.clipboardData.getData("text") ?? "";
+              const digits = raw
+                .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
+                .replace(/\D/g, "")
+                .slice(0, 6);
+              if (digits.length > 0) {
+                e.preventDefault();
+                setCode(digits);
+              }
+            }}
+          >
             <InputOTP
               maxLength={6}
               value={code}

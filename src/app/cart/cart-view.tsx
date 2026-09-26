@@ -169,9 +169,11 @@ export function CartView({ shippingRates }: { shippingRates: ShippingRates }) {
               </div>
               {totals.discount > 0 && (
                 <div className="flex items-center justify-between">
-                  <dt className="text-muted-foreground">تخفیف</dt>
-                  <dd className="font-medium text-destructive">
-                    −{formatPrice(totals.discount)}
+                  {/* UX-04 (فاز ۴): این ردیف «تخفیف فاکتور» نیست — سود قیمت مصوب
+                      است و در مبلغ قابل پرداخت اثر ندارد؛ برچسب صادقانه + رنگ مثبت */}
+                  <dt className="text-muted-foreground">سود شما از قیمت مصوب</dt>
+                  <dd className="font-medium text-sage">
+                    {formatPrice(totals.discount)}
                   </dd>
                 </div>
               )}

@@ -38,8 +38,10 @@
   --color-deep: #303a35;
   --color-sand: #b7a48c;
   --color-sand-soft: #efe9df;
-  --color-terracotta: #c88f72;
-  --color-terracotta-deep: #a9714f;
+  /* UX-05 (فاز ۴): تیره‌تر شد تا کنتراست با متن سفید ≥۴.۵:۱ باشد
+     (#9c6440=۴.۸۷ — قبلاً #c88f72=۲.۷۵؛ hue برند حفظ شده) */
+  --color-terracotta: #9c6440;
+  --color-terracotta-deep: #8f5c3b;
   --color-ink: #242424;
   --color-stone-muted: #77736d;
   --color-line: #e5e1da;

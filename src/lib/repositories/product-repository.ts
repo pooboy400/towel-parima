@@ -28,6 +28,9 @@ const productInclude = {
   images: { orderBy: [{ sortOrder: "asc" as const }] },
   collections: { include: { collection: true } },
   category: true,
+  // UX-01 (فاز ۴) — آمار نظرات صادقانه: COUNT/AVG واقعی نظرات APPROVED؛
+  // ستون‌های دستی seed (reviewCount/rating) دیگر منبع نمایش نیستند (ADR 011)
+  reviews: { where: { status: "APPROVED" }, select: { rating: true } },
 } satisfies Prisma.ProductInclude;
 
 function applySortInMemory(items: Product[], sort?: SortOption): Product[] {

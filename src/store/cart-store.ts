@@ -178,6 +178,11 @@ export const useCartStore = create<CartState>()(
         const state = await customerState().catch(() => null);
         if (!state?.customer) return;
 
+        // UX-03 — علاقه‌مندی محلی مهاجرت و از سرور هیدریت می‌شود
+        void import("@/store/wishlist-store").then((w) =>
+          w.useWishlistStore.getState().hydrateFromServer(),
+        );
+
         set({
           customer: {
             userId: state.customer.userId,

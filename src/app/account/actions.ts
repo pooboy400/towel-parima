@@ -12,6 +12,7 @@ import { ZodError } from "zod";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { DomainError } from "@/core/errors";
+import { db } from "@/lib/db";
 import { getCustomerContext, requireCustomerContext, createCustomerSession, revokeCustomerSession } from "@/core/auth/customer-session";
 import { sendOtp, verifyOtpAndLogin } from "@/core/auth/otp-auth-service";
 import { getClientIp } from "@/lib/client-ip";
@@ -109,6 +110,29 @@ export async function signInWithPasswordAction(input: {
 export async function logoutAction(): Promise<AuthActionResult> {
   await revokeCustomerSession();
   return { ok: true };
+}
+
+/**
+ * UX-09 (فاز ۴) — ثبت/ویرایش نام مشتری؛ قبلاً هیچ مسیری برای ثبت نام حساب نبود
+ * (نام فقط در دفترچهٔ آدرس ذخیره می‌شد و فاکتور/خوش‌آمد بی‌نام بود).
+ */
+export async function updateCustomerNameAction(
+  nameRaw: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  try {
+    const ctx = await requireCustomerContext();
+    const name = nameRaw.trim();
+    if (name.length < 2 || name.length > 80) {
+      return { ok: false, message: "نام باید بین ۲ تا ۸۰ نویسه باشد." };
+    }
+    await db.user.update({ where: { id: ctx.userId }, data: { name } });
+    revalidatePath("/account");
+    return { ok: true };
+  } catch (error) {
+    if (error instanceof DomainError) return { ok: false, message: error.message };
+    console.error("updateCustomerNameAction failed:", error);
+    return { ok: false, message: "ذخیره نام ناموفق بود." };
+  }
 }
 
 export async function getCustomerStateAction(): Promise<{

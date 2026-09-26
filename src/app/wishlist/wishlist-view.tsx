@@ -20,6 +20,7 @@ import type { Product } from "@/types";
 export function WishlistView({ products }: { products: Product[] }) {
   const wishlist = useWishlistStore();
   const addToCart = useCartStore((s) => s.addLine);
+  const customer = useCartStore((s) => s.customer);
   const mounted = useMounted();
 
   const items = mounted
@@ -33,6 +34,17 @@ export function WishlistView({ products }: { products: Product[] }) {
       <Breadcrumb items={[{ label: "خانه", href: "/" }, { label: "علاقه‌مندی‌ها" }]} />
 
       <h1 className="mt-5 text-2xl font-bold sm:text-3xl">علاقه‌مندی‌ها</h1>
+
+      {/* UX-03 (فاز ۴) — رفتار شفاف برای مهمان: لیست محلی است و با ورود مهاجرت می‌شود */}
+      {mounted && !customer && wishlist.items.length > 0 && (
+        <p className="mt-3 rounded-md border border-line bg-surface px-4 py-2.5 text-[13px] text-muted-foreground">
+          این لیست روی همین دستگاه ذخیره شده —{" "}
+          <Link href="/account" className="font-medium text-terracotta underline underline-offset-4">
+            با ورود به حساب
+          </Link>{" "}
+          روی همهٔ دستگاه‌های شما در دسترس خواهد بود.
+        </p>
+      )}
 
       {items.length === 0 ? (
         <div className="mt-8 flex flex-col items-center gap-5 rounded-lg border border-line bg-surface px-6 py-20 text-center">

@@ -1356,3 +1356,27 @@ Stage Summary:
 - فاز ۳ رسماً بسته شد: ۲۴۵/۲۴۵ · typecheck/lint صفر · پروب زندهٔ BUG-14/SEC-10 سبز
 - یافتهٔ باتری به‌روز: تست health برای سقف مستقل به‌روز شد (انتظار ۶۰)
 - گام بعدی: فاز ۴ — UI/UX (۱۴ تسک)
+
+---
+Task ID: 62
+Agent: main (Super Z — مهندس کل)
+Task: فاز ۴ — UI/UX به سمت ۱۰/۱۰ (۱۲ تسک اجرایی + UX-12/14 که در فاز ۳ بسته شد)
+
+Work Log:
+- UX-01: آمار نظرات صادقانه — productInclude اکنون reviews APPROVED واقعی را می‌آورد؛ mapper COUNT/AVG واقعی (میانگین یک‌رقم اعشار) — ستون‌های دستی seed دیگر منبع نمایش نیستند (ADR 011)
+- UX-02: خطای فیلد-محور آدرس زیر فیلد کدپستی (role=alert + aria-invalid) — پیام فارسی اسکیما (فاز ۳) حالا در فرم دیده می‌شود
+- UX-03: علاقه‌مندی DB واقعی — wishlist-actions.ts (sync/toggle/get با requireCustomerContext + سقف ۲۰۰)؛ استور serverSync الگوی سبد؛ مهاجرت localStorage→DB بعد از ورود (skipDuplicates + idempotent)؛ هیدریشن در CartSync (دستگاه دوم درست) و syncAfterLogin؛ بج هدر از حقیقت سرور؛ بنر شفاف مهمان در /wishlist
+- UX-04: ردیف سبد «تخفیف» → «سود شما از قیمت مصوب» با رنگ مثبت sage — دیگر ادعای تخفیف فاکتور نیست
+- UX-05: terracotta #c88f72→#9c6440 (کنتراست ۲.۷۵→۴.۸۷ با متن سفید؛ deep → #8f5c3b = ۵.۵۸) — hue برند حفظ شد
+- UX-06: اثبات زندهٔ رفع OOM — /admin/settings کامل رندر شد (۲۹ المان، همهٔ بخش‌ها) و سرور سالم ماند؛ ریشه در bb635dc رفع شده بود + این دور تأیید نهایی
+- UX-07: Toaster از bottom-center (روی دکمه‌ها) به top-left
+- UX-08: دستگیرهٔ صریح paste روی OTP — پاکسازی ارقام فارسی/غیررقمی و مقداردهی مطمئن
+- UX-09: ویرایش نام در پروفایل + updateCustomerNameAction (۲..۸۰ نویسه) — فاکتور/خوش‌آمد دیگر بی‌نام نیست
+- UX-10: success اکنون revalidatePath(/cart) — ترکیب با clear سروری موجود، دستگاه دوم هم سبد خالی می‌بیند
+- UX-11: favicon.ico (ICO سه‌سایزی PNG-embedded با sharp از logo.svg) + icon.svg + apple-icon.png — هر دو مسیر 200 زنده
+- UX-13: پیام فارسی max ۲۰۰۰ در اسکیمای سرور و کلاینت (شمارندهٔ UI به باتری نهایی)
+- F4-be: شرط canReturn ادمین بررسی شد — درست است (RETURN_REQUESTED) و تا ساخته‌شدن مسیر مشتری عمداً خفته (ADR BUG-15)
+
+Stage Summary:
+- فاز ۴ بسته شد: ۲۴۵/۲۴۵ · typecheck/lint صفر · UX-11/UX-06 تأیید زنده
+- معیار ۱۰/۱۰ (گشت ۳ کاربر) به باتری نهایی سپرده می‌شود

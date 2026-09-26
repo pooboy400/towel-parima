@@ -23,6 +23,7 @@ import { useCartStore } from "@/store/cart-store";
 import {
   logoutAction,
   createAddressAction,
+  updateCustomerNameAction,
   updateAddressAction,
   deleteAddressAction,
   setDefaultAddressAction,
@@ -200,6 +201,8 @@ function AddressDialog({
 }) {
   const [open, setOpen] = useState(false);
   const [saving, startTransition] = useTransition();
+  // UX-02 (فاز ۴): خطای فیلد-محور سرور (BUG-12 پیام فارسی اسکیما) زیر همان فیلد نشان داده می‌شود
+  const [fieldError, setFieldError] = useState<string | null>(null);
   const [form, setForm] = useState({
     fullName: address?.fullName ?? "",
     phone: address?.phone ?? "",
@@ -217,8 +220,10 @@ function AddressDialog({
         : await createAddressAction(form);
       if (res.ok) {
         toast.success(address ? "آدرس ویرایش شد" : "آدرس ذخیره شد");
+        setFieldError(null);
         setOpen(false);
       } else {
+        setFieldError(res.message);
         toast.error(res.message);
       }
     });
@@ -281,9 +286,18 @@ function AddressDialog({
                 dir="ltr"
                 inputMode="numeric"
                 value={form.postalCode}
-                onChange={(e) => setForm((f) => ({ ...f, postalCode: e.target.value }))}
+                onChange={(e) => {
+                  setForm((f) => ({ ...f, postalCode: e.target.value }));
+                  if (fieldError) setFieldError(null);
+                }}
                 placeholder="۱۹۶۵۸۴۳۱۱۱"
+                aria-invalid={fieldError ? true : undefined}
               />
+              {fieldError && (
+                <p className="mt-1 text-xs text-destructive" role="alert">
+                  {fieldError}
+                </p>
+              )}
             </Field>
           </div>
           <Field label="نشانی کامل">
@@ -346,6 +360,23 @@ export function ProfilePanel({
     });
   };
 
+  // UX-09 (فاز ۴): ثبت/ویرایش نام — قبلاً هیچ راهی برای ثبت نام حساب نبود
+  const [name, setName] = useState(customer.name ?? "");
+  const [nameSaved, setNameSaved] = useState(false);
+
+  const saveName = () => {
+    startTransition(async () => {
+      const res = await updateCustomerNameAction(name);
+      if (res.ok) {
+        setNameSaved(true);
+        toast.success("نام ذخیره شد");
+        router.refresh();
+      } else {
+        toast.error(res.message);
+      }
+    });
+  };
+
   return (
     <div className="flex flex-col gap-4 rounded-lg border border-line bg-surface p-5">
       <div className="flex flex-col gap-2 text-[13px] leading-6">
@@ -353,8 +384,37 @@ export function ProfilePanel({
           <Phone className="size-4 text-muted-foreground" aria-hidden />
           <span dir="ltr">{faDigits(customer.phone ?? "—")}</span>
         </p>
+        <div className="flex flex-col gap-2">
+          <label htmlFor="customer-name" className="text-muted-foreground">
+            نام و نام خانوادگی:
+          </label>
+          <div className="flex items-center gap-2">
+            <Input
+              id="customer-name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+                setNameSaved(false);
+              }}
+              placeholder="مثال: سارا محمدی"
+              className="max-w-64"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={saveName}
+              disabled={pending || (nameSaved && name === customer.name)}
+            >
+              {pending ? "…" : nameSaved ? "ذخیره شد ✓" : "ذخیره نام"}
+            </Button>
+          </div>
+        </div>
         <p className="text-muted-foreground">
-          {customer.name ? "نام: " + customer.name : "نام ثبت نشده — در آدرس‌ها می‌توانید نام گیرنده را وارد کنید."}
+          {customer.name && !nameSaved
+            ? "نام: " + customer.name
+            : nameSaved
+              ? "نام ثبت شد — در فاکتور و خوش‌آمدگویی نمایش داده می‌شود."
+              : "نام ثبت نشده — می‌توانید همین‌جا ثبت کنید."}
         </p>
         <p className="text-muted-foreground">
           {customer.passwordSet

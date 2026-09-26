@@ -19,7 +19,11 @@ export const contactMessageSchema = z.object({
     .optional()
     .or(z.literal("")),
   subject: z.string().trim().min(2).max(120),
-  message: z.string().trim().min(10, "پیام حداقل ۱۰ نویسه است.").max(2000),
+  message: z
+    .string()
+    .trim()
+    .min(10, "پیام حداقل ۱۰ نویسه است.")
+    .max(2000, "پیام حداکثر ۲۰۰۰ نویسه است."),
 });
 
 export const newsletterSchemaZ = z.object({

@@ -30,6 +30,10 @@ export function CartSync() {
       if (state?.customer && serverCart?.ok) {
         // مشتری: سبد سروری حقیقت است — جایگزین محلی (ادغام قطعی در syncAfterLogin)
         store.replaceLines(serverCart.lines);
+        // UX-03 — بج/صفحهٔ علاقه‌مندی از سرور هیدریت شود (دستگاه دوم هم درست)
+        void import("@/store/wishlist-store").then((w) =>
+          w.useWishlistStore.getState().hydrateFromServer(),
+        );
       }
     });
   }, []);

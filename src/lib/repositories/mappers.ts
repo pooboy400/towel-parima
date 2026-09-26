@@ -98,6 +98,8 @@ export interface PrismaProductLike {
   features: string[];
   rating: number;
   reviewCount: number;
+  /** UX-01 — نظرات APPROVED واقعی (از productInclude) — اختیاری برای فراخوان‌های قدیمی */
+  reviews?: { rating: number }[];
   sortOrder: number;
   variants: PrismaVariantLike[];
   images: PrismaProductImageLike[];
@@ -171,6 +173,16 @@ export function mapReviewToDomain(r: {
 /* ------------------------------------------------------------------ */
 
 export function mapProductToDomain(p: PrismaProductLike): Product {
+  // UX-01 — میانگین/تعداد واقعی از نظرات تأییدشده؛ fallback ستون دستی فقط
+  // برای فراخوان‌هایی که include نظرات ندارند (بدون include، مقدار DB باقی می‌ماند)
+  const honestRating = (() => {
+    if (!p.reviews) return { rating: p.rating, reviewCount: p.reviewCount };
+    const count = p.reviews.length;
+    if (count === 0) return { rating: 0, reviewCount: 0 };
+    const avg = p.reviews.reduce((s, r) => s + r.rating, 0) / count;
+    return { rating: Math.round(avg * 10) / 10, reviewCount: count };
+  })();
+
   // واریانت‌های فعالِ حذف‌نشده — واحد قیمت و موجودی
   const variants = p.variants.filter((v) => v.isActive && !v.deletedAt);
   // BUG-05 (فاز ۲ — ADR 011 «UI هرگز جعل نمی‌کند»): fallback قبلی به همهٔ
@@ -239,8 +251,9 @@ export function mapProductToDomain(p: PrismaProductLike): Product {
     features: p.features,
     stock,
     status: p.status,
-    rating: p.rating,
-    reviewCount: p.reviewCount,
+    // UX-01 (فاز ۴) — آمار از نظرات واقعی تأییدشده؛ بدون نظر = صفرِ صادقانه
+    rating: honestRating.rating,
+    reviewCount: honestRating.reviewCount,
     // برچسب‌ها محاسباتی‌اند (ADR 011) — Repository با attachAutoBadges پر می‌کند
     badges: [],
     order: p.sortOrder,

@@ -91,8 +91,9 @@ export default async function RootLayout({
             expressShippingCost: config.expressShippingCost,
           }}
         />
+        {/* UX-07 (فاز ۴): از پایین-وسط (روی دکمهٔ ارسال می‌نشست) به بالا-چپ */}
         <Toaster
-          position="bottom-center"
+          position="top-left"
           dir="rtl"
           toastOptions={{
             style: {

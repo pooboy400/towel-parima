@@ -113,14 +113,21 @@ export function ProductCard({
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-1.5">
           <div className="flex flex-col">
-            {showDiscount && (
-              <span className="text-xs text-muted-foreground line-through">
-                {formatPrice(product.compareAtPrice!, false)}
-              </span>
+            {product.stock === 0 ? (
+              // FE-F1 (فاز ۴): ناموجود به‌جای «۰ تومان»
+              <span className="text-[13px] font-medium text-muted-foreground">ناموجود</span>
+            ) : (
+              <>
+                {showDiscount && (
+                  <span className="text-xs text-muted-foreground line-through">
+                    {formatPrice(product.compareAtPrice!, false)}
+                  </span>
+                )}
+                <span className="text-[15px] font-semibold">
+                  {formatPrice(product.price)}
+                </span>
+              </>
             )}
-            <span className="text-[15px] font-semibold">
-              {formatPrice(product.price)}
-            </span>
           </div>
 
           {/* رنگ‌ها */}

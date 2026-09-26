@@ -67,17 +67,23 @@ export function ProductInfo({
         <Rating value={product.rating} count={product.reviewCount} size="md" />
       </div>
 
-      {/* قیمت */}
+      {/* قیمت — FE-F1 (فاز ۴): محصول ناموجود قیمت نمایش نمی‌دهد (بدون «۰ تومان») */}
       <div className="flex items-center gap-3">
-        {product.compareAtPrice && percent && (
+        {product.stock === 0 ? (
+          <span className="text-2xl font-bold text-muted-foreground">ناموجود</span>
+        ) : (
           <>
-            <span className="text-base text-muted-foreground line-through">
-              {formatPrice(product.compareAtPrice, false)}
-            </span>
-            <DiscountBadge price={product.price} compareAtPrice={product.compareAtPrice} />
+            {product.compareAtPrice && percent && (
+              <>
+                <span className="text-base text-muted-foreground line-through">
+                  {formatPrice(product.compareAtPrice, false)}
+                </span>
+                <DiscountBadge price={product.price} compareAtPrice={product.compareAtPrice} />
+              </>
+            )}
+            <span className="text-2xl font-bold">{formatPrice(product.price)}</span>
           </>
         )}
-        <span className="text-2xl font-bold">{formatPrice(product.price)}</span>
       </div>
 
       <p className="text-[15px] leading-8 text-muted-foreground">

@@ -33,7 +33,10 @@ export const contactFormSchema = z.object({
   name: z.string().min(2, "نام خود را وارد کنید"),
   email: z.string().email("ایمیل معتبر وارد کنید"),
   subject: z.string().min(2, "موضوع پیام را بنویسید"),
-  message: z.string().min(10, "متن پیام حداقل ۱۰ کاراکتر باشد"),
+  message: z
+    .string()
+    .min(10, "متن پیام حداقل ۱۰ کاراکتر باشد")
+    .max(2000, "پیام حداکثر ۲۰۰۰ نویسه است."),
 });
 
 export type ContactFormSchema = z.infer<typeof contactFormSchema>;

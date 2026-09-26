@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { revalidatePath } from "next/cache";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { CheckCircle2, Package, Truck } from "lucide-react";
@@ -27,6 +28,8 @@ export default async function CheckoutSuccessPage({
 }: {
   searchParams: Promise<{ code?: string }>;
 }) {
+  // UX-10 (فاز ۴): کش مسیر سبد تازه شود — دستگاه دوم هم سبد خالی می‌بیند
+  revalidatePath("/cart");
   const { code } = await searchParams;
   const jar = await cookies();
   const proof = jar.get(PAY_PROOF_COOKIE)?.value ?? null;
