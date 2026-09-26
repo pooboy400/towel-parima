@@ -1,0 +1,97 @@
+{
+  "RUN": "HACK67",
+  "startedAt": "2026-09-26T14:27:13.201Z",
+  "attack1_guests": {
+    "attempts": 15,
+    "succeeded": 2,
+    "failed": 13,
+    "failCodes": [
+      [
+        "COUPON_INVALID",
+        13
+      ]
+    ],
+    "redemptions": 2,
+    "guestRedemptions": 2,
+    "usedCount": 2,
+    "verdict": "EXACTLY_2 ✅"
+  },
+  "attack2_combo": {
+    "attempts": 28,
+    "succeeded": 18,
+    "failed": 10,
+    "perUserCounts": [
+      {
+        "userId": "cmuihhbzu002cndo4im0r53gw",
+        "count": 3
+      },
+      {
+        "userId": "cmuihhc0a002endo41hx6i0my",
+        "count": 3
+      },
+      {
+        "userId": "cmuihhc0c002gndo49yn5gw1f",
+        "count": 3
+      },
+      {
+        "userId": "cmuihhc0e002indo4kpso97gg",
+        "count": 3
+      },
+      {
+        "userId": "cmuihhc0f002kndo4h4a9ry7q",
+        "count": 3
+      }
+    ],
+    "eachUserExactly3": true,
+    "guestRedemptions": 3,
+    "totalRedemptions": 18,
+    "usedCount": 18,
+    "failCodes": [
+      [
+        "COUPON_INVALID",
+        10
+      ]
+    ],
+    "verdict": "LIMITS_EXACT ✅"
+  },
+  "cleanupLedger": {
+    "orderIds": [
+      "cmuihhbui0002ndo4izbmf5p1",
+      "cmuihhbun0005ndo4znzgrq98",
+      "cmuihhc0y002mndo4axbhh0nr",
+      "cmuihhc0z002pndo4f08ftjx0",
+      "cmuihhc13002sndo4lk6kxos1",
+      "cmuihhc14002vndo4k8bzpi2e",
+      "cmuihhc190030ndo4550ct5l2",
+      "cmuihhc2u003gndo41upu765x",
+      "cmuihhc38003ondo4a3h5jsf8",
+      "cmuihhc3k003wndo4upbjnlvs",
+      "cmuihhc3v0044ndo456mzxcyq",
+      "cmuihhc45004cndo4zn4se9e2",
+      "cmuihhc57004hndo4r58nsodz",
+      "cmuihhc62005fndo4ihboc4wh",
+      "cmuihhc5t0055ndo4go0g00je",
+      "cmuihhc69005lndo4qkkl72bz",
+      "cmuihhc6e005qndo4z8t7jomo",
+      "cmuihhc70006dndo49sdnxqu8",
+      "cmuihhc6n005yndo4gsie2db7",
+      "cmuihhc7w006jndo4a543fk1a"
+    ],
+    "userIds": [
+      "cmuihhbzu002cndo4im0r53gw",
+      "cmuihhc0a002endo41hx6i0my",
+      "cmuihhc0c002gndo49yn5gw1f",
+      "cmuihhc0e002indo4kpso97gg",
+      "cmuihhc0f002kndo4h4a9ry7q"
+    ],
+    "couponIds": [
+      "cmuihhbqr0000ndo469edykwc",
+      "cmuihhbzr002ando4nlu0rack"
+    ],
+    "phones": [
+      "09336700000–09336700114",
+      "093367000100–093367000107",
+      "09336760001–05"
+    ]
+  }
+}

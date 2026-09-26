@@ -152,3 +152,20 @@
 4. ✅ lint + typecheck صفر
 5. ✅ تکرار گشت ۳ کاربر → هیچ یافتهٔ متوسط/بالایی باقی نمانده باشد و امتیاز UX ≥ ۹.۵
 6. ✅ گزارش‌های جدید در `qa-reports/` + ثبت رگرسیون در worklog.md
+
+
+---
+
+# 📋 بک‌لاگ باتری ۶۷ (پس از ۱۰/۱۰ — برای M6+)
+
+| # | شدت | تسک | کجا | شرح | راه‌حل |
+|---|-----|------|------|------|--------|
+| BL-1 | 🟡 | گذار FAILED→REFUNDED در جدول PAYMENT_TRANSITIONS + ۲ تست | src/domain/state-machines/index.ts + payment-service (FS-1) | مسیر بازپرداخت رقابت/تأخیر از FAILED خارج از جدول رسمی است | افزودن rule + تست رقابتِ دیرهنگام |
+| BL-2 | 🟡 | تست پذیرش BUG-06 (Σqty) | tests/integration | منطق درست ولی بدون تست اختصاصی | سناریوی رزرو جزئی منقضی → failPayment |
+| BL-3 | 🟡 | رقابت میکروسکوپیک confirm×expiry-worker (کاندید BUG-17) | inventory-service convertReservation | no-op بی‌صدا در پنجرهٔ خیلی باریک | گارد Σqty در confirm همین را می‌بندد — تست ثبت شود |
+| BL-4 | 🟡 | ZodError هندل در updateAddress هم (UX-02 فقط create) | account/actions.ts | خطای فیلد در ویرایش آدرس جنریک می‌ماند | همان الگوی create |
+| BL-5 | 🔵 | توست موبایل روی هدر sticky | sonner offset | گذرا | offset 72px |
+| BL-6 | 🔵 | برچسب‌های فرم بدون htmlFor/describedby | account-panels | a11y | اتصال id/label |
+| BL-7 | 🔵 | ۲ مقالهٔ ژورنال بدون تصویر درون‌متنی + alt قالبی | seed-data/content | سئوی محتوایی | تکمیل seed |
+| BL-8 | 🔵 | هدر x-nonce بدون مصرف‌کننده در dev | proxy.ts | نیت | مستند |
+| BL-9 | 🔵 | advisory XFH: وقتی TRUSTED_PROXY ست نیست Host مبنا باشد | proxy.ts | سناریوی دیپلوی | شرط env |

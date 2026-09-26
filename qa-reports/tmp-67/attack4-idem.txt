@@ -1,0 +1,5 @@
+NOK#1 307 -> http://localhost:3000/checkout/failed
+NOK#2 307 -> http://localhost:3000/checkout/failed
+NOK#3 307 -> http://localhost:3000/checkout/failed
+NOK#4 307 -> http://localhost:3000/checkout/failed
+OK-after-FAILED 307 -> http://localhost:3000/checkout/failed

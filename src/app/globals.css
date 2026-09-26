@@ -42,6 +42,8 @@
      (#9c6440=۴.۸۷ — قبلاً #c88f72=۲.۷۵؛ hue برند حفظ شده) */
   --color-terracotta: #9c6440;
   --color-terracotta-deep: #8f5c3b;
+  /* یافتهٔ 67-fe: متن terracotta روی بستر تیره (bg-deep) → نسخهٔ روشن (۵.۳۷:۱) */
+  --color-terracotta-light: #d9a583;
   --color-ink: #242424;
   --color-stone-muted: #77736d;
   --color-line: #e5e1da;

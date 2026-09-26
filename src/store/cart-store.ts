@@ -131,7 +131,10 @@ export const useCartStore = create<CartState>()(
       },
 
       updateQuantity: (lineId, quantity) => {
-        if (quantity < 1) {
+        // FS F-4 (باتری ۶۷): clamp به maxStock — خط صفرتایی (شبح) ساخته نمی‌شود
+        const line = get().lines.find((l) => l.lineId === lineId);
+        const clamped = Math.min(quantity, line?.maxStock ?? quantity);
+        if (clamped < 1) {
           set({ lines: get().lines.filter((l) => l.lineId !== lineId) });
           if (get().customer) serverSync("updateServerCartQuantityAction", { lineId, quantity: 0 });
           return;

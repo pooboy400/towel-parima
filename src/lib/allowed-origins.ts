@@ -20,10 +20,13 @@ export function allowedOrigins(): string[] {
   return ["*.space-z.ai"];
 }
 
-/** تطبیق مبدأ: تساوی دقیق یا wildcard زیردامنه (مثال: *.example.com) */
+/** تطبیق مبدأ: exact یا wildcard زیردامنه — الگوها با scheme/اسلش هم پذیرفته
+ * و کانونی می‌شوند (FS F-1 باتری ۶۷: در دیپلوی، env با "https://..." ست می‌شود) */
 export function isAllowedOrigin(originHost: string, host: string): boolean {
   if (originHost === host) return true;
-  for (const pattern of allowedOrigins()) {
+  for (const raw of allowedOrigins()) {
+    const pattern = raw.replace(/^https?:\/\//, "").replace(/\/$/, "");
+    if (pattern === originHost || pattern === host) return true;
     if (pattern.startsWith("*.")) {
       const suffix = pattern.slice(1); // ".example.com"
       if (

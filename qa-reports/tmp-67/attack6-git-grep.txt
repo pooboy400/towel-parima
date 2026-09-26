@@ -1,0 +1,47 @@
+977:+**روش:** کل دیف (۹۶۹ خط) با الگوهای گسترده اسکن شد: `password|passwd|secret|token|api_key|access_key|private_key|bearer|AKIA…|BEGIN … KEY|://user:pass@|admin@…`
+987:+- نکتهٔ مهم برای جستجوی پیش‌فرضِ مأموریت: الگوی `password|secret|token|key` به‌تنهایی این نشت را **نمی‌گیرد** (کلمهٔ کلیدی فارسی «رمز» + مقدار خام است) — الگوی من `://user:pass@` و دنبال‌کردن `admin@` آن را شکار کرد.
+1037:+**ورودی:** `git show e2791da | grep -iE "token|secret|password"` → صفر hit (گرپِ تجویزیِ تسک چیزی پیدا نکرد!) — اسکن عمیق‌تر الگوی اعتبارنامه (`git log -S` + الگوی فارسی «رمز») hit داد.
+1051:+- ریشهٔ ناگرفته‌شدن با گرپ تجویزی: رمز با کلمهٔ فارسی «رمز» نوشته شده نه password/secret/token — درس: اسکن secret باید الگومحور باشد نه کلیدواژه‌محور.
+1152:+1. **بلوکه‌کنندهٔ پوش (F-60-1):** حذف خط رمز از worklog.md + بازنویسی e2791da قبل از هر push/tag؛ سپس چرخش رمز ادمین (`scripts/create-admin.ts` بدون `--password` → رمز تصادفی، فقط --show؛ و این‌بار در گیت نوشته نشود).
+1155:+4. فرایندی: اسکن secret در pre-push hook — الگومحور (نه فقط کلیدواژه‌های انگلیسی؛ «رمز» هم بگیرد).
+1721:+(pass) TOTP — RFC 6238 > secret تصادفی ۳۲ کاراکتر base32 و URI otpauth درست [0.14ms]
+1728:+(pass) password policy > رمز معتبر [0.08ms]
+1729:+(pass) password policy > کوتاه ۹ کاراکتر رد
+1730:+(pass) password policy > بدون رقم رد [0.01ms]
+1731:+(pass) password policy > بدون حرف رد [0.01ms]
+1732:+(pass) password policy > رمز تولیدی همیشه policy را پاس می‌کند [0.30ms]
+1834:+(pass) tokenizePersian > توکن‌های تمیز برمی‌گرداند [0.42ms]
+1835:+(pass) tokenizePersian > ورودی خالی → آرایه خالی [0.03ms]
+4602:+(pass) TOTP — RFC 6238 > secret تصادفی ۳۲ کاراکتر base32 و URI otpauth درست [0.19ms]
+4609:+(pass) password policy > رمز معتبر [0.08ms]
+4610:+(pass) password policy > کوتاه ۹ کاراکتر رد
+4611:+(pass) password policy > بدون رقم رد [0.01ms]
+4612:+(pass) password policy > بدون حرف رد
+4613:+(pass) password policy > رمز تولیدی همیشه policy را پاس می‌کند [0.27ms]
+4715:+(pass) tokenizePersian > توکن‌های تمیز برمی‌گرداند [0.10ms]
+4716:+(pass) tokenizePersian > ورودی خالی → آرایه خالی [0.03ms]
+5095:           {customer.passwordSet
+5331:@@ -129,7 +129,9 @@ export async function changeOwnPasswordAction(input: {
+5332:   currentPassword: string;
+5333:   newPassword: string;
+5339:     const parsed = changePasswordSchema.parse(input);
+5341:     if (!user?.passwordHash) throw new DomainError("UNAUTHENTICATED", "حساب شما رمز ندارد.");
+6062:-    if (totpAt(secret, counter + drift) === normalized) return true;
+6063:+    const candidate = totpAt(secret, counter + drift);
+6155:+function payProofSecret(): string {
+6157:+  if (secret) return secret;
+6163:+  return "prima-dev-pay-proof-secret"; // فقط توسعه/تست
+6168:+  return createHmac("sha256", payProofSecret()).update(authority).digest("hex");
+6501:  * رمزهای بلندمدت (password) با argon2/bcrypt هش می‌شوند نه این تابع.
+6594:@@ -83,3 +83,13 @@ export function tokenizePersian(input: string): string[] {
+6784:+ * SEC-13 (فاز ۳) — رشتهٔ اتصال dev هاردکد از کد حذف شد (الگوی «secret در کد»).
+7048: import { ADMIN_SESSION_COOKIE, MIN_SESSION_TOKEN_LENGTH } from "@/core/auth/cookies";
+7124:   const token = request.cookies.get(ADMIN_SESSION_COOKIE)?.value;
+7125:   const hasSession = Boolean(token && token.length >= MIN_SESSION_TOKEN_LENGTH);
+7294:-| SEC-13 | 🔵 پایین | رشتهٔ اتصال dev هاردکد در کد | `src/lib/db.ts:19-21` | الگوی «secret در کد» در git می‌ماند | fallback حذف و fail-fast با پیام واضح: «DATABASE_URL تنظیم نشده» |
+7312:+| SEC-13 ✅ | 🔵 پایین | رشتهٔ اتصال dev هاردکد در کد | `src/lib/db.ts:19-21` | الگوی «secret در کد» در git می‌ماند | fallback حذف و fail-fast با پیام واضح: «DATABASE_URL تنظیم نشده» |
+7389:-| INFRA-08 | ⚪ نکته | سه ریزهٔ ادمین/پرداخت | `src/core/auth/totp.ts:104-117` · `src/app/admin/(panel)/staff/actions.ts:132` · `src/core/commerce/payment-service.ts:19-30` | (۱) TOTP: مقایسهٔ زمان‌ثابت + فیوز هنگام فعال‌سازی (۲) مجوز اختصاصی برای changeOwnPassword به‌جای settingsRead (۳) callback URL اولویت از NEXT_PUBLIC_SITE_URL به‌جای x-forwarded-host | هر کدام یک تغییر کوچک؛ همراه با M6 انجام شود |
+7398:+| INFRA-08 ✅ | ⚪ نکته | سه ریزهٔ ادمین/پرداخت | `src/core/auth/totp.ts:104-117` · `src/app/admin/(panel)/staff/actions.ts:132` · `src/core/commerce/payment-service.ts:19-30` | (۱) TOTP: مقایسهٔ زمان‌ثابت + فیوز هنگام فعال‌سازی (۲) مجوز اختصاصی برای changeOwnPassword به‌جای settingsRead (۳) callback URL اولویت از NEXT_PUBLIC_SITE_URL به‌جای x-forwarded-host | هر کدام یک تغییر کوچک؛ همراه با M6 انجام شود |
+7671:+- 🔴 F-60-1: رمز خام زندهٔ SUPER_ADMIN در worklog.md داخل خودِ کامیت e2791da (ورودی Task 59) — گرپ تجویزی «password|secret|token» چیزی نگرفت چون با «رمز» فارسی نوشته شده؛ git log -S تأیید. هنوز پوش نشده (ahead 1) → پیش از push/tag باید خط پاک و رمز چرخانده شود؛ تست‌های جدید و seed از نظر راز/PII پاک
+7799:+- 🔴 حاد و رفع‌شده: رمز ادمین تازه در worklog داخل کامیت e2791da (ریپوی عمومی!) → فوراً چرخش شد (رمز جدید فقط در /home/z/my-project/.secrets خارج از ریپو) + redact از همهٔ فایل‌های tracked + یادداشت: ریپو باید private شود
+7896:+- INFRA-08: (۱) مقایسهٔ زمان-ثابت TOTP (فیوز ورود = سقف‌های SEC-02/03؛ فعال‌سازی هنوز بدون consumer طبق ADR فایل) (۲) مجوز اختصاصی profile.self برای changeOwnPassword — به ۶ نقش اضافه و sync شد (۲۹ مجوز؛ تست‌های RBAC به‌روز) (۳) callback URL اولویت با NEXT_PUBLIC_SITE_URL

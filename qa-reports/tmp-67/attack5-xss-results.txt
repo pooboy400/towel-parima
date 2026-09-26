@@ -1,0 +1,10 @@
+shop_q => raw_script=0 raw_img=0 raw_js=1 | CSP: content-security-policy-report-only: default-src 'self'; scr;
+shop_category_q => raw_script=0 raw_img=0 raw_js=0 | CSP: content-security-policy-report-only: default-src 'self'; scr;
+order_tracking => raw_script=0 raw_img=0 raw_js=0 | CSP: content-security-policy-report-only: default-src 'self'; scr;
+checkout_success => raw_script=0 raw_img=0 raw_js=0 | CSP: content-security-policy-report-only: default-src 'self'; scr;
+checkout_failed => raw_script=0 raw_img=0 raw_js=0 | CSP: content-security-policy-report-only: default-src 'self'; scr;
+mock_gateway => raw_script=0 raw_img=0 raw_js=0 | CSP: content-security-policy-report-only: default-src 'self'; scr;
+not_found_page => raw_script=0 raw_img=0 raw_js=0 | CSP: content-security-policy-report-only: default-src 'self'; scr;
+api_search => raw_script=0 raw_img=0 raw_js=0 | CSP: content-security-policy-report-only: default-src 'self'; scr;
+home => raw_script=0 raw_img=0 raw_js=0 | CSP: content-security-policy-report-only: default-src 'self'; scr;
+journal => raw_script=0 raw_img=0 raw_js=0 | CSP: content-security-policy-report-only: default-src 'self'; scr;

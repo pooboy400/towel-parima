@@ -1,0 +1,14 @@
+P1_origin_evil_normal_host => HTTP 403 | content-type: application/json | body: {"ok":false,"code":"FORBIDDEN_ORIGIN","message":"درخواست از مبدأ غیرمجاز رد شد."}
+P2_origin_evil_XFH_evil => HTTP 405 |  | body: 
+P3_suffix_trick => HTTP 405 |  | body: 
+P4_origin_null => HTTP 405 |  | body: 
+P5_origin_same_host => HTTP 405 |  | body: 
+P6_origin_wildcard_sandbox => HTTP 405 |  | body: 
+P7_origin_malformed => HTTP 405 |  | body: 
+P8_origin_port_diff => HTTP 405 |  | body: 
+P9_host_header_evil => HTTP 405 |  | body: 
+P10_origin_evil_XFH_sandbox => HTTP 403 | content-type: application/json | body: {"ok":false,"code":"FORBIDDEN_ORIGIN","message":"درخواست از مبدأ غیرمجاز رد شد."}
+P8b_diff_port_valid => HTTP 403 | {"ok":false,"code":"FORBIDDEN_ORIGIN","message":"درخواست از مبدأ غیرمجاز رد شد."}
+P3b_subdomain_of_host => HTTP 403 | {"ok":false,"code":"FORBIDDEN_ORIGIN","message":"درخواست از مبدأ غیرمجاز رد شد."}
+P3c_wildcard_origin_bare_host => HTTP 403 | {"ok":false,"code":"FORBIDDEN_ORIGIN","message":"درخواست از مبدأ غیرمجاز رد شد."}
+P11_double_port => HTTP 405 | 

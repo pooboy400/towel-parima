@@ -158,7 +158,8 @@ export default function AboutPage() {
       >
         <div className="grid gap-8 lg:grid-cols-[1fr_1.3fr] lg:gap-14">
           <div className="flex flex-col items-start gap-4">
-            <span className="text-xs font-medium tracking-wide text-terracotta">
+            {/* 67-fe: روی bg-deep فقط tint روشن ≥۴.۵:۱ است */}
+            <span className="text-xs font-medium tracking-wide text-terracotta-light">
               تعهد ما
             </span>
             <h2

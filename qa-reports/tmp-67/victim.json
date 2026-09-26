@@ -1,0 +1,8 @@
+{
+  "orderId": "cmuihi16a0001ndvc2su2hgc7",
+  "orderCode": "5598372938",
+  "paymentStatus": "PENDING",
+  "amount": 284000,
+  "authority": "MOCK-d1c21e963b75305d596658ff",
+  "redirectUrl": "/mock-gateway?authority=MOCK-d1c21e963b75305d596658ff"
+}

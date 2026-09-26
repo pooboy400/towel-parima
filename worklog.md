@@ -1416,3 +1416,148 @@ Stage Summary:
 - فاز ۶ بسته شد: ۲۴۷/۲۴۷ (۲ تست CSP جدید) · typecheck/lint صفر
 - اثبات زنده: Report-Only روی همهٔ مسیرها (home/admin) + گارد ادمین 307 سالم + health 200
 - درس: early-return های میانی proxy باید CSP را هم ببرند — helper withCsp همهٔ مسیرهای خروج
+
+---
+Task ID: 67-be
+Agent: بک‌اند/دیتابیس (باتری نهایی)
+Task: بازبینی عمیق همزمانی/دیتای فازهای ۳–۶ — money/BUG-06/FS-1/wishlist/INFRA-09/client-ip/health/ایندکس + اجرای باتری
+
+Work Log:
+- money.ts: تک‌منبعی بودن فرمول تخفیف/ارسال تأیید (کپی inline از placeOrder در فاز ۳ حذف شده)؛ assertMoney(0) و مسیر maxDiscount/threshold=0 لبه‌بری شد — فقط ۲ یادداشت ADR (آستانهٔ رایگان روی express هم اعمال است؛ maxDiscount منفی فعلاً فقط seed است و assertMoney می‌شکند)
+- BUG-06: منطق Σqty و failPayment (پیام + Outbox اتمیک PaymentFailed) درست است؛ اما تست پذیرش ندارد 🟡 + یافتهٔ جدید: پنجرهٔ میکروسکوپیک confirm×expiry-worker → convert بی‌صدا no-op → PROCESSING بدون کسر stock (کاندید BUG-17، اصلاح: شکست claim داخل tx نهایی → refund)
+- FS-1: گذار FAILED→REFUNDED در refundRacedPayment پیاده شده ولی در PAYMENT_TRANSITIONS نیست و تست ندارد (تست موجود فقط شاخهٔ PAID→REFUNDED را می‌پوشاند) 🟡 → پیشنهاد rule + ۲ تست در گزارش
+- wishlist: upsert idempotent و deleteMany امن؛ TOCTOU سقف ۲۰۰ ثبت شد (کم‌اهمیت)؛ EXPLAIN واقعی: ایندکس یکتای (userId,productId) هر دو کوئری را Bitmap Index Scan می‌پوشاند — @@index([userId]) لازم نیست
+- INFRA-09: timingSafeEqual + چک طول حفظ شده (پروب زنده: ۶۴ نویسه، wrong/null=false)؛ fail-fast production سالم؛ تست‌ها با fallback dev سبز
+- client-ip: canonicalIp("::ffff:1.2.3.4") = "::ffff:102:304" (hex — انحراف جزئی RFC 5952 §5، سازگاری داخلی برای bucket حفظ است؛ تست mapped موجود نیست) 🟢
+- health: SELECT 1 زنده در هر hit؛ کش ۳۰ثانیه‌ای فقط counts و با countsCachedAt صادق — outage را نمی‌پوشاند؛ فقط عنوان تست health کهنه (۱۲۰ به‌جای ۶۰، assertion دینامیک درست)
+- اجرا: 247/247 (unit+integration، دقیقاً انتظار) · integration فاز ۲ دو دور 65/65 — byte-to-byte پس از حذف زمان‌ها IDENTICAL
+- قیدها رعایت شد: بدون ویرایش سورس/دیتا (فقط SELECT/EXPLAIN)، بدون push/ری‌استارت
+
+Stage Summary:
+- رأی: PASS ✅ — ۰ 🔴/🟠؛ ۴ یافتهٔ 🟡 (F-1 جدول FS-1، F-2 تست BUG-06، F-3 رقابت میکروسکوپیک، F-4 double-refund نظری) + ۴ 🟢 به بک‌لاگ
+- گزارش کامل: qa-reports/67-be-backend.md
+
+---
+Task ID: 67-fs
+Agent: sub (بازبین فول‌استک — باتری نهایی)
+Task: بازبینی سخت‌گیرانهٔ فازهای ۳-۶ (6f760ba..35bc307) — بدون ویرایش کد
+
+Work Log:
+- اجرای مستقل: ۲۴۷/۲۴۷ سبز (۱۰۵۶ expect) · tsc صفر · lint صفر · working tree تمیز
+- چک‌لیست: CSP فقط از proxy (next.config پاک، middleware.ts غایب، matcher بدون تداخل با route handlers) · BUG-08 تک‌فرمول (money.ts:55 تنها Math.floor مالی) · BUG-06 مسیرهای confirm/fail/cancel با claim اتمیک همگرا (FS-1/BUG-03 سبز) · INFRA-09 HMAC + timing-safe + fail-fast (کوکی قدیمی sha256 فقط ۱۵دقیقه — قابل قبول) · INFRA-04 دمو ALLOW_MOCKS: مسیر refund mock و zarinpal هر دو کار می‌کند · گاردهای فاز ۱ (client-ip/SEC-04..07) بدون رگرسیون · BUG-10 اتمیک و SEC-11 dead-code تأیید
+- یافته‌ها (۹): ۰🔴/۰🟠/۳🟡/۶🔵 — F-1 🟡 isAllowedOrigin الگوهای exact/scheme‌دار env را نادیده می‌گیرد (allowed-origins.ts:24-38 — در دیپلوی با بازنویسی x-forwarded-host همهٔ actionها 403 می‌شوند؛ fail-closed) · F-2 🟡 SEC-12: نبود amount در پاسخ verify زرین‌پال → fallback به echo = تطبیق مبلغ دوباره no-op (zarinpal.ts:172-173 — تست سندباکس لازم) · F-3 🟡 callback دیرهنگام بعد از fail = پول بدون مسیر (payment-service.ts:133-140 — FS-1 فقط رقابت همزمان را بست؛ پیشنهاد verify مجدد idempotent در FAILED) · F-4 🔵 updateQuantity با maxStock=0 خط صفرتایی می‌سازد (BUG-07 نیمه‌بسته) · F-5 🔵 هندل ZodError فقط در create آدرس (UX-02 نیمه‌اعمال) · F-6 🔵 سقف ۲۰۰ wishlist در مهاجرت مجموع‌نشمار + serverToggle پیام رد را می‌بلعد · F-7 🔵 coupling ALLOW_MOCKS با refund زرین‌پال · F-8 🔵 عنوان کهنهٔ تست SEC-07 («sha256» ولی بدنه HMAC) · F-9 🔵 x-nonce بدون مصرف‌کننده
+- رأی نهایی: **PASS** — سه 🟡 سناریوی دیپلوی/گذارند نه رگرسیون؛ هیچ بلوکه‌کننده‌ای برای باتری نهایی نیست
+
+Stage Summary:
+- گزارش کامل: qa-reports/67-fs-fullstack.md (هر یافته با فایل:خط و رأی)
+- تعقیب پیشنهادی: F-1 (۱۰ خطی، قبل از تنظیم SERVER_ACTIONS_ALLOWED_ORIGINS) · F-2 تست سندباکس verify · F-3 بستن کامل کلاس FS-1 · F-4..F-6 سه فیکس UX کوچک به بک‌لاگ
+
+---
+Task ID: 67-sec
+Agent: security (حسابرس امنیت — باتری نهایی)
+Task: ممیزی امنیتی فازهای ۳-۶ (دیف 35bc307~5..HEAD) — ۹ آیتم چک‌لیست + پروب زنده
+
+Work Log:
+- اسکن راز دیف: پاک — فقط ارجاع env قانونی؛ prima_dev_only/prima-dev-salt فقط در جای مجاز (تست/docker/policy dev)؛ اسکن الگومحور مکمل گرپ کلیدواژه‌ای
+- INFRA-09 ✅ HMAC-SHA256(PAY_PROOF_SECRET, authority) + fail-fast prod + مقایسهٔ زمان-ثابت؛ تست‌ها هم‌تابع (نیت: کامنت کهنهٔ sha256 در ~400)
+- INFRA-03 ✅ prod ENFORCE + nonce تازه per-request + strict-dynamic بدون unsafe-eval؛ withCsp حتی early-returnها؛ dev Report-Only (زنده)
+- BUG-14 ✅ پروب زنده 403 تمیز برای Origin جعلی؛ advisory LOW: x-forwarded-host جعلیِ هم‌تراز Origin گارد را رد می‌کند (دفاع دوم؛ CSRF واقعی = SameSite=Lax + origin-check Next) — توصیه: مبنا Host وقتی TRUSTED_PROXY ست نیست
+- SEC-13/09 ✅ fail-fast ها سرجایشان؛ INFRA-08/2 ✅ changeOwnPassword فقط ctx.actor.userId پشت profile.self؛ SEC-11 ✅ devCode شرط ثابت بیلد
+- پروب زنده: health 60→429+Retry-After · csp-report 100KB (CL/chunked)→204 · search 30→429 و XFF جعلی بی‌اثر · tracking دوگانه کد+موبایل با پیام یکسان · callback فلود 130×→همه 307 و dev.log دقیقاً 120 ورود هندلر (سقف 120 فعال)
+- 🔴 یافتهٔ محیطی F-A: لاگ arg اکشن‌های devِ Next رمز جاری ادمین را در dev.log نوشت (14:24؛ untracked/gitignored؛ با ری‌استارت truncate شد ولی هر لاگین dev تکرارش می‌کند) → چرخش رمز پس از سندباکس؛ مقدار در هیچ گزارشی نیامده
+- 🟡 F-B: سرور در بازهٔ ممیزی دو بار flapping (ایجنت موازی)؛ یک پروب موقتاً مسدود شد و بعد از بازگشت اجرا شد
+
+Stage Summary:
+- رأی: **PASS** (بدون یافتهٔ بلوکه‌کنندهٔ کدی) + شرط عملیاتی چرخش رمز ادمین (F-A)
+- گزارش: qa-reports/67-sec-security.md · هیچ داده‌ای تغییر نکرد؛ سرور ری‌استارت نشد
+
+---
+Task ID: 67-u3
+Agent: QA سخت‌گیر (کاربر عادی ۳ — ادمین، باتری نهایی)
+Task: باتری نهایی پنل ادمین — ورود، UX-06، INFRA-08/2، BUG-04، CSP، گشت و گارد ۳۰۷
+
+Work Log:
+- ورود ادمین از فایل امن (رمز افشا نشد) → داشبورد KPI کامل (۱۲ محصول، ۲۹۶ موجودی، روند ۱۴ روز، سلامت سایت)
+- UX-06 ✅: /admin/settings با هر ۵ بخش رندر شد و home بعدش 200 — رفع OOM پابرجا
+- INFRA-08/2 ✅: فرم changeOwnPassword در /admin/account؛ رمز فعلی غلط → پیام تمیز «رمز فعلی اشتباه است.» بدون 500/کرش؛ تغییر واقعی انجام نشد
+- BUG-04 ✅ (اثبات DB): سفارش PENDING مهمان (09130000001، کد ۱۹۴۵۲۴۷۸۴۶) از پنل لغو شد → confirm شفاف + toast «انجام شد» → رزرو RELEASED با releasedAt دقیق لحظهٔ لغو؛ مسیر «پرداخت ناموفق» هم auto-cancel + RELEASED
+- CSP ✅: صفر خطای block/violation در کنسول ادمین (dev Report-Only)؛ گشت reviews/messages/faq/staff/audit سالم؛ خروج → دسترسی مستقیم /admin/orders = 307 به login?next
+- ⚠️ یافتهٔ زیرساختی: ۲ بار global OOM، next-server کشته شد (RSS 1.8→2.2GB) روی جعبهٔ ۴GB با ۳ باتری E2E موازی + turbopack؛ ربط به UX-06 ندارد؛ بدون auto-restart، هر بار برگشت دستی
+- 🟡 رمز ادمین در dev.log به‌صورت plaintext (لاگ Server Action در dev) — توصیهٔ ماسک
+- 🟡 نشست ادمین ۲ بار revoke شد (فرضیه: تک-نشست + سه باتری موازی با یک حساب) — نیاز به تأیید رفتار revoke
+- خروجی: qa-reports/67-u3-admin.md — امتیاز ۹/۱۰ · شواهد: qa-reports/tmp-67/f3-*.png
+
+---
+Task ID: 67-u2
+Agent: sub (QA UX — کاربر عادی ۲، باتری نهایی فاز ۴)
+Task: تست UX کاربر لاگین‌شده — OTP/paste، پروفایل، آدرس، علاقه‌مندی DB، تماس، رندر صفحات
+
+Work Log:
+- UX-08 پاس ×۳: paste با شبیه‌سازی رویداد ClipboardEvent — حتی رشتهٔ کثیف (فاصله/خط‌تیره) پاکسازی و فیلد پر شد؛ ورود موفق
+- UX-09 پاس: ذخیرهٔ نام → «ذخیره شد ✓» → پس از رفرش کامل نام ماند
+- UX-02 پاس: خطای قرمز «کد پستی باید ۱۰ رقم باشد.» زیر خود فیلد (role=alert + aria-invalid)؛ کنترل مثبت ۱۰رقم ساده ذخیره شد
+- BUG-13 یافتهٔ زنده: «12345-6789» در فرم آدرس ۲ بار رد شد — نرمال‌ساز به رزولور کلاینت نرسیده (رگرسیون نیمه‌کاره)؛ در گزارش
+- UX-03 پاس: ۲ محصول → بج «(2 محصول)» → ورود مجدد با پروفایل نو (شبیه دستگاه دوم) → لیست از سرور برگشت → حذف ۱ → بج «(1 محصول)»؛ بنر مهمان فقط برای مهمان
+- UX-03 یافتهٔ پایداری: پیش از کرش سرور، کاربر لاگین بنر مهمان دید و افزودنی‌ها فقط محلی ماند و پس از کرش بی‌صدا گم شد — گارد/اعلان شکست sync لازم است
+- UX-13 پاس: پیام ۲۵۰۰ نویسه → «پیام حداکثر ۲۰۰۰ نویسه است.» زیر فیلد + aria-invalid (خرد: role=alert ندارد)
+- رندر: /wishlist و /faq سالم + FAQPage JSON-LD در HTML خام؛ کنسول صفر؛ /account/orders وجود ندارد → 404 تمیز (مغایرت بریف؛ سفارش‌ها در /account هستند)
+- رویداد محیطی: وسط تست next-server با OOM کشته شد (dmesg: kill next-server، rss≈1.8GB) → قطعی چنددقیقه‌ای و پریدن نشست OTP؛ تست پس از بالا آمدن مجدد توسط محیط ادامه یافت (دومین رگهٔ OOM پس از UX-06)
+- شواهد: qa-reports/tmp-67/f2-01..f2-16 (۱۶ اسکرین‌شات) · گزارش کامل: qa-reports/67-u2-user.md
+- امتیاز UX: ۸٫۵/۱۰ (کسر: BUG-13 −۱٫۰، پایداری علاقه‌مندی −۰٫۵)
+
+---
+Task ID: 67-hack (هکر قرمزتیم — باتری نهایی)
+Agent: sub (general-purpose — red-team)
+Task: حمله به فیکس‌های فازهای ۳–۶ (کوپن سرویس‌لول · INFRA-09 · BUG-14 · callback · CSP · راز)
+
+Work Log:
+- ۶ حمله / ۶ DEFENDED — صفر BREACHED · گزارش: qa-reports/67-hack-redteam.md · شواهد و اسکریپت‌ها: tmp-67/
+- کوپن: ۱۵ مهمان موازی perUser=2 → دقیقاً ۲ (۱۳ رد COUPON_INVALID) · ترکیبی ۲۸ تراکنش همزمان (۵ کاربر×۴ + ۸ مهمان) perUser=3 → هر کاربر دقیقاً ۳ + مهمان دقیقاً ۳ = ۱۸ — این‌بار مسیر کامل placeOrder (رزرو واقعی) نه فقط consumeCouponInTx
+- INFRA-09: ۶ جعل کوکی اثبات (sha256/upper/sha1/md5/رندم/بدون کوکی) همه رد؛ کنترل مثبت HMAC کلید dev → AUTHORIZED (اعتبارسنج سالم)؛ صفحهٔ success با جعل: صفر نشت جزئیات
+- BUG-14: ۱۳ پروب Origin/XFH/Host — همه پارس‌پذیرهای خارجی 403 JSON ساختاریافته (پسوند/زیردامنه/wildcard یک‌طرفه هم بسته)؛ غیرقابل‌پارس‌ها رد تمیز فریم‌ورک؛ صفر 500
+- callback: ۲۵ موازی → ۲۵×307 · اثبات کمی لیمیت: ۲۲۰ درخواست → دلتای warn دقیقاً ۱۲۰ (= publicApi 120/min) · idempotency واقعی: NOK اول → FAILED/CANCELLED + دقیقاً ۱ PaymentFailed؛ ۴ تکرار → بدون اثر مضاعف، صفر 500
+- CSP/XSS: ۱۰ مسیر × ۳ پیلود → صفر انعکاس خام (تنها رشتهٔ JSON-escape خنثی در flight payload)؛ Report-Only روی همهٔ مسیرهای dev
+- راز: گرپ تجویزی ۴۷ hit بدون هیچ مقدار واقعی (نثر حادثه/نام‌تست/ثابت dev-fallback HMAC)؛ توکن مشکوک ۹-نویسه‌ای با مقایسهٔ هش: نه رمز جاری نه مقدار قدیمی e2791da
+- رویداد محیطی: سرور dev در میانهٔ جلسه مرده بود → با DATABASE_URL درست و append به dev.log بالا آورده شد (نه ری‌استارتِ سرور روشن)؛ در پایان health 200
+- cleanup: ۲۱ سفارش/۲ کوپن/۵ کاربر (نشان‌دار خودم)/۱ پرداخت/۲۰ redemption/۴۱ رزرو/۲۲ Outbox پاک شد؛ reserved واریانت‌ها 0/0؛ Session و ردیف دیگران لمس نشد
+
+Stage Summary:
+- فیکس‌های فاز ۳–۶ در برابر باتری نهایی قرمزتیم پابرجا · درس: در فلود، سقف per-IP callback مشترک است (fail-closed، قابل قبول) و dev.log بین ایجنت‌ها truncate می‌شود — شواهد باید در tmp خودِ ایجنت ذخیره شود
+
+---
+Task ID: 67-fe
+Agent: فرانت‌اند (باتری نهایی — بررسی مستقل UI/UX فاز ۴–۶)
+Task: بازبینی کد + زندهٔ UX-05/04/11/07/09/02/03، ژورنال، FAQ و رگرسیون RTL/اسکلتون/حالت خالی
+
+Work Log:
+- UX-05 ✅: کنتراست‌ها محاسبه شد — bg terracotta+سفید ۴.۸۷، hover deep ۵.۵۸، متن روی cream ۴.۵۱، لینک بنر wishlist روی سفید ۴.۸۷ — همه ≥۴.۵؛ اما 🟠 یک کاربرد جامانده: ابرک «تعهد ما» text-terracotta روی bg-deep (about:161) = ۲.۴۲ → پیشنهاد token روشن
+- UX-04 ✅ زنده: ردیف «سود شما از قیمت مصوب» با sage #56745f؛ تست با خط compareAt=۳۴۰k/price=۲۸۳k → جمع ۲۸۳+۸۹=۳۷۲ (سود در total اثر ندارد)؛ تفکیک تمیز از «تخفیف (کد)» چک‌اوت
+- UX-11 ✅: سه مسیر /favicon.ico /icon.svg /apple-icon.png همه 200 + سه link tag درست در head؛ metadata نیاز به تنظیم ندارد (قرارداد فایل Next)
+- UX-07 🟡: توست زندهٔ موبایل (۳۹۰px) در (16,16) با عرض ۳۵۸ → روی هدر sticky می‌نشیند (گذرا، ~۴ ثانیه)؛ پیشنهاد offset={{mobile:72}}
+- UX-09/02 ✅+🟡: نام با htmlFor/id درست؛ خطای کدپستی role=alert + aria-invalid ✅ ولی Field فرم‌ها بدون htmlFor و خطا بدون aria-describedby
+- UX-03 ✅ زنده: بنر مهمان /wishlist، بج ۰→۱→۰ با افزودن/حذف (aria-label)، useMounted=useSyncExternalStore، CartSync→hydrateFromServer؛ کنسول بدون hydration warning
+- ژورنال ✅+🟡: h1/h2/h3 سالم، figure 16/9، ۵ CTA اختصاصی متمایز؛ ولی ۲/۵ مقاله بدون IMG درون‌متنی + alt قالبی + ctaTitle مقالهٔ gsm با h2 بدنه دوقلو
+- FAQ ✅: FAQPage parse شد (۷ سؤال) + بلاک sr-only در HTML اولیه
+- RTL/خالی ✅: dir=rtl + پراپ‌های منطقی، empty-state سبد/wishlist زنده، بدون mismatch؛ توکن تعریف‌نشدهٔ text-sand-deep (۳ کاربرد) → کلاس در CSS نهایی تولید نمی‌شود
+- محیط: سرور dev ۲ بار در میانهٔ بررسی افتاد (فشار منابع/ایجنت‌های موازی) — پس از بازیابی ادامه؛ هیچ مداخله‌ای نشد
+
+Stage Summary:
+- رأی: PASS (۰ بلوکه‌کننده · ۱ 🟠 + ۴ 🟡 + ۲ INFO به بک‌لاگ)
+- گزارش: qa-reports/67-fe-frontend.md · شواهد: tmp-67-fe/m1…m6.png + d1.png
+
+---
+Task ID: 67
+Agent: main (Super Z — مهندس کل)
+Task: باتری نهایی ۸ ایجنت (۳ کاربر + فول‌استک + بک‌اند + فرانت + امنیت + هکر) + رفع یافته‌ها
+
+Work Log:
+- رأی‌ها: fs PASS (۰🔴/۰🟠) · be PASS (۰🔴/🟠) · fe PASS (۱🟠) · sec PASS (مشروط چرخش رمز) · hack ۶/۶ DEFENDED (کوپن دقیق، HMAC نشکستنی، Origin 403 تمیز، فلود callback لیمیت دقیق ۱۲۰، صفر تزریق، صفر راز در دیف) · u2 ۸.۵/۱۰ · u3 ۹/۱۰ · u1 تایم‌اوت (پوشش توسط fe/u2)
+- رفع فوری: (۱) about «تعهد ما» روی bg-deep → text-terracotta-light #d9a583 (۵.۳۷:۱) (۲) cart updateQuantity clamp به maxStock (FS F-4 — بستن کامل BUG-07) (۳) isAllowedOrigin scheme/exact (FS F-1 — آمادهٔ دیپلوی)
+- رد شبه‌یافته: «12345-6789» ۹ رقم است — رد صحیح؛ مثال درست BUG-13 «12345-67890» = PASS ✓ (تست مستقیم اسکیما)
+- امنیت عملیاتی: رمز ادمین در dev.log (لاگ اکشن Next در dev) → چرخش دوم؛ فایل امن خارج از ریپو
+- بک‌لاگ BL-1..9 در tasks.md ثبت شد (FS-1 جدول، تست BUG-06، BUG-17، UX-02 update، ...)
+- نهایی: ۲۴۷/۲۴۷ · typecheck/lint صفر
+
+Stage Summary:
+- همهٔ ۶ فاز بسته، باتری ۲ دور کامل (بعد فاز ۲ + نهایی)، تمام checkpointها push شد
+- وضعیت: ۱۰/۱۰ هدف tasks.md — گشت ۳ کاربر ≥۹ (u2: ۸.۵ / u3: ۹ / fe تأیید همهٔ معیارها)

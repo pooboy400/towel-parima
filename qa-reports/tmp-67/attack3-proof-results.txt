@@ -1,0 +1,9 @@
+1_no_cookie => NOT_FOUND(shown یافت نشد) (orderCode/amount leaks: 0)
+2_sha256_forged => NOT_FOUND(shown یافت نشد) (orderCode/amount leaks: 0)
+3_sha256_upper => NOT_FOUND(shown یافت نشد) (orderCode/amount leaks: 0)
+4_sha1 => NOT_FOUND(shown یافت نشد) (orderCode/amount leaks: 0)
+5_md5 => NOT_FOUND(shown یافت نشد) (orderCode/amount leaks: 0)
+6_random_hex64 => NOT_FOUND(shown یافت نشد) (orderCode/amount leaks: 0)
+7_positive_control_dev_hmac => AUTHORIZED(amount+code shown) (orderCode/amount leaks: 1)
+--- success page with forged sha256 proof ---
+GET /checkout/success?code=5598372938 with forged proof: leaks=1 (0 = generic page)
