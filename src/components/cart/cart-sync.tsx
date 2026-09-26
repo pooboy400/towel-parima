@@ -11,13 +11,14 @@ import { useCartStore } from "@/store/cart-store";
  */
 export function CartSync() {
   useEffect(() => {
-    void import("@/app/cart/actions").then(async (mod) => {
-      const [serverCart, state] = await Promise.all([
-        mod.getServerCartAction().catch(() => null),
-        mod
-          .getCustomerStateAction()
-          .catch(() => null),
-      ]);
+    void Promise.all([import("@/app/cart/actions"), import("@/app/account/actions")]).then(
+      async ([cartMod, accountMod]) => {
+        const [serverCart, state] = await Promise.all([
+          cartMod.getServerCartAction().catch(() => null),
+          accountMod
+            .getCustomerStateAction() // UX-14 — منبع یکتا
+            .catch(() => null),
+        ]);
       const store = useCartStore.getState();
 
       store.setCustomer(

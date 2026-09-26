@@ -6,6 +6,7 @@
  */
 
 import { DomainError } from "../../core/errors";
+import { allowMocksInProduction } from "../../core/env";
 import { normalizeFaDigits, normalizePersian } from "../text/normalize-fa";
 
 export const OTP_POLICY = {
@@ -44,9 +45,21 @@ export function generateOtpCode(length = OTP_POLICY.length): string {
  * hash کد — SHA-256 با salt سرور (env).
  * ⚠️ OTP عمر کوتاه دارد و SHA-256 با salt برای این threat model کافی است؛
  * رمزهای بلندمدت (password) با argon2/bcrypt هش می‌شوند نه این تابع.
+ *
+ * SEC-09 (فاز ۳) — salt هاردکد دیگر در production بی‌صدا استفاده نمی‌شود:
+ * اگر OTP_HASH_SALT ست نشده باشد و محیط production (بدون فلگ دمو) باشد،
+ * همین‌جا crash-fast می‌کنیم تا hash با salt عمومی انجام نگیرد.
  */
 export async function hashOtpCode(code: string): Promise<string> {
-  const salt = process.env.OTP_HASH_SALT ?? "prima-dev-salt";
+  let salt = process.env.OTP_HASH_SALT;
+  if (!salt) {
+    if (process.env.NODE_ENV === "production" && !allowMocksInProduction()) {
+      throw new Error(
+        "SEC-09: OTP_HASH_SALT تنظیم نشده است — در production یک رشتهٔ تصادفی ≥۳۲ کاراکتری ست کنید (fail-fast؛ fallback dev فقط برای توسعه/تست است).",
+      );
+    }
+    salt = "prima-dev-salt"; // فقط توسعه/تست — هرگز production
+  }
   const data = new TextEncoder().encode(`${salt}:${code}`);
   const digest = await globalThis.crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(digest))

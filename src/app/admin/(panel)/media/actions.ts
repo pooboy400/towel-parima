@@ -13,7 +13,7 @@ import { safeAudit } from "@/core/audit";
 import { CACHE_TAGS, revalidateEntityTag } from "@/core/cache";
 import { DomainError } from "@/core/errors";
 import { PERMISSIONS } from "@/core/auth/permissions";
-import { MediaError, processUpload, deleteMedia } from "@/core/media/pipeline";
+import { MediaError, MEDIA_LIMITS, processUpload, deleteMedia } from "@/core/media/pipeline";
 import { withAdminAction, requestMeta, type ActionResult } from "@/lib/admin/action-helpers";
 
 export interface UploadedMedia {
@@ -32,6 +32,11 @@ export async function uploadMediaAction(
     const file = formData.get("file");
     if (!(file instanceof File)) {
       throw new DomainError("VALIDATION_ERROR", "فایلی انتخاب نشده است.");
+    }
+
+    // SEC-14 (فاز ۳) — چک حجم قبل از arrayBuffer تا فایل بزرگ هرگز وارد RAM نشود
+    if (file.size > MEDIA_LIMITS.maxBytes) {
+      throw new MediaError("حجم فایل بیش از ۵ مگابایت است.");
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());

@@ -6,6 +6,10 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 import { db } from "@/lib/db";
+import { DomainError } from "@/core/errors";
+import { rateLimiter } from "@/core/rate-limit";
+import { RATE_RULES, rateKey } from "@/core/rate-limit/policies";
+import { extractClientIp } from "@/lib/client-ip";
 import {
   confirmPayment,
   failPayment,
@@ -19,6 +23,14 @@ import {
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
+  // فاز ۳ (پیشنهاد 60-hack) — سقف سبک روی callback: فلود بدون authority هم
+  // ارزان رد می‌شود؛ پاسخ همان redirect مسیر خطاست (بدون افشا)
+  const ip = extractClientIp(request.headers) ?? "unknown";
+  const rl = await rateLimiter.hit(rateKey("checkout-callback", ip), RATE_RULES.publicApi);
+  if (!rl.ok) {
+    return NextResponse.redirect(new URL("/checkout/failed", request.url));
+  }
+
   const { searchParams } = new URL(request.url);
   const authority = searchParams.get("authority");
   const status = searchParams.get("status");
@@ -60,7 +72,18 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.redirect(new URL("/checkout/failed", request.url));
   } catch (error) {
-    console.error("checkout callback failed:", error);
+    // BUG-12 (فاز ۳) — DomainError موردانتظرهٔ callback یک‌خطی لاگ می‌شود؛
+    // استک کامل فقط برای خطای غیرمنتظره
+    if (error instanceof DomainError) {
+      console.warn(
+        "checkout callback domain error:",
+        error.code,
+        "-",
+        error.message,
+      );
+    } else {
+      console.error("checkout callback failed:", error);
+    }
     return NextResponse.redirect(new URL("/checkout/failed", request.url));
   }
 }

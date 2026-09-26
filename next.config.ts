@@ -36,6 +36,8 @@ const cspReportOnly = [
 const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: true,
+  // SEC-10 (فاز ۳) — افشای فریم‌ورک خاموش می‌شود (X-Powered-By: Next.js حذف)
+  poweredByHeader: false,
 
   /**
    * Server Actions — فهرست سفید مبدأ (رفع خطای «Invalid Server Actions request»)
@@ -51,6 +53,10 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: ["*.space-z.ai"],
+      // SEC-14 (فاز ۳) — سقف بدنهٔ action بالا برده شد تا پایپ‌لاین رسانه (۵MB +
+      // overhead multipart) دست‌نیافتنی نباشد؛ چک file.size قبل از arrayBuffer
+      // در media/actions.ts انجام می‌شود تا فایل بزرگ قبل از RAM رد شود.
+      bodySizeLimit: "6mb",
     },
   },
 

@@ -83,3 +83,13 @@ export function tokenizePersian(input: string): string[] {
 export function buildSearchKey(input: string): string {
   return normalizePersian(input).replace(/ /g, "");
 }
+
+/**
+ * نرمال‌ساز مشترک کد پستی — BUG-13 (فاز ۳)
+ * ارقام فارسی/عربی → لاتین + حذف فاصله/خط‌تیره؛ در هر دو اسکیمای
+ * حساب (addressV2) و چک‌اوت (checkoutAddress) استفاده می‌شود تا
+ * «۱۲۳۴۵-۶۷۸۹۰» همه‌جا یکسان پذیرفته/رد شود.
+ */
+export function normalizePostalCode(input: string): string {
+  return normalizeFaDigits(normalizePersian(input)).replace(/[\s-]/g, "");
+}

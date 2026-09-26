@@ -10,6 +10,7 @@
 import { describe, expect, it, afterAll } from "bun:test";
 import { createHash } from "node:crypto";
 import { PrismaClient } from "@prisma/client";
+import { RATE_RULES } from "../../src/core/rate-limit/policies";
 import { POST as cspReportPOST } from "../../src/app/api/csp-report/route";
 import { GET as healthGET } from "../../src/app/api/health/route";
 import { GET as mediaGET } from "../../src/app/api/media/file/[...path]/route";
@@ -138,7 +139,9 @@ describe("SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After",
   it("health: دقیقاً 120 پاسخ سالم سپس 429 با Retry-After ≥ 1", async () => {
     let okCount = 0;
     let limited: Response | null = null;
-    for (let i = 0; i < 121; i++) {
+    // HEALTH-MON-01 (فاز ۳) — health سقف مستقل گرفت (healthCheck: 60/min) نه publicApi
+    const healthLimit = RATE_RULES.healthCheck.limit;
+    for (let i = 0; i < healthLimit + 1; i++) {
       const res = await healthGET(plainRequest<HealthReq>("http://localhost/api/health"));
       if (res.status === 429) {
         limited = res;
@@ -147,7 +150,7 @@ describe("SEC-06/CR-7 — publicApi با سقف دقیق و هدر Retry-After",
         expect([200, 503]).toContain(res.status);
       }
     }
-    expect(okCount).toBe(120);
+    expect(okCount).toBe(healthLimit);
     expect(limited).not.toBeNull();
     const ra = limited!.headers.get("retry-after");
     expect(ra).not.toBeNull();

@@ -47,9 +47,10 @@ export async function startPayment(input: {
   });
   if (!order) throw new DomainError("NOT_FOUND", "سفارش یافت نشد.");
 
-  // مالکیت: مهمان فقط سفارش خودش را از session جریان checkout می‌شناسد —
-  // اگر سفارش متعلق به کاربر است، همان کاربر حق شروع پرداخت دارد.
-  if (order.userId && input.userId && order.userId !== input.userId) {
+  // SEC-08 (فاز ۳) — مالکیت سخت‌گیرانه: اگر سفارش مالک دارد، درخواست‌دهنده باید
+  // دقیقاً همان کاربر باشد؛ مهمان (userId=null) حق شروع پرداخت سفارشِ کاربر دیگر را
+  // ندارد (قبلاً شرط با && input.userId مهمان را از گارد خارج می‌کرد).
+  if (order.userId && order.userId !== input.userId) {
     throw new DomainError("FORBIDDEN", "به این سفارش دسترسی ندارید.");
   }
 
@@ -107,7 +108,12 @@ export async function confirmPayment(authority: string): Promise<ConfirmResult> 
   const payment = await db.payment.findUnique({
     where: { authority },
     include: {
-      order: { include: { reservations: true } },
+      order: {
+        include: {
+          reservations: true,
+          items: { select: { quantity: true } }, // BUG-06 — مقایسهٔ Σqty
+        },
+      },
     },
   });
   if (!payment) throw new DomainError("NOT_FOUND", "پرداخت یافت نشد.");
@@ -160,10 +166,14 @@ export async function confirmPayment(authority: string): Promise<ConfirmResult> 
     throw new DomainError("PAYMENT_VERIFY_FAILED", "مبلغ پرداخت با سفارش مطابقت ندارد.");
   }
 
-  // ── گارد رزرو: اگر رزروها منقضی شده‌اند (worker رفته) قابل تأیید نیست
+  // ── گارد رزرو (BUG-06 فاز ۳): فقط «حداقل یک رزرو فعال» کافی نیست —
+  // اگر انقضا وسط حلقه رخ داده باشد، تأییدِ ناقص → oversell در fulfillment.
+  // Σqty رزروهای ACTIVE باید دقیقاً Σqty اقلام سفارش باشد؛ نابرابری = شکست.
   const activeReservations = order.reservations.filter((r) => r.status === "ACTIVE");
-  if (activeReservations.length === 0) {
-    await failPayment({ authority, reason: "پنجره پرداخت منقضی شد — رزرو آزاد شده." });
+  const reservedQty = activeReservations.reduce((s, r) => s + r.qty, 0);
+  const itemsQty = order.items.reduce((s, i) => s + i.quantity, 0);
+  if (activeReservations.length === 0 || reservedQty !== itemsQty) {
+    await failPayment({ authority, reason: "پنجره پرداخت منقضی شد — رزرو ناقص یا آزاد شده." });
     return {
       ok: false,
       status: "FAILED",
@@ -180,6 +190,19 @@ export async function confirmPayment(authority: string): Promise<ConfirmResult> 
   if (claimed.count === 0) {
     // callback همزمان — وضعیت فعلی را برگردان (idempotent)
     const fresh = await db.payment.findUnique({ where: { id: payment.id } });
+    if (fresh?.status === "FAILED" && verify.ok) {
+      // FS-1 (فاز ۳ — یافتهٔ بازبین فول‌استک 60-fs): verify درگاه موفق بوده
+      // (پول گرفته شده) ولی مسیر شکست در همین فاصله claim را برده — پول بدون
+      // مسیر نمی‌ماند: بازپرداخت خودکار مثل رقابت لغو×تأیید.
+      return await refundRacedPayment({
+        paymentId: payment.id,
+        orderId: order.id,
+        orderCode: order.code,
+        amount: payment.amount,
+        transactionId: verify.transactionId ?? null,
+        reason: "تأیید موفق درگاه با بسته‌شدن همزمان پرداخت — بازپرداخت خودکار",
+      });
+    }
     return {
       ok: fresh?.status === "PAID",
       status: fresh?.status === "PAID" ? "ALREADY_PAID" : "FAILED",
@@ -242,8 +265,10 @@ async function refundRacedPayment(input: {
   orderCode: string;
   amount: number;
   transactionId: string | null;
+  /** دلیل رکورد Refund — پیش‌فرض: رقابت لغو×تأیید */
+  reason?: string;
 }): Promise<ConfirmResult> {
-  const reason = "لغو همزمان سفارش با پرداخت — استرداد خودکار";
+  const reason = input.reason ?? "لغو همزمان سفارش با پرداخت — استرداد خودکار";
 
   let refundOk = false;
   let providerRef: string | null = null;

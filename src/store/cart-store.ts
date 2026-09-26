@@ -82,12 +82,23 @@ export const useCartStore = create<CartState>()(
         if (existing) {
           // اعتبارسنجی موجودی — پرامپت 76
           const nextQty = Math.min(existing.quantity + quantity, product.stock);
+          // BUG-07 (فاز ۳) — clamp به صفر خطِ صفرتایی (شبح) نمی‌سازد؛
+          // همان رفتار updateQuantity: حذف خط + sync سرور
+          if (nextQty < 1) {
+            set({ lines: get().lines.filter((l) => l.lineId !== lineId) });
+            if (get().customer) serverSync("removeServerCartItemAction", { lineId });
+            return;
+          }
           set({
             lines: get().lines.map((l) =>
               l.lineId === lineId ? { ...l, quantity: nextQty } : l,
             ),
           });
         } else {
+          // BUG-07 (فاز ۳) — محصول ناموجود (stock=0) اصلاً وارد سبد نمی‌شود؛
+          // قبلاً Math.min(qty, 0)=0 خط صفرتایی می‌ساخت و در چک‌اوت خطای گیج‌کننده می‌داد
+          const clampedQty = Math.min(quantity, product.stock);
+          if (clampedQty < 1) return;
           const line: CartLine = {
             lineId,
             productId: product.id,
@@ -99,7 +110,7 @@ export const useCartStore = create<CartState>()(
             sizeLabel: size?.label ? `${size.label} · ${size.dimensions}` : undefined,
             price: product.price,
             compareAtPrice: product.compareAtPrice,
-            quantity: Math.min(quantity, product.stock),
+            quantity: clampedQty,
             maxStock: product.stock,
           };
           set({ lines: [...get().lines, line] });
@@ -159,10 +170,12 @@ export const useCartStore = create<CartState>()(
       setCustomer: (customer) => set({ customer }),
 
       syncAfterLogin: async () => {
-        const { getCustomerStateAction, mergeGuestCartAction } = await import(
-          "@/app/cart/actions"
-        );
-        const state = await getCustomerStateAction().catch(() => null);
+        const [{ mergeGuestCartAction }, { getCustomerStateAction: customerState }] =
+          await Promise.all([
+            import("@/app/cart/actions"),
+            import("@/app/account/actions"), // UX-14 — منبع یکتا
+          ]);
+        const state = await customerState().catch(() => null);
         if (!state?.customer) return;
 
         set({

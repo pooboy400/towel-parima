@@ -7,6 +7,7 @@
  */
 
 import { z } from "zod";
+import { normalizePostalCode } from "../text/normalize-fa";
 
 /* ------------------------------------------------------------------ */
 /* مشترک                                                                */
@@ -64,10 +65,10 @@ export const addressV2Schema = z.object({
   phone: phoneSchema,
   province: z.string().trim().min(2, "استان را وارد کنید").max(40),
   city: z.string().trim().min(2, "شهر را وارد کنید").max(40),
+  // BUG-13 (فاز ۳) — همان نرمال‌ساز مشترک چک‌اوت: ارقام فارسی + فاصله/خط‌تیره
   postalCode: z
     .string()
-    .trim()
-    .transform(latinDigits)
+    .transform(normalizePostalCode)
     .pipe(z.string().regex(/^\d{10}$/, "کد پستی باید ۱۰ رقم باشد")),
   line: z.string().trim().min(10, "آدرس کامل‌تر وارد کنید").max(400),
   isDefault: z.boolean().optional(),

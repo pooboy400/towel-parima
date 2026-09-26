@@ -185,7 +185,10 @@ export function mapProductToDomain(p: PrismaProductLike): Product {
     (min, v) => (v.price < min ? v.price : min),
     activeVariants[0]?.price ?? 0,
   );
-  // compareAtPrice از واریانت اول (همه هم‌مقدار)
+  // compareAtPrice از واریانت اول — BUG-16 (فاز ۳) ADR: در واریانت ناهم‌قیمت
+  // درصد تخفیف کارت ممکن است بیش‌نمایی شود؛ دیتای فعلی هم‌قیمت است و تصمیم
+  // نهایی (min compareAt یا گارد فرم ادمین) برای فاز ۴ ثبت شد — قبل از آن
+  // ادمین نباید واریانت‌های یک محصول را ناهم‌قیمت کند.
   const compareAtPrice = activeVariants[0]?.compareAtPrice ?? undefined;
   // sku: واریانت اصلی (اولین) — همان sku mock
   const sku = activeVariants[0]?.sku ?? "";

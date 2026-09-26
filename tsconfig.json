@@ -41,6 +41,7 @@
     "skills",
     "examples",
     "tests",
-    "scripts"
+    "scripts",
+    "qa-reports"
   ]
 }

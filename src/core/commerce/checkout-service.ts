@@ -19,6 +19,8 @@ import { randomInt, createHash, timingSafeEqual } from "node:crypto";
 import { db } from "@/lib/db";
 import { DomainError } from "@/core/errors";
 import { normalizePhone, isValidIranMobile } from "@/domain/policies/otp";
+import { calcShipping } from "@/domain/policies/money";
+import { computeDiscount } from "./coupon-service";
 import { enqueueOutbox } from "@/core/commerce/outbox-service";
 import { invalidateStorefrontForOrder } from "./storefront-invalidation";
 import { reserveVariant, RESERVATION_TTL_MS } from "./inventory-service";
@@ -55,12 +57,14 @@ export interface CheckoutAddressInput {
 /* قیمت‌گذاری سروری                                                    */
 /* ------------------------------------------------------------------ */
 
-/** هزینه ارسال بر اساس تنظیمات فروشگاه — ارسال رایگان بالای آستانه */
+/** هزینه ارسال بر اساس تنظیمات فروشگاه — ارسال رایگان بالای آستانه
+ * BUG-08 (فاز ۳) — مسیر زنده از فرمول واحد money.calcShipping عبور می‌کند؛
+ * اینجا فقط واکشی تنظیمات و نگاشت نام‌هاست.
+ */
 export async function computeShippingCost(
   subtotal: number,
   method: "standard" | "express",
 ): Promise<number> {
-  if (subtotal === 0) return 0;
   let config: {
     freeShippingThreshold: number;
     standardShippingCost: number;
@@ -74,8 +78,12 @@ export async function computeShippingCost(
     const { storeConfig } = await import("@/lib/config");
     config = storeConfig;
   }
-  if (subtotal >= config.freeShippingThreshold) return 0;
-  return method === "express" ? config.expressShippingCost : config.standardShippingCost;
+  return calcShipping(
+    subtotal,
+    { flatFee: config.standardShippingCost, freeThreshold: config.freeShippingThreshold },
+    method,
+    config.expressShippingCost,
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -232,14 +240,8 @@ export async function placeOrder(input: PlaceOrderInput): Promise<CheckoutResult
         if (coupon.minSubtotal !== null && subtotal < coupon.minSubtotal) {
           throw new DomainError("COUPON_INVALID", "مبلغ سبد برای این کد کافی نیست.");
         }
-        let discount =
-          coupon.type === "PERCENT"
-            ? Math.floor((subtotal * coupon.value) / 100)
-            : coupon.value;
-        if (coupon.type === "PERCENT" && coupon.maxDiscount !== null) {
-          discount = Math.min(discount, coupon.maxDiscount);
-        }
-        discountTotal = Math.max(0, Math.min(discount, subtotal));
+        // BUG-08 (فاز ۳) — کپی inline حذف شد؛ همان فرمول واحد evaluate/consume
+        discountTotal = computeDiscount(coupon, subtotal);
         couponId = coupon.id;
         couponCodeSnapshot = coupon.code;
       }

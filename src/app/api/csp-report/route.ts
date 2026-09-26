@@ -71,7 +71,15 @@ export async function POST(request: NextRequest) {
   }
 
   // CR-5 — مسیر chunked/بی‌هدر: خواندن با سقف واقعی حافظه
-  const { text, capped } = await readBodyCapped(request, CSP_MAX_BODY_BYTES);
+  // CSP-N1 (فاز ۳) — خطای مسیر reader (قطع اتصال کلاینت و…) 500 نمی‌سازد؛
+  // 204 بی‌لاگ مثل بقیهٔ مسیرهای رد.
+  let text: string | null;
+  let capped: boolean;
+  try {
+    ({ text, capped } = await readBodyCapped(request, CSP_MAX_BODY_BYTES));
+  } catch {
+    return new NextResponse(null, { status: 204 });
+  }
   if (capped || text === null) {
     // بزرگ‌تر از سقف = هم‌رفتار مسیر Content-Length: بدون لاگ (ضد log flooding)
     return new NextResponse(null, { status: 204 });

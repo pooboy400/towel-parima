@@ -35,7 +35,8 @@ export function isReservationExpired(expiresAt: Date, now = new Date()): boolean
   return expiresAt.getTime() <= now.getTime();
 }
 
-/** TTL کد تخفیف پرداخت روی callback — هم‌تراز با پنجره پرداخت */
+/** TTL رزرو موجودی (پنجرهٔ پرداخت) — هم‌تراز با worker انقضا؛
+ * BUG-16 (فاز ۳): کامنت قبلی («کد تخفیف پرداخت روی callback») کپی-پیست نادرست بود */
 export function reservationExpiry(now = new Date(), ttlMs = RESERVATION_TTL_MS): Date {
   return new Date(now.getTime() + ttlMs);
 }

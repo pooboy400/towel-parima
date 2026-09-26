@@ -8,6 +8,7 @@
 
 "use server";
 
+import { ZodError } from "zod";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { DomainError } from "@/core/errors";
@@ -143,6 +144,11 @@ export async function createAddressAction(input: unknown): Promise<AddressAction
     return { ok: true };
   } catch (error) {
     if (error instanceof DomainError) return { ok: false, message: error.message };
+    if (error instanceof ZodError) {
+      // BUG-12/UX-02 (فاز ۳) — پیام فیلد-محور فارسی به کاربر می‌رسد؛ استک کامل در لاگ نمی‌آید
+      const first = error.issues[0]?.message ?? "ورودی آدرس نامعتبر است.";
+      return { ok: false, message: first };
+    }
     console.error("createAddressAction failed:", error);
     return { ok: false, message: "ذخیره آدرس ناموفق بود." };
   }

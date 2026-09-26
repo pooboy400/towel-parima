@@ -178,8 +178,16 @@ export async function expireStaleReservations(now = new Date()): Promise<number>
         freedVariantIds.push(reservation.variantId);
         expired += 1;
       });
-    } catch {
-      // رقابت با checkout — رکورد در دور بعد پاک می‌شود
+    } catch (err) {
+      // BUG-09 (فاز ۳) — دیگر بی‌صدا نیست: قطع DB/خطاهای سیستمی باید در لاگ
+      // دیده شوند؛ فقط خطای رقابتی موردانتظار (P2002/P2034 — رکورد همان دور
+      // بعد پاک می‌شود) بدون نویز رد می‌شود.
+      const e = err as { code?: string };
+      if (e?.code === "P2002" || e?.code === "P2034") {
+        // رقابت با checkout — رکورد در دور بعد پاک می‌شود
+      } else {
+        console.warn("[reservation-expiry] خطای آزادسازی رزرو:", err);
+      }
     }
   }
 

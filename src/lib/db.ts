@@ -10,14 +10,17 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 /**
- * Guard محیطی: اگر DATABASE_URL ورثه‌ی بقایای قدیمی (sqlite) باشد،
- * به رشته اتصال dev پیش‌فرض برمی‌گردیم تا بوت/پیش‌نمایش نشکند.
- * (همان رشته docker-compose.yml و .env.example — فقط dev؛ production
- * همیشه DATABASE_URL صحیح خودش را تزریق می‌کند.)
+ * SEC-13 (فاز ۳) — رشتهٔ اتصال dev هاردکد از کد حذف شد (الگوی «secret در کد»).
+ * نبود/نامعتبری DATABASE_URL → fail-fast با پیام واضح؛ دیگر بی‌صدا به یک
+ * رشتهٔ شناخته‌شده برنمی‌گردیم. راه‌اندازی محیط dev:
+ *   bash scripts/pg.sh start && export DATABASE_URL="$(bash scripts/pg.sh url)"
+ * (اسکریپت‌های test/ci در package.json خودشان مقدار را تزریق می‌کنند.)
  */
 if (!process.env.DATABASE_URL?.startsWith("postgresql")) {
-  process.env.DATABASE_URL =
-    "postgresql://prima:prima_dev_only@127.0.0.1:5432/prima?schema=public";
+  throw new Error(
+    "DATABASE_URL تنظیم نشده یا معتبر نیست (باید با postgresql:// شروع شود).\n" +
+      'راه‌اندازی: bash scripts/pg.sh start && export DATABASE_URL="$(bash scripts/pg.sh url)"',
+  );
 }
 
 const logLevels =

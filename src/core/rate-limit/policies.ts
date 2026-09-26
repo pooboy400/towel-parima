@@ -38,6 +38,8 @@ export const RATE_RULES = {
   orderTracking: { limit: 30, windowMs: MINUTE },
   /** بقیه APIهای عمومی — per IP */
   publicApi: { limit: 120, windowMs: MINUTE },
+  /** HEALTH-MON-01 (فاز ۳) — سقف مستقل health (مانیتور منظم + پروب‌ها نباید هم‌سقف publicApi بمانند) */
+  healthCheck: { limit: 60, windowMs: MINUTE },
 } as const satisfies Record<string, RateLimitRule>;
 
 export type RateRuleName = keyof typeof RATE_RULES;

@@ -12,7 +12,6 @@
 import "server-only";
 import { db } from "@/lib/db";
 import { DomainError } from "@/core/errors";
-import { allowMocksInProduction } from "@/core/env";
 import { smsProvider } from "@/providers/sms";
 import { rateLimiter } from "@/core/rate-limit";
 import { RATE_RULES, rateKey } from "@/core/rate-limit/policies";
@@ -111,11 +110,20 @@ export async function sendOtp(input: {
 
   return {
     cooldownSeconds: Math.ceil(OTP_POLICY.resendCooldownMs / 1000),
-    // devCode فقط برای تست — در production واقعی هرگز (مگر دموی صریح §ALLOW_MOCKS_IN_PRODUCTION)
-    ...(process.env.NODE_ENV !== "production" || allowMocksInProduction()
-      ? { devCode: code }
-      : {}),
+    ...(includeDevCodeInResponse() ? { devCode: code } : {}),
   };
+}
+
+/**
+ * SEC-11 (فاز ۳) — devCode فقط با شرطِ ثابتِ بیلد: در بیلد production این
+ * شرط به literal(false) فرومی‌ریزد و کل مسیر dead-code-eliminate می‌شود —
+ * کد OTP هرگز از مرز build عبور نمی‌کند (نه فقط گارد ران‌تایم).
+ * دموی production (§ALLOW_MOCKS_IN_PRODUCTION) کد را از مسیر provider mock
+ * پیامک می‌گیرد، نه از پاسخ API.
+ */
+function includeDevCodeInResponse(): boolean {
+  if (process.env.NODE_ENV !== "production") return true;
+  return false;
 }
 
 export interface VerifyOtpResult {
@@ -170,11 +178,18 @@ export async function verifyOtpAndLogin(input: {
   );
 
   if (!result.ok) {
-    // شمارش تلاش — جز مصرف کد
-    await db.otpCode.update({
-      where: { id: record.id },
+    // BUG-10 (فاز ۳) — شمارش اتمیک تلاش: بورست موازیِ بین-خواندن-و-افزایش
+    // نمی‌تواند از سقف ۵ عبور کند (شرط lt در همان UPDATE)
+    const bumped = await db.otpCode.updateMany({
+      where: { id: record.id, attemptCount: { lt: OTP_POLICY.maxAttempts } },
       data: { attemptCount: { increment: 1 } },
     });
+    if (bumped.count === 0) {
+      throw new DomainError(
+        "CONFLICT",
+        "تعداد تلاش‌ها بیش از حد مجاز است. کد جدید بگیرید.",
+      );
+    }
     throw otpFailureToError(result.failure ?? "MISMATCH");
   }
 

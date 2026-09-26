@@ -15,7 +15,52 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ADMIN_SESSION_COOKIE, MIN_SESSION_TOKEN_LENGTH } from "@/core/auth/cookies";
 
+/** فاز ۳ (BUG-12/3) — سقف طول URL: query عظیم 400 ساختاریافته می‌گیرد */
+const MAX_URL_LENGTH = 2048;
+
+/** فاز ۳ (BUG-14) — مبدأ مجاز: خودِ هاست یا فهرست سفید سندباکس (هم‌راستا با next.config) */
+function isAllowedOrigin(originHost: string, host: string): boolean {
+  if (originHost === host) return true;
+  // INFRA-06: در دیپلوی واقعی زیردامنه‌های سندباکس از فهرست حذف شوند
+  return originHost.endsWith(".space-z.ai") && host.endsWith(".space-z.ai");
+}
+
 export function proxy(request: NextRequest) {
+  // ── فاز ۳ — گاردهای عمومی (قبل از گارد ادمین)
+  // BUG-12/3: URL با query عظیم → 400 JSON ساختاریافته (نه خطای عمومی)
+  if (request.url.length > MAX_URL_LENGTH) {
+    return NextResponse.json(
+      { ok: false, code: "URI_TOO_LONG", message: "آدرس درخواست بیش از حد طولانی است." },
+      { status: 400 },
+    );
+  }
+  // BUG-14: Origin قابل‌پارسِ خارج از مبدأ → 403 تمیز (نه 500 خام فریم‌ورک)؛
+  // Origin «null»/غایب به فریم‌ورک واگذار می‌شود (رفتار سندبکس‌های خاص حفظ است)
+  if (request.method === "POST") {
+    const origin = request.headers.get("origin");
+    if (origin) {
+      let originHost: string | null = null;
+      try {
+        originHost = new URL(origin).host;
+      } catch {
+        originHost = null;
+      }
+      if (originHost) {
+        const host =
+          request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? "";
+        if (host && !isAllowedOrigin(originHost, host)) {
+          return NextResponse.json(
+            { ok: false, code: "FORBIDDEN_ORIGIN", message: "درخواست از مبدأ غیرمجاز رد شد." },
+            { status: 403 },
+          );
+        }
+      }
+    }
+  }
+
+  // گارد ادمین فقط روی مسیرهای /admin اعمال می‌شود
+  if (!request.nextUrl.pathname.startsWith("/admin")) return NextResponse.next();
+
   // صفحه ورود بدون کوکی باید در دسترس باشد — وگرنه حلقه ریدایرکت
   if (request.nextUrl.pathname === "/admin/login") return NextResponse.next();
 
@@ -34,5 +79,7 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin", "/admin/:path*"],
+  // فاز ۳: از فقط-/admin به همه‌مسیرهای غیراستاتیک گسترش یافت (BUG-14/12 برای
+  // همهٔ POSTها) — گارد ادمین داخل proxy با startsWith("/admin") محدود مانده
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

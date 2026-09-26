@@ -196,6 +196,45 @@ function isPlausibleClientIp(value: string): boolean {
  * خروجی null = «هدر معتبری در دسترس نیست» → فراخواننده باید bucket اشتراکی
  * ("unknown") بسازد، هرگز هدر را مستقیم معتبر نگیرد.
  */
+/**
+ * CLIENT-IP-T1 (فاز ۳) — شکل کانونی خروجی: v6 فشرده/کوچک (RFC 5952)، v4 دست‌نخورده.
+ * نتیجه: شکل‌های هم‌ارز همان آدرس (::1 و 0:0:0:0:0:0:0:1) یک bucket می‌گیرند.
+ */
+function canonicalIp(value: string): string | null {
+  if (isIPv4(value)) return value;
+  const v6 = ipv6ToBigInt(value);
+  if (v6 === null) return null;
+  const groups = Array.from({ length: 8 }, (_, i) => (v6 >> BigInt(16 * (7 - i))) & BigInt(0xffff));
+  let bestStart = -1;
+  let bestLen = 0;
+  let curStart = -1;
+  let curLen = 0;
+  groups.forEach((g, i) => {
+    if (g === BigInt(0)) {
+      if (curStart === -1) {
+        curStart = i;
+        curLen = 1;
+      } else {
+        curLen += 1;
+      }
+      if (curLen > bestLen) {
+        bestLen = curLen;
+        bestStart = curStart;
+      }
+    } else {
+      curStart = -1;
+      curLen = 0;
+    }
+  });
+  const hex = groups.map((g) => g.toString(16));
+  if (bestLen > 1) {
+    const head = hex.slice(0, bestStart).join(":");
+    const rear = hex.slice(bestStart + bestLen).join(":");
+    return `${head}::${rear}`;
+  }
+  return hex.join(":");
+}
+
 export function extractClientIp(h: HeaderLike): string | null {
   const cidrs = trustedCidrs();
   if (cidrs.length === 0) return null; // حالت دست‌رسی مستقیم — fail-closed
@@ -204,11 +243,12 @@ export function extractClientIp(h: HeaderLike): string | null {
   if (xff) {
     const entries = xff.split(",").map((e) => e.trim()).filter(Boolean);
     const last = entries[entries.length - 1];
-    if (last && isPlausibleClientIp(last)) return last;
+    if (last && isPlausibleClientIp(last)) return canonicalIp(last);
   }
 
-  const real = h.get("x-real-ip");
-  if (real && isPlausibleClientIp(real)) return real;
+  // CLIENT-IP-T1 — trim اینجا هم باشد (XFF در بالا trim می‌شود؛ نامتقارن بود)
+  const real = h.get("x-real-ip")?.trim();
+  if (real && isPlausibleClientIp(real)) return canonicalIp(real);
 
   return null;
 }

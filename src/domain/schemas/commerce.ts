@@ -3,7 +3,7 @@
  * در لایه domain تا بدون سرور هم تست‌پذیر باشند.
  */
 import { z } from "zod";
-import { normalizeFaDigits, normalizePersian } from "../text/normalize-fa";
+import { normalizeFaDigits, normalizePersian, normalizePostalCode } from "../text/normalize-fa";
 import { normalizePhone, isValidIranMobile } from "../policies/otp";
 
 /* ------------------------------------------------------------------ */
@@ -27,10 +27,11 @@ const faPhoneSchema = z
   .transform((v) => normalizePhone(v))
   .refine((v) => isValidIranMobile(v), "شماره موبایل معتبر نیست.");
 
-/** کد پستی ۱۰ رقمی با پذیرش ارقام فارسی */
+/** کد پستی ۱۰ رقمی — BUG-13 (فاز ۳): نرمال‌ساز مشترک با اسکیمای حساب؛
+ * ارقام فارسی/عربی + فاصله/خط‌تیره همه‌جا یکسان پذیرفته می‌شوند */
 const postalCodeSchema = z
   .string()
-  .transform((v) => normalizeFaDigits(normalizePersian(v)).replace(/[\s-]/g, ""))
+  .transform(normalizePostalCode)
   .refine((v) => /^\d{10}$/.test(v), "کد پستی باید ۱۰ رقم باشد.");
 
 export const checkoutAddressSchema = z.object({

@@ -93,13 +93,17 @@ export function calcGrandTotal({
   return total;
 }
 
-/** هزینه ارسال بر اساس سیاست فروشگاه — IRT */
+/** هزینه ارسال بر اساس سیاست فروشگاه — IRT
+ * BUG-08 (فاز ۳) — تنها فرمول ارسال؛ مسیر زندهٔ checkout هم از همین عبور می‌کند.
+ * گارد subtotal=0: سبد خالی هرگز هزینهٔ ارسال ندارد (خطای «سبد خالی» بالادست است).
+ */
 export function calcShipping(
   subtotal: number,
   config: { flatFee: number; freeThreshold: number },
   method: "standard" | "express" = "standard",
   expressFee = 0,
 ): number {
+  if (subtotal <= 0) return 0;
   if (subtotal >= config.freeThreshold) return 0;
   if (method === "express") return expressFee;
   return config.flatFee;

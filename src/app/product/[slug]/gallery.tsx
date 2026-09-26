@@ -82,7 +82,7 @@ export function ProductGallery({
             >
               <Image
                 src={src}
-                alt=""
+                alt={`${name} — بندانگشتی ${i + 1}`}
                 fill
                 sizes="120px"
                 className="object-cover"

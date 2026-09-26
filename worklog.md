@@ -1324,3 +1324,35 @@ Work Log:
 Stage Summary:
 - فاز ۲ با رأی اکثریت قاطع باتری بسته شد؛ یافته‌های 🟡 باقی‌مانده به بک‌لاگ فاز ۳ رفت: FS-1 (refund مسیر confirm-باخته)، UX-04/07 (ردیف تخفیف/توست)، BUG-07 (خط صفرتایی quick-add)، F-4/be (canReturn روی وضعیت دست‌نیافتنی)، ریت-لیمیت /checkout/callback، حذف fallback URL از تست‌ها
 - درس عملیاتی: ایجنت‌های موازی DB-تاچر نباید همزمان session/کاربر پاک کنند (نشست ادمین u3 دوبار افتاد) — باتری بعدی: user-agents متوالی یا DB جدا
+
+---
+Task ID: 61
+Agent: main (Super Z — مهندس کل)
+Task: فاز ۳ — بهداشت کد و امنیت پایین‌تر (SEC-08..14، BUG-06..16، UX-12/14) + بک‌لاگ باتری ۶۰
+
+Work Log:
+- SEC-08: startPayment — مالکیت سخت‌گیرانه (سفارش مالک‌دار فقط برای همان کاربر؛ مهمان خارج از گارد قبلی بود)
+- SEC-09: hashOtpCode — production بدون OTP_HASH_SALT → crash-fast (fallback فقط dev)
+- SEC-10: poweredByHeader:false + حذف route «Hello world» از /api
+- SEC-11: devCode با شرط ثابت بیلد (includeDevCodeInResponse) — در build production مسیر dead-code-eliminate می‌شود
+- SEC-12: زرین‌پال — مبلغ verify از پاسخ واقعی درگاه خوانده می‌شود (تطبیق مبلغ دیگر no-op نیست)
+- SEC-13: fallback هاردکد DATABASE_URL حذف → fail-fast با پیام راهنما؛ اسکریپت‌های test/ci/dev خودشان URL تزریق می‌کنند
+- SEC-14: bodySizeLimit 6mb + چک file.size قبل از arrayBuffer (RAM امن)
+- BUG-06: confirmPayment — Σqty رزروهای ACTIVE باید == Σqty اقلام؛ نابرابری = failPayment (ضد oversell)
+- BUG-07: cart-store — خط صفرتایی دیگر ساخته نمی‌شود؛ stock=0 وارد سبد نمی‌شود (قیف مردهٔ quick-add باتری ۶۰ هم بسته شد)
+- BUG-08: یک فرمول پول — computeDiscount → money.calcCouponDiscount؛ checkout دیگر کپی inline ندارد؛ computeShippingCost → money.calcShipping (+گارد subtotal=0)
+- BUG-09: catch خام worker انقضا → تفکیک خطای رقابتی از سیستمی + warn
+- BUG-10: شمارش تلاش OTP اتمیک (updateMany شرطی lt:5)
+- BUG-12: ZodError → پیام فیلد-محور بدون استک (UX-02 سروری)؛ DomainError callback یک‌خطی؛ URL عظیم → 400 ساختاریافته
+- BUG-13: نرمال‌ساز مشترک کدپستی (normalizePostalCode) در هر دو اسکیمای حساب/چک‌اوت
+- BUG-14: proxy.ts (Next 16) — Origin جعلی POST → 403 JSON تمیز (اثبات زنده: قبلاً 500 خام) — middleware.ts تداخل Next16 داشت، ادغام در proxy.ts
+- BUG-15/16: ADR مرجوعی در returns.ts؛ کامنت inventory اصلاح؛ ADR compareAt در mappers
+- UX-12: alt بندانگشتی‌های گالری توصیفی شد؛ UX-14: getCustomerStateAction یکتا (کپی cart حذف)
+- HEALTH-MON-01: سقف مستقل healthCheck (60/min) + کش ۳۰ثانیه‌ای شمارنده‌ها؛ CLIENT-IP-T1: trim x-real-ip + خروجی کانونی v6 (RFC 5952)؛ CSP-N1: reader مسیر خطا → 204 بدون 500
+- بک‌لاگ باتری: FS-1 (verify-موفق ولی claim-باخته → بازپرداخت خودکار) + ریت‌لیمیت /checkout/callback
+- درس Next 16: قرارداد middleware.ts → proxy.ts؛ دو فایل همزمان = 404 سراسری موقت
+
+Stage Summary:
+- فاز ۳ رسماً بسته شد: ۲۴۵/۲۴۵ · typecheck/lint صفر · پروب زندهٔ BUG-14/SEC-10 سبز
+- یافتهٔ باتری به‌روز: تست health برای سقف مستقل به‌روز شد (انتظار ۶۰)
+- گام بعدی: فاز ۴ — UI/UX (۱۴ تسک)

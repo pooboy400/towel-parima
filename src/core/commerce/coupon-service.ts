@@ -27,6 +27,7 @@
 
 import { db } from "@/lib/db";
 import { DomainError } from "@/core/errors";
+import { calcCouponDiscount } from "@/domain/policies/money";
 import type { Prisma, Coupon } from "@prisma/client";
 
 export interface CouponEvaluation {
@@ -38,17 +39,12 @@ export interface CouponEvaluation {
 
 type Tx = Prisma.TransactionClient;
 
-/** تخفیف محاسبه‌شده یک کوپن روی ساب‌توتال — بدون سمتِ سقف‌ها */
+/** تخفیف محاسبه‌شده یک کوپن روی ساب‌توتال — بدون سمتِ سقف‌ها
+ * BUG-08 (فاز ۳) — یک فرمول: ریاضی تخفیف فقط در money.calcCouponDiscount است؛
+ * این تابع فقط پوشش دامنه‌ای است تا سه کپی موازی واگرا نشوند.
+ */
 export function computeDiscount(coupon: Coupon, subtotal: number): number {
-  let discount =
-    coupon.type === "PERCENT"
-      ? Math.floor((subtotal * coupon.value) / 100)
-      : coupon.value;
-  if (coupon.type === "PERCENT" && coupon.maxDiscount !== null) {
-    discount = Math.min(discount, coupon.maxDiscount);
-  }
-  // تخفیف هرگز از ساب‌توتال عبور نمی‌کند
-  return Math.max(0, Math.min(discount, subtotal));
+  return calcCouponDiscount({ subtotal, coupon }).discount;
 }
 
 /**

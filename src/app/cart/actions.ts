@@ -69,20 +69,8 @@ async function resolveVariantId(triple: {
   return variant?.id ?? null;
 }
 
-/** وضعیت مشتری برای استور سبد — مهمان: null */
-export async function getCustomerStateAction(): Promise<{
-  ok: true;
-  customer: { userId: string; name: string | null; phone: string | null } | null;
-}> {
-  const customer = await getCustomerContext();
-  return {
-    ok: true,
-    customer: customer
-      ? { userId: customer.userId, name: customer.name, phone: customer.phone }
-      : null,
-  };
-}
-
+// UX-14 (فاز ۳) — کپی موازی getCustomerStateAction حذف شد؛
+// منبع یکتا: src/app/account/actions.ts
 /** خط‌های سبد سروری — مهمان: [] */
 export async function getServerCartAction(): Promise<{ ok: true; lines: CartLine[] }> {
   const customer = await getCustomerContext();

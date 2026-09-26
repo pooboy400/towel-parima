@@ -148,11 +148,11 @@ export class ZarinpalPaymentProvider implements PaymentProvider {
     amountIrt: number;
   }): Promise<VerifyPaymentResult> {
     const amountRial = input.amountIrt * 10;
-    let data: { code?: number; ref_id?: number; card_pan?: string } | undefined;
+    let data: { code?: number; ref_id?: number; card_pan?: string; amount?: number } | undefined;
     let codeStr = "unknown";
 
     try {
-      data = await this.post<{ code?: number; ref_id?: number; card_pan?: string }>(
+      data = await this.post<{ code?: number; ref_id?: number; card_pan?: string; amount?: number }>(
         "/pg/v4/payment/verify.json",
         { amount: amountRial, authority: input.authority },
       );
@@ -167,12 +167,16 @@ export class ZarinpalPaymentProvider implements PaymentProvider {
 
     // 100 = موفق · 101 = قبلاً تأییدشده (callback تکراری — بدون اثر مضاعف §11)
     if (data?.code === 100 || data?.code === 101) {
+      // SEC-12 (فاز ۳) — مبلغ از پاسخ واقعی درگاه خوانده می‌شود (نه echo ورودی)؛
+      // تطبیق مبلغ در payment-service حالا واقعاً معنا دارد. زرین‌پال ریال برمی‌گرداند.
+      const verifiedAmountIrt =
+        typeof data.amount === "number" ? Math.round(data.amount / 10) : input.amountIrt;
       return {
         ok: true,
         code: String(data.code),
         message: data.code === 101 ? "قبلاً تأیید شده" : "تأیید شد",
         transactionId: data.ref_id ? String(data.ref_id) : null,
-        amount: input.amountIrt,
+        amount: verifiedAmountIrt,
         raw: { authority: input.authority, card_pan: data.card_pan ?? null },
       };
     }
