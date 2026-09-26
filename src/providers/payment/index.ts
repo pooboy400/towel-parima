@@ -53,7 +53,11 @@ export interface PaymentProvider {
   readonly name: string;
   startPayment(input: StartPaymentInput): Promise<StartPaymentResult>;
   verifyPayment(input: { authority: string; amountIrt: number }): Promise<VerifyPaymentResult>;
-  refundPayment(input: { transactionId: string; amountIrt: number }): Promise<RefundPaymentResult>;
+  refundPayment(input: {
+    transactionId: string;
+    amountIrt: number;
+    authority?: string | null;
+  }): Promise<RefundPaymentResult>;
   parseCallback(input: { searchParams: URLSearchParams }): ParsedCallback;
   /** URL ادامهٔ پرداخت برای تلاش PENDING موجود (بدون ساخت authority تازه) */
   buildResumeUrl(authority: string): string;

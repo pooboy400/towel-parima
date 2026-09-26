@@ -36,6 +36,7 @@ export const ROLE_DEFINITIONS: readonly RoleDefinition[] = [
     name: "STORE_MANAGER",
     title: "مدیر فروشگاه",
     permissions: [
+      PERMISSIONS.profileSelf, // INFRA-08/2 — self-service تغییر رمز خود
       ...allOf("products"),
       PERMISSIONS.inventoryRead,
       PERMISSIONS.inventoryUpdate,
@@ -58,6 +59,7 @@ export const ROLE_DEFINITIONS: readonly RoleDefinition[] = [
     name: "ORDER_MANAGER",
     title: "مدیر سفارش‌ها",
     permissions: [
+      PERMISSIONS.profileSelf, // INFRA-08/2 — self-service تغییر رمز خود
       ...readOf("products"),
       PERMISSIONS.ordersRead,
       PERMISSIONS.ordersUpdate,
@@ -71,6 +73,7 @@ export const ROLE_DEFINITIONS: readonly RoleDefinition[] = [
     name: "CONTENT_MANAGER",
     title: "مدیر محتوا",
     permissions: [
+      PERMISSIONS.profileSelf, // INFRA-08/2 — self-service تغییر رمز خود
       PERMISSIONS.productsRead,
       PERMISSIONS.contentRead,
       PERMISSIONS.contentUpdate,
@@ -85,6 +88,7 @@ export const ROLE_DEFINITIONS: readonly RoleDefinition[] = [
     name: "SUPPORT_AGENT",
     title: "کارشناس پشتیبانی",
     permissions: [
+      PERMISSIONS.profileSelf, // INFRA-08/2 — self-service تغییر رمز خود
       PERMISSIONS.productsRead,
       PERMISSIONS.ordersRead,
       PERMISSIONS.customersRead,
@@ -97,6 +101,7 @@ export const ROLE_DEFINITIONS: readonly RoleDefinition[] = [
     name: "MARKETING_MANAGER",
     title: "مدیر بازاریابی",
     permissions: [
+      PERMISSIONS.profileSelf, // INFRA-08/2 — self-service تغییر رمز خود
       PERMISSIONS.productsRead,
       ...allOf("coupons"),
       PERMISSIONS.reviewsRead,

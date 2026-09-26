@@ -1395,3 +1395,24 @@ Work Log:
 
 Stage Summary:
 - فاز ۵ بسته شد: ۲۴۵/۲۴۵ · typecheck/lint صفر · اثبات زنده: FAQPage در HTML، h2/h3 و CTA اختصاصی در مقاله
+
+---
+Task ID: 64
+Agent: main (Super Z — مهندس کل)
+Task: فاز ۶ — زیرساخت و M6 (INFRA-01..09)
+
+Work Log:
+- INFRA-01: sharp 0.34.5→0.35.4 (libvips 8.18.6) — رگرسیون پایپ‌لاین رسانه ۵/۵ + decode/encode سه‌فرمت سبز
+- INFRA-02: bun update (react-query/react-hook-form و...) — typecheck/lint/۲۴۵ تست سبز
+- INFRA-03: CSP به src/lib/csp.ts (builder خالص + ۲ تست) و proxy.ts منتقل شد — production: ENFORCE با nonce+strict-dynamic (بدون unsafe-eval)، dev: Report-Only (HMR سالم)؛ هدر روی request هم ست می‌شود تا Next nonce را به bootstrap اضافه کند (الگوی رسمی)؛ باگ میانی: early-return گارد ادمین CSP را دور می‌زد → بازسازی با withCsp روی همهٔ مسیرها؛ هدر تکراری از next.config حذف شد
+- INFRA-04: refund زرین‌پال — authority به API می‌رود (transactionId fallback) + گارد قفل: در production بدون ZARINPAL_REFUND_ENABLED=1 → پیام «پیگیری دستی» (مسیر Refund FAILED)؛ interface هر سه provider + ۴ call-site به‌روز
+- INFRA-05: bun-types pin به 1.3.14 (هم‌تراز ران‌تایم)
+- INFRA-06: فهرست سفید مبدأ = src/lib/allowed-origins.ts (منبع یگانه برای next.config + proxy)؛ در دیپلوی واقعی SERVER_ACTIONS_ALLOWED_ORIGINS ست می‌شود و wildcard سندباکس از کار می‌افتد
+- INFRA-07: ADR مستند در in-memory.ts — تک‌instance عمدی؛ در multi-instance فقط adapter Redis پشت همین اینترفیس (هیچ import مستقیمی وجود ندارد)
+- INFRA-08: (۱) مقایسهٔ زمان-ثابت TOTP (فیوز ورود = سقف‌های SEC-02/03؛ فعال‌سازی هنوز بدون consumer طبق ADR فایل) (۲) مجوز اختصاصی profile.self برای changeOwnPassword — به ۶ نقش اضافه و sync شد (۲۹ مجوز؛ تست‌های RBAC به‌روز) (۳) callback URL اولویت با NEXT_PUBLIC_SITE_URL
+- INFRA-09: کوکی اثبات پرداخت = HMAC-SHA256(PAY_PROOF_SECRET, authority) — در production بدون کلید fail-fast (قبلاً sha256 بی‌کلید)
+
+Stage Summary:
+- فاز ۶ بسته شد: ۲۴۷/۲۴۷ (۲ تست CSP جدید) · typecheck/lint صفر
+- اثبات زنده: Report-Only روی همهٔ مسیرها (home/admin) + گارد ادمین 307 سالم + health 200
+- درس: early-return های میانی proxy باید CSP را هم ببرند — helper withCsp همهٔ مسیرهای خروج

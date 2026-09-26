@@ -20,12 +20,16 @@ const EXPECTED: Record<string, readonly string[]> = {
     "media.read", "media.upload", "media.delete",
     "analytics.read",
     "settings.read",
+  
+    "profile.self", // INFRA-08/2 — self-service
   ],
   ORDER_MANAGER: [
     "products.read",
     "orders.read", "orders.update", "orders.refund",
     "customers.read",
     "analytics.read",
+  
+    "profile.self", // INFRA-08/2 — self-service
   ],
   CONTENT_MANAGER: [
     "products.read",
@@ -33,12 +37,16 @@ const EXPECTED: Record<string, readonly string[]> = {
     "reviews.read", "reviews.moderate",
     "media.read", "media.upload", "media.delete",
     "analytics.read",
+  
+    "profile.self", // INFRA-08/2 — self-service
   ],
   SUPPORT_AGENT: [
     "products.read",
     "orders.read",
     "customers.read", "customers.update",
     "reviews.read",
+  
+    "profile.self", // INFRA-08/2 — self-service
   ],
   MARKETING_MANAGER: [
     "products.read",
@@ -46,16 +54,18 @@ const EXPECTED: Record<string, readonly string[]> = {
     "reviews.read",
     "content.read",
     "analytics.read",
+  
+    "profile.self", // INFRA-08/2 — self-service
   ],
 };
 
 describe("فهرست کانونی مجوزها — بخش ۶.۲ سند", () => {
-  it("دقیقاً ۲۸ مجوز دارد", () => {
-    expect(ALL_PERMISSIONS.length).toBe(28);
+  it("دقیقاً ۲۹ مجوز دارد (INFRA-08/2: profile.self اضافه شد)", () => {
+    expect(ALL_PERMISSIONS.length).toBe(29);
   });
 
   it("بدون تکرار", () => {
-    expect(new Set(ALL_PERMISSIONS).size).toBe(28);
+    expect(new Set(ALL_PERMISSIONS).size).toBe(29);
   });
 
   it("همه با الگوی entity.action هستند", () => {

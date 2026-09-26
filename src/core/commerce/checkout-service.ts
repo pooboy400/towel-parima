@@ -15,7 +15,8 @@
  * از روی آن resolve می‌شود؛ قیمت همیشه از DB.
  */
 
-import { randomInt, createHash, timingSafeEqual } from "node:crypto";
+import { randomInt, createHmac, timingSafeEqual } from "node:crypto";
+import { allowMocksInProduction } from "@/core/env";
 import { db } from "@/lib/db";
 import { DomainError } from "@/core/errors";
 import { normalizePhone, isValidIranMobile } from "@/domain/policies/otp";
@@ -340,12 +341,28 @@ export const PAY_PROOF_COOKIE = "prima_pay_proof";
 /** TTL کوکی اثبات (ثانیه) — فقط برای همان سفر پرداخت */
 export const PAY_PROOF_TTL_S = 15 * 60;
 
-/** sha256(authority) — اثبات کوتاه‌عمر؛ بدون authority قابل ساخت نیست */
-export function paidProofValue(authority: string): string {
-  return createHash("sha256").update(authority).digest("hex");
+/**
+ * INFRA-09 (فاز ۶) — اثبات keyed: HMAC-SHA256(کلید سرور, authority).
+ * قبلاً sha256(authority) بی‌کلید بود — هرکس authority را از لاگ/Referer
+ * می‌دانست می‌توانست کوکی اثبات را خودش بسازد. حالا کلید فقط سمت سرور است.
+ * کلید: PAY_PROOF_SECRET — در production الزامی (fail-fast).
+ */
+function payProofSecret(): string {
+  const secret = process.env.PAY_PROOF_SECRET;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === "production" && !allowMocksInProduction()) {
+    throw new Error(
+      "INFRA-09: PAY_PROOF_SECRET تنظیم نشده است — در production الزامی است (fail-fast).",
+    );
+  }
+  return "prima-dev-pay-proof-secret"; // فقط توسعه/تست
 }
 
-/** مقایسهٔ زمان-ثابت کوکی اثبات با sha256(authority) */
+export function paidProofValue(authority: string): string {
+  return createHmac("sha256", payProofSecret()).update(authority).digest("hex");
+}
+
+/** مقایسهٔ زمان-ثابت کوکی اثبات با HMAC(authority) */
 export function isValidProof(
   provided: string | null | undefined,
   authority: string,

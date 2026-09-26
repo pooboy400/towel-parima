@@ -186,11 +186,30 @@ export class ZarinpalPaymentProvider implements PaymentProvider {
   async refundPayment(input: {
     transactionId: string;
     amountIrt: number;
+    authority?: string | null;
   }): Promise<RefundPaymentResult> {
+    // INFRA-04 (فاز ۶) — گارد قفل: بازگشت وجه خودکار زرین‌پال تا زمان تأیید
+    // sandbox رسمی خاموش است؛ مسیر fallback = پیگیری دستی ادمین (Refund FAILED).
+    // فعال‌سازی صریح با ZARINPAL_REFUND_ENABLED=1 (پس از تست sandbox) یا دموی mock.
+    if (
+      process.env.ZARINPAL_REFUND_ENABLED !== "1" &&
+      process.env.ALLOW_MOCKS_IN_PRODUCTION !== "1" &&
+      process.env.NODE_ENV === "production"
+    ) {
+      return {
+        ok: false,
+        message: "بازگشت وجه خودکار زرین‌پال فعال نیست — پیگیری دستی توسط ادمین انجام می‌شود.",
+      };
+    }
     try {
       const data = await this.post<{ code?: number; message?: string }>(
         "/pg/v4/payment/refund.json",
-        { amount: input.amountIrt * 10 },
+        {
+          // INFRA-04 — API refund زرین‌پال با authority کار می‌کند؛
+          // transactionId (ref_id) فقط به‌عنوان fallback نسخه‌های قدیمی
+          authority: input.authority ?? input.transactionId,
+          amount: input.amountIrt * 10,
+        },
       );
       if (data?.code === 100 || data?.code === 101) {
         return { ok: true, providerRef: data.code === 101 ? "already-refunded" : `zp-${Date.now()}` };

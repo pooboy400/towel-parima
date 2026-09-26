@@ -56,6 +56,7 @@ export class MockPaymentProvider implements PaymentProvider {
   async refundPayment(input: {
     transactionId: string;
     amountIrt: number;
+    authority?: string | null;
   }): Promise<RefundPaymentResult> {
     if (process.env.NODE_ENV === "production" && !allowMocksInProduction()) {
       throw new DomainError("INTERNAL", "درگاه mock در تولید غیرفعال است.");

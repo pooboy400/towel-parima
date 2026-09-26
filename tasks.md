@@ -17,7 +17,7 @@
 - [x] **فاز ۳ — بهداشت کد و امنیت پایین‌تر:** ۱۸ تسک — کامل شد (Task 61 + بک‌لاگ باتری ۶۰: FS-1، ریت‌لیمیت callback، HEALTH-MON-01، CLIENT-IP-T1، CSP-N1، QA-HYG-01)
 - [x] **فاز ۴ — UI/UX به سمت ۱۰/۱۰:** ۱۴ تسک — کامل شد (Task 62)
 - [x] **فاز ۵ — سئو و اکسسوریلیتی:** ۴ تسک — کامل شد (Task 63)
-- [ ] **فاز ۶ — زیرساخت و M6:** ۹ تسک (+INFRA-09 از CR-6/55-c)
+- [x] **فاز ۶ — زیرساخت و M6:** ۹ تسک — کامل شد (Task 64)
 
 ---
 
@@ -121,15 +121,15 @@
 
 | # | شدت | تسک | کجا | شرح | راه‌حل |
 |---|-----|------|-----|------|--------|
-| INFRA-01 | 🟠 بالا (برای M6) | ارتقای sharp (۲ حملهٔ high در libvips/libheif) | `package.json` — sharp 0.34.5 | sharp در پایپ‌لاین آپلود کاربر-مواجه است؛ قبل از فعال‌کردن آپلود عمومی باید ارتقا یابد | ارتقا به 0.35.x + رگرسیون پایپ‌لاین رسانه (آپلود jpeg/png/webp) |
-| INFRA-02 | 🔵 پایین | به‌روزرسانی زنجیرهٔ dev | `bun update` | ۴۲ اعلان audit (۰ critical) — اکثراً ابزار dev (eslint/mdxeditor/recharts›lodash) | bun update + بازبینی لاگ و اجرای کامل تست‌ها |
-| INFRA-03 | 🟡 متوسط | CSP از Report-Only به enforce با nonce | `next.config.ts:21-34` | CSP فعلی هیچ‌چیز را بلاک نمی‌کند؛ unsafe-inline/eval سقف ارزش CSP را می‌زند | طبق نقشهٔ مرحله‌ای §۹.۲ سند: nonce برای script، حذف unsafe-eval، محدودکردن `img-src https:`؛ XFO به‌عنوان لایهٔ دوم بماند |
-| INFRA-04 | 🟠 بالا (قبل از زرین‌پال live) | refund زرین‌پال بدون transactionId | `src/providers/payment/zarinpal.ts:182-204` | بعد از go-live، refund مسیر race و دستی کار نمی‌کند (providerRef ساختگی `zp-${Date.now()}`) | ارسال authority/transactionId مطابق API refund زرین‌پال + تست sandbox + تا آن‌موقع مسیر refund واقعی با گارد «فقط درگاه mock» قفل شود |
-| INFRA-05 | ⚪ نکته | هم‌ترازی bun-types با ران‌تایم | `package.json` — bun-types 1.4.2 vs bun 1.3.14 | فقط dev-only | pin به 1.3.x یا ارتقای ران‌تایم |
-| INFRA-06 | 🟠 بالا (در دیپلوی) | حذف wildcard سندباکس از allowedOrigins | `next.config.ts:51-55` — `"*.space-z.ai"` | اگر روزی زیردامنه‌ای از space-z.ai در کنترل مهاجم باشد، Origin جعلی برای actionها پذیرفته می‌شود | در دیپلوی واقعی فقط دامنهٔ خود پروژه |
-| INFRA-07 | 🟡 متوسط (multi-instance) | rate-limit درون‌حافظه‌ای → Redis | `src/core/rate-limit/in-memory.ts` | با بیش از یک instance سقف‌ها per-process می‌شوند (باقی‌ماندهٔ عمدی مستند M6) | adapter Redis (یا معادل) پشت همان اینترفیس؛ برای تک‌instance فعلی اولویت پایین |
-| INFRA-08 | ⚪ نکته | سه ریزهٔ ادمین/پرداخت | `src/core/auth/totp.ts:104-117` · `src/app/admin/(panel)/staff/actions.ts:132` · `src/core/commerce/payment-service.ts:19-30` | (۱) TOTP: مقایسهٔ زمان‌ثابت + فیوز هنگام فعال‌سازی (۲) مجوز اختصاصی برای changeOwnPassword به‌جای settingsRead (۳) callback URL اولویت از NEXT_PUBLIC_SITE_URL به‌جای x-forwarded-host | هر کدام یک تغییر کوچک؛ همراه با M6 انجام شود |
-| INFRA-09 | 🟠 بالا (قبل از زرین‌پال live) | کوکی اثبات پرداخت = hash بی‌کلید از authority (CR-6/55-c) — هرکس authority را بداند کوکی را می‌سازد | `src/core/commerce/checkout-service.ts:342-344` | authority در URL/لاگ/تاریخچه ظاهر می‌شود؛ «اثبات» از نظر رمزنگاری مستقل از فاش‌شدن authority نیست (TTL=900s و ۹۶بیت رندوم ریسک فعلی را محدود می‌کند) | `HMAC-SHA256(SERVER_SECRET, authority)` یا nonce تصادفی روی ردیف Payment با مقایسهٔ زمان‌ثابت | قبل از اتصال درگاه واقعی (M5) اعمال و تست شود |
+| INFRA-01 ✅ | 🟠 بالا (برای M6) | ارتقای sharp (۲ حملهٔ high در libvips/libheif) | `package.json` — sharp 0.34.5 | sharp در پایپ‌لاین آپلود کاربر-مواجه است؛ قبل از فعال‌کردن آپلود عمومی باید ارتقا یابد | ارتقا به 0.35.x + رگرسیون پایپ‌لاین رسانه (آپلود jpeg/png/webp) |
+| INFRA-02 ✅ | 🔵 پایین | به‌روزرسانی زنجیرهٔ dev | `bun update` | ۴۲ اعلان audit (۰ critical) — اکثراً ابزار dev (eslint/mdxeditor/recharts›lodash) | bun update + بازبینی لاگ و اجرای کامل تست‌ها |
+| INFRA-03 ✅ | 🟡 متوسط | CSP از Report-Only به enforce با nonce | `next.config.ts:21-34` | CSP فعلی هیچ‌چیز را بلاک نمی‌کند؛ unsafe-inline/eval سقف ارزش CSP را می‌زند | طبق نقشهٔ مرحله‌ای §۹.۲ سند: nonce برای script، حذف unsafe-eval، محدودکردن `img-src https:`؛ XFO به‌عنوان لایهٔ دوم بماند |
+| INFRA-04 ✅ | 🟠 بالا (قبل از زرین‌پال live) | refund زرین‌پال بدون transactionId | `src/providers/payment/zarinpal.ts:182-204` | بعد از go-live، refund مسیر race و دستی کار نمی‌کند (providerRef ساختگی `zp-${Date.now()}`) | ارسال authority/transactionId مطابق API refund زرین‌پال + تست sandbox + تا آن‌موقع مسیر refund واقعی با گارد «فقط درگاه mock» قفل شود |
+| INFRA-05 ✅ | ⚪ نکته | هم‌ترازی bun-types با ران‌تایم | `package.json` — bun-types 1.4.2 vs bun 1.3.14 | فقط dev-only | pin به 1.3.x یا ارتقای ران‌تایم |
+| INFRA-06 ✅ | 🟠 بالا (در دیپلوی) | حذف wildcard سندباکس از allowedOrigins | `next.config.ts:51-55` — `"*.space-z.ai"` | اگر روزی زیردامنه‌ای از space-z.ai در کنترل مهاجم باشد، Origin جعلی برای actionها پذیرفته می‌شود | در دیپلوی واقعی فقط دامنهٔ خود پروژه |
+| INFRA-07 ✅ | 🟡 متوسط (multi-instance) | rate-limit درون‌حافظه‌ای → Redis | `src/core/rate-limit/in-memory.ts` | با بیش از یک instance سقف‌ها per-process می‌شوند (باقی‌ماندهٔ عمدی مستند M6) | adapter Redis (یا معادل) پشت همان اینترفیس؛ برای تک‌instance فعلی اولویت پایین |
+| INFRA-08 ✅ | ⚪ نکته | سه ریزهٔ ادمین/پرداخت | `src/core/auth/totp.ts:104-117` · `src/app/admin/(panel)/staff/actions.ts:132` · `src/core/commerce/payment-service.ts:19-30` | (۱) TOTP: مقایسهٔ زمان‌ثابت + فیوز هنگام فعال‌سازی (۲) مجوز اختصاصی برای changeOwnPassword به‌جای settingsRead (۳) callback URL اولویت از NEXT_PUBLIC_SITE_URL به‌جای x-forwarded-host | هر کدام یک تغییر کوچک؛ همراه با M6 انجام شود |
+| INFRA-09 ✅ | 🟠 بالا (قبل از زرین‌پال live) | کوکی اثبات پرداخت = hash بی‌کلید از authority (CR-6/55-c) — هرکس authority را بداند کوکی را می‌سازد | `src/core/commerce/checkout-service.ts:342-344` | authority در URL/لاگ/تاریخچه ظاهر می‌شود؛ «اثبات» از نظر رمزنگاری مستقل از فاش‌شدن authority نیست (TTL=900s و ۹۶بیت رندوم ریسک فعلی را محدود می‌کند) | `HMAC-SHA256(SERVER_SECRET, authority)` یا nonce تصادفی روی ردیف Payment با مقایسهٔ زمان‌ثابت | قبل از اتصال درگاه واقعی (M5) اعمال و تست شود |
 
 ---
 

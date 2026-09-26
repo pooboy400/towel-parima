@@ -15,17 +15,23 @@ import { enqueueOutbox } from "@/core/commerce/outbox-service";
 import { invalidateStorefrontForOrder } from "./storefront-invalidation";
 import { convertReservation, releaseReservation } from "./inventory-service";
 
-/** callback مطلق — زرین‌پال URL کامل می‌خواهد؛ از هدرهای درخواست می‌سازیم (x-forwarded-host پس از پراکسی) */
+/** callback مطلق — زرین‌پال URL کامل می‌خواهد.
+ * INFRA-08/3 (فاز ۶): اولویت با NEXT_PUBLIC_SITE_URL — callback باید دامنهٔ
+ * معتبر و پایدار باشد؛ x-forwarded-host از درخواست قابل تأثیر است و در
+ * production نباید منبع URL بانکی باشد. هدرها فقط fallback توسعه.
+ */
 async function absoluteCallbackUrl(path: string): Promise<string> {
+  const site = process.env.NEXT_PUBLIC_SITE_URL;
+  if (site) {
+    return `${site.replace(/\/$/, "")}${path}`;
+  }
   try {
     const h = await (await import("next/headers")).headers();
     const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
     const proto = h.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
     return `${proto}://${host}${path}`;
   } catch {
-    // خارج از scope درخواست (تست/worker) — env یا fallback
-    const site = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-    return `${site.replace(/\/$/, "")}${path}`;
+    return `http://localhost:3000${path}`;
   }
 }
 
@@ -200,6 +206,7 @@ export async function confirmPayment(authority: string): Promise<ConfirmResult> 
         orderCode: order.code,
         amount: payment.amount,
         transactionId: verify.transactionId ?? null,
+        authority, // INFRA-04
         reason: "تأیید موفق درگاه با بسته‌شدن همزمان پرداخت — بازپرداخت خودکار",
       });
     }
@@ -251,6 +258,7 @@ export async function confirmPayment(authority: string): Promise<ConfirmResult> 
     orderCode: order.code,
     amount: payment.amount,
     transactionId: verify.transactionId ?? null,
+    authority, // INFRA-04
   });
 }
 
@@ -265,6 +273,8 @@ async function refundRacedPayment(input: {
   orderCode: string;
   amount: number;
   transactionId: string | null;
+  /** INFRA-04 — برای refund زرین‌پال */
+  authority?: string | null;
   /** دلیل رکورد Refund — پیش‌فرض: رقابت لغو×تأیید */
   reason?: string;
 }): Promise<ConfirmResult> {
@@ -277,6 +287,7 @@ async function refundRacedPayment(input: {
     const refund = await paymentProvider.refundPayment({
       transactionId: input.transactionId ?? "",
       amountIrt: input.amount,
+      authority: input.authority ?? null, // INFRA-04
     });
     refundOk = refund.ok;
     providerRef = refund.providerRef ?? null;

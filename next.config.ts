@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { allowedOrigins } from "./src/lib/allowed-origins";
 
 /**
  * Security hardening — فاز ۱ + M0
@@ -10,28 +11,6 @@ import type { NextConfig } from "next";
  * سایت را داخل iframe نشان می‌دهد و این هدر باعث صفحه سفید/بلاک می‌شود.
  */
 const isProduction = process.env.NODE_ENV === "production";
-
-/**
- * CSP مرحله‌ای (بخش ۹.۲ سند) — حالت Report-Only در M0:
- * هیچ‌چیز بلاک نمی‌شود؛ فقط تخلف‌ها به /api/csp-report می‌آیند تا در M6
- * با داده واقعی، سیاست سخت‌گیرانه nonce-دار ساخته شود.
- * unsafe-inline/unsafe-eval فعلاً مجاز (Next بدون nonce نیاز دارد) —
- * signalهای واقعی ما: منابع خارجی، frame-ancestors، object-src.
- */
-const cspReportOnly = [
-  "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https:",
-  "font-src 'self' data:",
-  "connect-src 'self'",
-  "frame-ancestors 'none'",
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "report-uri /api/csp-report",
-  "report-to csp-endpoint",
-].join("; ");
 
 const nextConfig: NextConfig = {
   output: "standalone",
@@ -52,7 +31,9 @@ const nextConfig: NextConfig = {
    */
   experimental: {
     serverActions: {
-      allowedOrigins: ["*.space-z.ai"],
+      // INFRA-06 (فاز ۶): منبع یگانه فهرست = src/lib/allowed-origins.ts —
+      // در دیپلوی واقعی SERVER_ACTIONS_ALLOWED_ORIGINS ست می‌شود و wildcard سندباکس حذف
+      allowedOrigins: allowedOrigins(),
       // SEC-14 (فاز ۳) — سقف بدنهٔ action بالا برده شد تا پایپ‌لاین رسانه (۵MB +
       // overhead multipart) دست‌نیافتنی نباشد؛ چک file.size قبل از arrayBuffer
       // در media/actions.ts انجام می‌شود تا فایل بزرگ قبل از RAM رد شود.
@@ -84,15 +65,8 @@ const nextConfig: NextConfig = {
             key: "Strict-Transport-Security",
             value: "max-age=31536000; includeSubDomains",
           },
-          // M0 — CSP فقط گزارش (بخش ۹.۲ سند معماری)
-          {
-            key: "Content-Security-Policy-Report-Only",
-            value: cspReportOnly,
-          },
-          {
-            key: "Reporting-Endpoints",
-            value: 'csp-endpoint="/api/csp-report"',
-          },
+          // INFRA-03 (فاز ۶): CSP به proxy.ts منتقل شد (nonce-aware) —
+          // اینجا دیگر هدر CSP تکراری نمی‌آید (دو CSP = سخت‌گیرترین تفسیر)
         ],
       },
     ];

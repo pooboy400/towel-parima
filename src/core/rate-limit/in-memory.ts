@@ -10,6 +10,14 @@
  * - setInterval با unref تا مانع shutdown پروسه نشود.
  */
 
+/**
+ * INFRA-07 (فاز ۶) — ADR: این adapter درون‌حافظه‌ای برای تک‌instance فعلی
+ * عمدی است (سریع، بدون وابستگی). در استقرار multi-instance باید پشت همین
+ * اینترفیس (rateLimiter) یک adapter Redis قرار بگیرد — هیچ call-site‌ای
+ * نباید مستقیم به این فایل import کند؛ همه از "@/core/rate-limit" (index)
+ * مصرف می‌کنند تا جابه‌جایی شفاف باشد.
+ */
+
 import type { RateLimitResult, RateLimitRule, RateLimiter } from "./types";
 
 const MAX_BUCKETS = 100_000; // سقف حافظه — در حمله، کلیدهای قدیمی دور ریخته می‌شوند

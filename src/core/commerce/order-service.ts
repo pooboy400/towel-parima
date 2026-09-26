@@ -91,6 +91,7 @@ export async function cancelOrder(
     const refund = await paymentProvider.refundPayment({
       transactionId: payment.transactionId,
       amountIrt: payment.amount,
+      authority: payment.authority, // INFRA-04
     });
 
     await db.$transaction(async (tx) => {

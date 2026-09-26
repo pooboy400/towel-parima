@@ -110,8 +110,18 @@ export function verifyTotpCode(
   const normalized = code.replace(/\D/g, "");
   if (normalized.length !== TOTP_DIGITS) return false;
   const counter = currentCounter(now);
+  // INFRA-08/1 (فاز ۶) — مقایسهٔ زمان-ثابت (قبلاً === رشته‌ای بود)
   for (let drift = -window; drift <= window; drift++) {
-    if (totpAt(secret, counter + drift) === normalized) return true;
+    const candidate = totpAt(secret, counter + drift);
+    if (timingSafeEqualStrings(candidate, normalized)) return true;
   }
   return false;
+}
+
+/** مقایسهٔ زمان-ثابت برای دو رشتهٔ هم‌طول (کد TOTP همیشه ۶ رقم است) */
+function timingSafeEqualStrings(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return diff === 0;
 }

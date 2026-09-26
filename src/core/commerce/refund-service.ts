@@ -126,6 +126,7 @@ export async function requestRefund(input: {
   const providerRes = await paymentProvider.refundPayment({
     transactionId: payment.transactionId!,
     amountIrt: amount,
+    authority: payment.authority, // INFRA-04
   });
 
   // ── tx ۲: نتیجه

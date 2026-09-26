@@ -46,6 +46,9 @@ export const PERMISSIONS = {
   usersUpdate: "users.update",
 
   auditRead: "audit.read",
+
+  /** INFRA-08/2 (فاز ۶) — تغییر رمز توسط خود کاربر؛ به همهٔ نقش‌های ادمین داده می‌شود */
+  profileSelf: "profile.self",
 } as const;
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS];

@@ -129,7 +129,9 @@ export async function changeOwnPasswordAction(input: {
   currentPassword: string;
   newPassword: string;
 }): Promise<ActionResult<{ saved: true }>> {
-  return withAdminAction(PERMISSIONS.settingsRead, async (ctx) => {
+  // INFRA-08/2 (فاز ۶) — مجوز اختصاصی self-service به‌جای settingsRead:
+  // هر نقش ادمینی حق تغییر رمزِ خودش را دارد (اثبات با رمز فعلی)
+  return withAdminAction(PERMISSIONS.profileSelf, async (ctx) => {
     const parsed = changePasswordSchema.parse(input);
     const user = await db.user.findUnique({ where: { id: ctx.actor.userId } });
     if (!user?.passwordHash) throw new DomainError("UNAUTHENTICATED", "حساب شما رمز ندارد.");
