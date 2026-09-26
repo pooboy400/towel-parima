@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/seo/json-ld";
 import Link from "next/link";
 import { MessageCircleQuestion } from "lucide-react";
 import { getFaq } from "@/services/content-service";
@@ -20,8 +21,30 @@ export const metadata: Metadata = {
 export default async function FaqPage() {
   const faq = await getFaq();
 
+  // SEO-01 (فاز ۵) — اسکیمای FAQPage با همان سؤال‌های صفحه
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  };
+
   return (
     <div className="container-brand py-8 lg:py-10">
+      <JsonLd data={faqJsonLd} />
+      {/* SEO-01 — پاسخ‌ها در HTML اولیه هم هستند (خزنده بدون اجرای JS می‌بیند) */}
+      <div className="sr-only" aria-hidden={false}>
+        <h2>پاسخ سؤالات پرتکرار</h2>
+        {faq.map((item, i) => (
+          <div key={i}>
+            <h3>{item.question}</h3>
+            <p>{item.answer}</p>
+          </div>
+        ))}
+      </div>
       <Breadcrumb
         items={[{ label: "خانه", href: "/" }, { label: "سؤالات پرتکرار" }]}
       />

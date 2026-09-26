@@ -273,6 +273,7 @@ export function mapJournalToDomain(j: {
   bodyMarkdown: string;
   coverKey: string | null;
   topic: string;
+  ctaTitle?: string | null;
   readingMinutes: number;
   publishedAt: Date | null;
 }): JournalPost {
@@ -286,6 +287,7 @@ export function mapJournalToDomain(j: {
     category: j.topic,
     date: (j.publishedAt ?? new Date(0)).toISOString().slice(0, 10),
     readingTime: j.readingMinutes,
+    ctaTitle: j.ctaTitle ?? null,
   };
 }
 

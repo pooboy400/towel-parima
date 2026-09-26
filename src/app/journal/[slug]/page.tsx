@@ -94,16 +94,46 @@ export default async function JournalPostPage({
           />
         </figure>
 
-        {/* بدنه مقاله */}
+        {/* بدنه مقاله — SEO-02 (فاز ۵): تیترهای h2/h3 و تصویر درون‌متنی پشتیبانی می‌شوند */}
         <div className="mx-auto mt-8 flex max-w-2xl flex-col gap-6 lg:mt-10">
-          {post.content.map((paragraph, i) => (
-            <p
-              key={i}
-              className="text-[15px] leading-9 text-foreground/85"
-            >
-              {paragraph}
-            </p>
-          ))}
+          {post.content.map((block, i) => {
+            if (block.startsWith("### ")) {
+              return (
+                <h3 key={i} className="mt-2 text-[17px] font-bold leading-8">
+                  {block.slice(4)}
+                </h3>
+              );
+            }
+            if (block.startsWith("## ")) {
+              return (
+                <h2 key={i} className="mt-4 text-xl font-bold leading-9">
+                  {block.slice(3)}
+                </h2>
+              );
+            }
+            if (block.startsWith("IMG:")) {
+              const src = block.slice(4).trim();
+              return (
+                <figure
+                  key={i}
+                  className="relative mx-auto my-2 aspect-[16/9] w-full overflow-hidden rounded-lg"
+                >
+                  <Image
+                    src={src}
+                    alt={`${post.title} — تصویر توضیحی ${i + 1}`}
+                    fill
+                    sizes="(min-width: 768px) 672px, 100vw"
+                    className="object-cover"
+                  />
+                </figure>
+              );
+            }
+            return (
+              <p key={i} className="text-[15px] leading-9 text-foreground/85">
+                {block}
+              </p>
+            );
+          })}
         </div>
 
         {/* CTA راهنمای خرید */}
@@ -113,7 +143,10 @@ export default async function JournalPostPage({
               <BookOpen className="size-5 text-terracotta-deep" aria-hidden />
             </span>
             <div className="flex flex-col gap-1">
-              <h2 className="text-base font-bold">راهنمای خرید حوله</h2>
+              <h2 className="text-base font-bold">
+                {/* SEO-03 (فاز ۵): عنوان CTA اختصاصی هر مقاله */}
+                {post.ctaTitle ?? "راهنمای خرید حوله"}
+              </h2>
               <p className="text-sm leading-7 text-foreground/75">
                 حالا که خواندید، مجموعه‌ی پریما را ببینید و با خیال راحت
                 انتخاب کنید.

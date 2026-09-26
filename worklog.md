@@ -1380,3 +1380,18 @@ Work Log:
 Stage Summary:
 - فاز ۴ بسته شد: ۲۴۵/۲۴۵ · typecheck/lint صفر · UX-11/UX-06 تأیید زنده
 - معیار ۱۰/۱۰ (گشت ۳ کاربر) به باتری نهایی سپرده می‌شود
+
+---
+Task ID: 63
+Agent: main (Super Z — مهندس کل)
+Task: فاز ۵ — سئو و اکسسوریلیتی (SEO-01..04)
+
+Work Log:
+- SEO-01: اسکیمای FAQPage (همان ۷ سؤال) + بلاک sr-only پاسخ‌ها در HTML اولیه — خزنده بدون JS می‌بیند
+- SEO-02: رندر مقاله ارتقا یافت — «## »→h2، «### »→h3، «IMG:...»→figure+next/image با alt توصیفی؛ ۵ مقالهٔ seed غنی شد (تیتر بخش + تصویر درون‌متنی) و با backfill-journal.ts به DB موجود اعمال شد
+- SEO-03: ctaTitle به مدل JournalPost اضافه شد (migration journal_cta_title + seed + mapper + دامنه)؛ عنوان CTA اختصاصی هر ۵ مقاله زنده رندر می‌شود؛ preload فونت با ADR مستند رد شد (next/font swap+self-host کافی؛ URL هاردکد شکننده)
+- SEO-04: scroll-behavior با data-scroll-behavior="smooth" روی html (پیشنهاد Next) — CSS دستی حذف، هشدار dev نمی‌آید
+- درس: کش turbopack (.next) بعد از migrate+backfill کهنه شد — rm -rf .next حل کرد؛ unstable_cache محتوا (۱ ساعت) با tag journal/content معتبر است ولی مسیر مستقیم DB باید cache-aware باشد
+
+Stage Summary:
+- فاز ۵ بسته شد: ۲۴۵/۲۴۵ · typecheck/lint صفر · اثبات زنده: FAQPage در HTML، h2/h3 و CTA اختصاصی در مقاله

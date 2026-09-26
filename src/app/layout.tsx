@@ -21,6 +21,15 @@ const vazirmatn = localFont({
   display: "swap",
 });
 
+/**
+ * SEO-03 (فاز ۵) — تصمیم ADR دربارهٔ preload فونت:
+ * next/font/local فونت‌ها را self-host و با display:swap سرو می‌کند
+ * (بدون FOIT و بدون رندر-بلاک). preload دستی URLهای هش‌دار build را
+ * می‌شکند (hash بین dev/prod عوض می‌شود) — لذا اعمال نشد؛ اگر روزی
+ * measurement نشان داد LCP فونت‌محور است، از next/font preload داخلی
+ * در build production استفاده می‌شود نه URL هاردکد.
+ */
+
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://prima-towel.ir",
@@ -66,7 +75,7 @@ export default async function RootLayout({
   const { config } = await getStoreSettingsSafe();
 
   return (
-    <html lang="fa" dir="rtl" suppressHydrationWarning>
+    <html lang="fa" dir="rtl" data-scroll-behavior="smooth" suppressHydrationWarning>
       <body
         className={`${vazirmatn.variable} flex min-h-screen flex-col bg-background font-sans text-foreground antialiased`}
       >

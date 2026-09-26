@@ -247,6 +247,7 @@ async function main() {
         bodyMarkdown: j.content.join("\n\n"),
         coverKey: j.image,
         topic: j.category,
+        ctaTitle: j.ctaTitle ?? null,
         readingMinutes: j.readingTime,
         status: "PUBLISHED",
         publishedAt: new Date(Date.now() - (journalDaysAgo.get(j.slug) ?? 30) * 24 * 60 * 60 * 1000),

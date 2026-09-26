@@ -126,9 +126,8 @@
   * {
     @apply border-border outline-ring/50;
   }
-  html {
-    scroll-behavior: smooth;
-  }
+  /* SEO-04 (فاز ۴/۵): smooth با data-scroll-behavior روی html مدیریت می‌شود
+     (پیشنهاد Next) — CSS دستی روی html هشدار dev می‌ساخت */
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "ss01";
@@ -141,9 +140,6 @@
   }
   /* Reduced motion — پرامپت 82 */
   @media (prefers-reduced-motion: reduce) {
-    html {
-      scroll-behavior: auto;
-    }
     *,
     *::before,
     *::after {

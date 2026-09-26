@@ -119,6 +119,8 @@ export interface JournalPost {
   category: string;
   date: string;
   readingTime: number;
+  /** SEO-03 (فاز ۵) — عنوان CTA اختصاصی؛ null = پیش‌فرض «راهنمای خرید حوله» */
+  ctaTitle: string | null;
 }
 
 export interface FaqItem {

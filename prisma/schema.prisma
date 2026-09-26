@@ -582,6 +582,8 @@ model JournalPost {
   bodyMarkdown String
   coverKey     String?
   topic        String
+  /** SEO-03 (فاز ۵) — عنوان CTA اختصاصی هر مقاله؛ null = عنوان پیش‌فرض */
+  ctaTitle     String?
   readingMinutes Int
   status       ContentStatus @default(DRAFT)
   publishedAt  DateTime?

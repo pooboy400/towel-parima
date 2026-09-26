@@ -16,7 +16,7 @@
 - [x] **فاز ۲ — باگ‌های پول و دیتا:** ۵ تسک — کامل شد (Task 60)
 - [x] **فاز ۳ — بهداشت کد و امنیت پایین‌تر:** ۱۸ تسک — کامل شد (Task 61 + بک‌لاگ باتری ۶۰: FS-1، ریت‌لیمیت callback، HEALTH-MON-01، CLIENT-IP-T1، CSP-N1، QA-HYG-01)
 - [x] **فاز ۴ — UI/UX به سمت ۱۰/۱۰:** ۱۴ تسک — کامل شد (Task 62)
-- [ ] **فاز ۵ — سئو و اکسسوریلیتی:** ۴ تسک
+- [x] **فاز ۵ — سئو و اکسسوریلیتی:** ۴ تسک — کامل شد (Task 63)
 - [ ] **فاز ۶ — زیرساخت و M6:** ۹ تسک (+INFRA-09 از CR-6/55-c)
 
 ---
@@ -110,10 +110,10 @@
 
 | # | شدت | تسک | کجا | شرح مشکل | راه‌حل |
 |---|-----|------|-----|-----------|--------|
-| SEO-01 | 🔵 پایین | اسکیمای FAQPage + SSR پاسخ‌ها | `src/app/faq/page.tsx` | پاسخ‌ها کلاینت‌رندرند (خزنده نمی‌بیند) و FAQPage JSON-LD وجود ندارد (فقط ۲ بلاک ld+json دیگر) | SSR پاسخ‌ها (یا حداقل در HTML اولیه) + بلاک JSON-LD نوع `FAQPage` با همان ۷ سوال |
-| SEO-02 | 🔵 پایین | مقالات ژورنال فقط پاراگراف‌اند | `prisma/seed-data/content.ts` + رندر `src/app/journal/[slug]/page.tsx` | بدون تیتر بخش (h2/h3) و تصویر درون‌متنی — ضعف سئوی محتوایی | مدل محتوا h2/h3 و تصویر بین‌متنی پشتیبانی کند (اکنون به پاراگراف split می‌شود)؛ seed مقالات موجود غنی‌تر شود |
-| SEO-03 | ⚪ سلیقه‌ای | عنوان CTA یکتا برای هر مقاله + preload فونت | `prisma/seed-data/content.ts` · `src/app/layout.tsx` | هر ۵ مقاله CTA «راهنمای خرید حوله» دارند؛ Vazirmatn preload ندارد | عنوان CTA اختصاصی per مقاله؛ `<link rel="preload" as="font">` برای وزن‌های اصلی Vazirmatn |
-| SEO-04 | 🔵 پایین | حذف هشدار dev مربوط به scroll-behavior | `src/app/globals.css` (روی html) | هشدار Next: «Detected scroll-behavior: smooth on <html>» — لاگ کنسول را شلوغ می‌کند | پیشنهاد Next را اعمال کن (`data-scroll-behavior="smooth"` روی html و حرکت smooth به media/screen مناسب) یا smooth را فقط روی عناصر داخلی بگذار |
+| SEO-01 ✅ | 🔵 پایین | اسکیمای FAQPage + SSR پاسخ‌ها | `src/app/faq/page.tsx` | پاسخ‌ها کلاینت‌رندرند (خزنده نمی‌بیند) و FAQPage JSON-LD وجود ندارد (فقط ۲ بلاک ld+json دیگر) | SSR پاسخ‌ها (یا حداقل در HTML اولیه) + بلاک JSON-LD نوع `FAQPage` با همان ۷ سوال |
+| SEO-02 ✅ | 🔵 پایین | مقالات ژورنال فقط پاراگراف‌اند | `prisma/seed-data/content.ts` + رندر `src/app/journal/[slug]/page.tsx` | بدون تیتر بخش (h2/h3) و تصویر درون‌متنی — ضعف سئوی محتوایی | مدل محتوا h2/h3 و تصویر بین‌متنی پشتیبانی کند (اکنون به پاراگراف split می‌شود)؛ seed مقالات موجود غنی‌تر شود |
+| SEO-03 ✅ | ⚪ سلیقه‌ای | عنوان CTA یکتا برای هر مقاله + preload فونت | `prisma/seed-data/content.ts` · `src/app/layout.tsx` | هر ۵ مقاله CTA «راهنمای خرید حوله» دارند؛ Vazirmatn preload ندارد | عنوان CTA اختصاصی per مقاله؛ `<link rel="preload" as="font">` برای وزن‌های اصلی Vazirmatn |
+| SEO-04 ✅ | 🔵 پایین | حذف هشدار dev مربوط به scroll-behavior | `src/app/globals.css` (روی html) | هشدار Next: «Detected scroll-behavior: smooth on <html>» — لاگ کنسول را شلوغ می‌کند | پیشنهاد Next را اعمال کن (`data-scroll-behavior="smooth"` روی html و حرکت smooth به media/screen مناسب) یا smooth را فقط روی عناصر داخلی بگذار |
 
 ---
 
