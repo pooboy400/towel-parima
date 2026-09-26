@@ -44,6 +44,7 @@ export async function transitionOrderAction(input: {
       await cancelOrder(parsed.orderId, {
         reason: "لغو توسط ادمین",
         actorId: ctx.actor.userId,
+        actor: "admin", // BUG-04 — بازیگر صریح (گذار چند-بازیگر PENDING→CANCELLED)
       });
     } else {
       await transitionOrder(parsed.orderId, parsed.to);

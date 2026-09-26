@@ -1124,3 +1124,43 @@ Stage Summary:
 - باقی‌مانده‌های کوچک برای فاز ۳ ثبت شد: HEALTH-MON-01 (سقف مستقل/cached health) · CLIENT-IP-T1 (trim x-real-ip + کانونی‌سازی خروجی v6) · CSP-N1 (try/catch مسیر خطای reader) · QA-HYG-01 (exclude qa-reports از typecheck/eslint) — همگی تک‌خطی/کوچک
 - گزارش‌ها: qa-reports/57-a-security-verify.md · 57-b-redteam.md · 57-c-code-review.md · 57-d-testsuite.md (+ شواهد tmp-57a/b/c/d و tmp-57cmd)
 - گام بعدی پیشنهادی: فاز ۲ — باگ‌های پول (BUG-01…05: TOCTOU کوپن، سقف مهمان، failPayment race و…)
+
+---
+Task ID: 59
+Agent: main (Super Z)
+Task: استارت dev server پس از ریست کامل محیط سندباکس
+
+Work Log:
+- کشف: محیط سندباکس ریست شده بود — towel-parima و .pg از دیسک پاک شده بودند (فقط اسکلت خالی my-project مانده بود)
+- بازیابی کامل از گیت‌هاب: git clone → دقیقاً روی 6f760ba (آخرین اسنپ‌شات فاز ۱ — هیچ کدی از دست نرفت چون فاز ۲ هنوز شروع نشده بود)
+- bun install: ۸۴۷ پکیج
+- بازنصب PostgreSQL پرتابل 16.4 با scripts/setup-pg.sh → init → start
+- prisma generate + migrate deploy: همه مهاجرت‌ها اعمال شد
+- seed کامل: ۱۲ محصول، ۶۰ واریانت، نقش‌ها، نظرات، ژورنال، FAQ، تنظیمات
+- ساخت ادمین جدید (دیتابیس تازه = رمز جدید)
+- استارت dev server با الگوی double-fork (setsid) — پورت 3000
+
+Stage Summary:
+- سرور فعال و سبز: / (200) · /shop (200) · /admin/login (200) · /api/health (200)
+- دیتابیس تازه: ۱۲ محصول، ۱ کاربر (ادمین)، ۰ سفارش — داده‌های تستی QA دورهٔ قبل پاک شده (در گیت نبودند و تستی بودند)
+- رمز جدید ادمین: admin@prima-store.ir / tgCRoA9MXheCbTSZ (رمز قدیمی دیگر کار نمی‌کند)
+- نکته: پوش گیت‌هاب قبلی دقیقاً همین‌جا نجات‌مان داد؛ برای فازهای بعدی checkpointهای محلی می‌سازیم
+
+---
+Task ID: 60
+Agent: main (Super Z — مهندس کل)
+Task: فاز ۲ — رفع ۵ باگ منطقی پول و دیتا (BUG-01..05) + تست پذیرش هر کدام
+
+Work Log:
+- BUG-01: coupon-service — قفل pessimistic ردیف Coupon با SELECT…FOR UPDATE در ابتدای consumeCouponInTx (الگوی refund-service)؛ شمارش perUserLimit حالا زیر قفل امن است + بازخوانی پس از قفل
+- BUG-02: ADR سقف مهمان — مهمان‌ها سبد گمنام مشترک دارند (مجموع مصرف مهمان ≤ perUserLimit)؛ پیام شفاف «با ورود به حساب…»؛ منطق در evaluateCoupon هم آینه شد؛ ADR کامل در کامنت هدر فایل
+- BUG-03: failPayment — claim اتمیک PENDING→FAILED با updateMany بدون throw + لغو شرطی سفارش (بدون P2025) + idempotent بودن callback تکراری + Outbox مستقل از نتیجهٔ لغو
+- BUG-04: state-machines — assertOrderTransition با filter(from,to)+تطبیق actor؛ 409 برای گذار ناموجود، 403 برای بازیگر نادرست؛ order-service از جدول دامنه تغذیه شد (حذف جدول موازی) + پارامتر actor الزامی در cancelOrder + حذف `as never` (BUG-11 زودهنگام)
+- BUG-05: mappers — حذف fallback فریبنده؛ واریانت فعال ملاک؛ همه-غیرفعال → stock=0 (ADR 011)
+- تست‌های جدید: coupon-concurrency.test.ts (۶ تست: ۱۰ موازی perUser=1→۱ مصرف، ۳ شماره مهمان→۱، جداسازی سبد مهمان/کاربر، رگرسیون usageLimit ۱۰/۳)، payment-fail-race.test.ts (۳ تست: رقابت لغو×شکست، idempotency، رقابت confirm×fail)، +۵ تست unit state-machine actor، +۳ تست unit mapper
+- رگرسیون کامل: unit+integration 245/245 (قبلاً 228) · lint صفر خطا/۹ هشدار قدیمی · typecheck فقط ۳ خطای اسکرچ tmp-*
+
+Stage Summary:
+- فاز ۲ رسماً بسته شد — هر ۵ معیار پذیرش tasks.md با تست خودکار پوشش داده شد
+- فیکسچرها با sku یونیک در مقیاس ران‌ها + پاکسازی مقاوم FK (درس P2002 بین-ران)
+- گام بعدی: باتری ۸ ایجنت روی فاز ۲ → commit+tag phase-2-complete → فاز ۳

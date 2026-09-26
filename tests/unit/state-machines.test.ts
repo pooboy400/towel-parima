@@ -68,6 +68,45 @@ describe("Order state machine — جدول بخش ۵.۱ سند", () => {
     );
     expect(shipped?.adminPermission).toBe("orders.update");
   });
+
+  // ── BUG-04 (فاز ۲) — جدول چند-بازیگر: actor باید ملاک باشد نه rule اول ──
+  it("BUG-04: لغو ادمین از PENDING مجاز است (قبلاً 403 می‌خورد)", () => {
+    const rule = assertOrderTransition("PENDING", "CANCELLED", "admin");
+    expect(rule.actor).toBe("admin");
+    expect(rule.adminPermission).toBe("orders.update");
+  });
+
+  it("BUG-04: لغو مشتری از PENDING همچنان مجاز و rule درست برمی‌گردد", () => {
+    const rule = assertOrderTransition("PENDING", "CANCELLED", "customer");
+    expect(rule.actor).toBe("customer");
+  });
+
+  it("BUG-04: بازیگر بی‌مجاز روی گذار موجود → 403", () => {
+    try {
+      assertOrderTransition("PENDING", "PROCESSING", "customer");
+      throw new Error("نباید به اینجا برسیم");
+    } catch (e) {
+      const err = e as DomainError;
+      expect(err.code).toBe("INVALID_TRANSITION");
+      expect(err.status).toBe(403);
+    }
+  });
+
+  it("BUG-04: گذار خارج از توپولوژی → 409 (تفکیک از 403 حفظ شده)", () => {
+    try {
+      assertOrderTransition("SHIPPED", "CANCELLED", "admin");
+      throw new Error("نباید به اینجا برسیم");
+    } catch (e) {
+      const err = e as DomainError;
+      expect(err.code).toBe("INVALID_TRANSITION");
+      expect(err.status).toBe(409);
+    }
+  });
+
+  it("BUG-04: system هم بازیگر شناخته‌شده است (PENDING→PROCESSING)", () => {
+    const rule = assertOrderTransition("PENDING", "PROCESSING", "system");
+    expect(rule.actor).toBe("system");
+  });
 });
 
 describe("Payment state machine — بخش ۵.۲", () => {

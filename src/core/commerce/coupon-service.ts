@@ -4,6 +4,25 @@
  * اعتبارسنجی خواندنی جدا از مصرفِ تراکنشی — مصرف فقط داخل tx checkout.
  * usedCount کشِ خواندنی است؛ حقیقت از CouponRedemption. اما افزایش آن در
  * همان tx مصرف انجام می‌شود تا سقف‌ها با COUNT رقابتی امن بمانند (شرط atomic).
+ *
+ * BUG-01 (فاز ۲ — TOCTOU سقف perUserLimit):
+ *   شمارش count-then-create بدون قفل نسبت به چک‌اوتِ همزمانِ یک کاربر ناامن بود
+ *   (سقف ۱ → دو مصرف). راه‌حل: قفل pessimistic ردیف Coupon با SELECT … FOR UPDATE
+ *   در ابتدای consumeCouponInTx (همان الگوی refund-service.ts) — همهٔ مصرف‌های
+ *   همزمانِ یک کوپن سریال می‌شوند و شمارش سقف کاربر در پنجرهٔ قفل نهایی و امن است.
+ *   گارد شرطی UPDATE ظرفیت کلی (usageLimit) هم به‌عنوان لایهٔ دوم باقی مانده است.
+ *
+ * BUG-02 (فاز ۲ — ADR سقف مهمان):
+ *   شرط قبلی «perUserLimit && userId» یعنی مهمان کاملاً از سقف خارج بود و با هر
+ *   شماره/آدرس جدید می‌توانست بی‌نهایت مصرف کند. تصمیم ثبت‌شده (ADR):
+ *   مهمان هویت پایدار ندارد (شماره تماس/ایمیل قابل جعل است)؛ بنابراین همهٔ
+ *   مهمان‌ها برای هر کوپن یک «سبد سهمیهٔ گمنام مشترک» دارند — یعنی مجموع مصرف
+ *   مهمان‌های کل سایت ≤ perUserLimit. کوپن‌های perUserLimit عملاً برای کاربران
+ *   لاگین طراحی شده‌اند و پیام خطای مهمان هم همین را پیشنهاد می‌دهد.
+ *   نکتهٔ محافظه‌کارانه: ردیف‌های Redemption که userId آن‌ها با حذف حساب
+ *   کاربر null شده (onDelete: SetNull) نیز به سبد گمنام شمرده می‌شوند —
+ *   سخت‌گیری عمدی؛ مسیر جایگزین (شماره تماس روی Order) قابل جعل بود و
+ *   معیار پذیرش («مهمان با ۳ شمارهٔ مختلف → فقط ۱ مصرف») را پاس نمی‌کرد.
  */
 
 import { db } from "@/lib/db";
@@ -63,14 +82,17 @@ export async function evaluateCoupon(
   if (coupon.usageLimit !== null && coupon.usedCount >= coupon.usageLimit) {
     throw new DomainError("COUPON_INVALID", "ظرفیت این کد تخفیف پر شده است.");
   }
-  if (coupon.perUserLimit !== null && userId) {
+  // BUG-02 — سقف per-user/مهمان در مسیر خواندنی (پیش‌نمایش UI؛ enforce نهایی در consume)
+  if (coupon.perUserLimit !== null) {
     const usedByUser = await db.couponRedemption.count({
-      where: { couponId: coupon.id, userId },
+      where: { couponId: coupon.id, userId: userId ?? null },
     });
     if (usedByUser >= coupon.perUserLimit) {
       throw new DomainError(
         "COUPON_INVALID",
-        "شما قبلاً حداکثر استفاده مجاز از این کد را داشته‌اید.",
+        userId
+          ? "شما قبلاً حداکثر استفاده مجاز از این کد را داشته‌اید."
+          : "ظرفیت این کد برای خرید مهمان پر شده — با ورود به حساب کاربری دوباره امتحان کنید.",
       );
     }
   }
@@ -98,6 +120,11 @@ export async function consumeCouponInTx(
   tx: Tx,
   input: { couponId: string; orderId: string; userId?: string | null },
 ): Promise<void> {
+  // BUG-01 — قفل ردیف کوپن: همهٔ مصرف‌های همزمانِ این کوپن اینجا سریال می‌شوند؛
+  // شمارش سقف کاربر/مهمان پس از این نقطه نسبت به رقابت امن است.
+  await tx.$queryRaw`SELECT "id" FROM "Coupon" WHERE "id" = ${input.couponId} FOR UPDATE`;
+
+  // بازخوانی پس از قفل — وضعیت تازه در پنجرهٔ قفل
   const coupon = await tx.coupon.findUnique({
     where: { id: input.couponId },
   });
@@ -132,14 +159,18 @@ export async function consumeCouponInTx(
     });
   }
 
-  if (coupon.perUserLimit !== null && input.userId) {
+  // BUG-01 — سقف per-user اکنون زیر قفل ردیف کوپن است (بدون TOCTOU)
+  // BUG-02 — مهمان: userId=null → شمارش روی سبد گمنام مشترک (ADR بالای فایل)
+  if (coupon.perUserLimit !== null) {
     const usedByUser = await tx.couponRedemption.count({
-      where: { couponId: coupon.id, userId: input.userId },
+      where: { couponId: coupon.id, userId: input.userId ?? null },
     });
     if (usedByUser >= coupon.perUserLimit) {
       throw new DomainError(
         "COUPON_INVALID",
-        "شما قبلاً حداکثر استفاده مجاز از این کد را داشته‌اید.",
+        input.userId
+          ? "شما قبلاً حداکثر استفاده مجاز از این کد را داشته‌اید."
+          : "ظرفیت این کد برای خرید مهمان پر شده — با ورود به حساب کاربری دوباره امتحان کنید.",
       );
     }
   }

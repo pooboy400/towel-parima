@@ -297,7 +297,14 @@ async function refundRacedPayment(input: {
   };
 }
 
-/** شکست پرداخت — Payment FAILED · سفارش CANCELLED · رزرو RELEASED */
+/** شکست پرداخت — Payment FAILED · سفارش CANCELLED · رزرو RELEASED
+ * BUG-03 (فاز ۲): UPDATE شرطی قبلی روی Order در نبود ردیف منطبق P2025 می‌داد →
+ * rollback کل tx → Payment برای همیشه PENDING و PaymentFailed هرگز به Outbox
+ * نمی‌رفت. الگوی جدید (مثل confirmPayment): claim اتمیک با updateMany بدون throw؛
+ * لغو سفارش نیز شرطی — اگر همزمان لغو/پیش رفته بود بی‌صدا رد می‌شود.
+ * آزادسازی رزرو و Outbox مستقل از نتیجهٔ لغو ادامه می‌یابد و callback تکراری
+ * کاملاً idempotent است (دومین فراخوانی زودعود می‌کند).
+ */
 export async function failPayment(input: {
   authority: string;
   reason: string;
@@ -309,22 +316,28 @@ export async function failPayment(input: {
   if (!payment || payment.status !== "PENDING") return;
 
   await db.$transaction(async (tx) => {
-    await tx.payment.update({
-      where: { id: payment.id },
+    // claim اتمیک PENDING → FAILED — اگر همزمان confirm برنده شده بود رد شو
+    const claimed = await tx.payment.updateMany({
+      where: { id: payment.id, status: "PENDING" },
       data: {
         status: "FAILED",
         metadata: { failReason: input.reason },
       },
     });
-    await tx.order.update({
+    if (claimed.count === 0) return; // پرداخت همزمان بسته شد (PAID/FAILED) — idempotent
+
+    // لغو شرطی سفارش — اگر همزمان لغو/پیش رفته بود P2025 نمی‌دهیم (BUG-03)
+    await tx.order.updateMany({
       where: { id: payment.orderId, status: "PENDING" },
       data: { status: "CANCELLED" },
     });
+
     for (const reservation of payment.order.reservations) {
       if (reservation.status === "ACTIVE") {
         await releaseReservation(tx, reservation.id);
       }
     }
+
     await enqueueOutbox(tx, {
       type: "PaymentFailed",
       payload: { orderId: payment.orderId, paymentId: payment.id, reason: input.reason },

@@ -176,24 +176,35 @@ export function checkTransition<TFrom extends string, TTo extends string>(
   return { allowed: Boolean(rule), rule };
 }
 
-/** بررسی گذار سفارش + نقش مجری — خطای DomainError استاندارد در صورت نقض */
+/**
+ * بررسی گذار سفارش + نقش مجری — خطای DomainError استاندارد در صورت نقض.
+ * BUG-04 (فاز ۲): find قبلی فقط اولین rule منطبق از/به را برمی‌گرداند و actor
+ * را نادیده می‌گرفت — گذار چند-بازیگر (مثل PENDING→CANCELLED که هم customer و
+ * هم admin دارد) همیشه با rule اول مقایسه می‌شد و لغو ادمین 403 می‌خورد.
+ * الگوریتم جدید: filter(from,to) → تطبیق actor:
+ *   · هیچ candidata نیست → 409 INVALID_TRANSITION (گذار در توپولوژی نیست)
+ *   · candidata هست ولی actor تطبیق ندارد → 403 (نقش مجری درست نیست)
+ */
 export function assertOrderTransition(
   from: OrderStatus,
   to: OrderStatus,
   actor: TransitionActor,
 ): OrderTransitionRule {
-  const rule = ORDER_TRANSITIONS.find((r) => r.from === from && r.to === to);
-  if (!rule) {
+  const candidates = ORDER_TRANSITIONS.filter((r) => r.from === from && r.to === to);
+  if (candidates.length === 0) {
     throw new DomainError(
       INVALID_TRANSITION,
       `گذار وضعیت سفارش از ${from} به ${to} مجاز نیست`,
       409,
     );
   }
-  if (rule.actor !== actor) {
+  const rule = candidates.find((r) => r.actor === actor);
+  if (!rule) {
     throw new DomainError(
       INVALID_TRANSITION,
-      `گذار ${from} → ${to} توسط ${actor} مجاز نیست (مجری: ${rule.actor})`,
+      `گذار ${from} → ${to} توسط ${actor} مجاز نیست (مجری‌های مجاز: ${candidates
+        .map((r) => r.actor)
+        .join("، ")})`,
       403,
     );
   }

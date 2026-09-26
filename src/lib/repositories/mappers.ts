@@ -173,7 +173,12 @@ export function mapReviewToDomain(r: {
 export function mapProductToDomain(p: PrismaProductLike): Product {
   // واریانت‌های فعالِ حذف‌نشده — واحد قیمت و موجودی
   const variants = p.variants.filter((v) => v.isActive && !v.deletedAt);
-  const activeVariants = variants.length > 0 ? variants : p.variants;
+  // BUG-05 (فاز ۲ — ADR 011 «UI هرگز جعل نمی‌کند»): fallback قبلی به همهٔ
+  // واریانت‌ها باعث می‌شد محصولی که واریانت دارد ولی همه غیرفعال‌اند، موجودیِ
+  // نمایشی مثبت بگیرد (۸) در حالی که رزرو با INACTIVE رد می‌شود — وعدهٔ کاذب.
+  // الان: فقط واریانت‌های فعال ملاک‌اند؛ محصولِ واقعاً بی‌واریانت هم طبیعتاً
+  // آرایهٔ خالی می‌گیرد (رفتار قبلی حفظ است) و موجودی نمایشی ۰ می‌شود.
+  const activeVariants = variants;
 
   // قیمت: حداقل قیمت واریانت‌ها (همان قیمت mock — همه واریانت‌ها هم‌قیمت seed شدند)
   const price = activeVariants.reduce(

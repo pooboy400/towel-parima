@@ -10,18 +10,25 @@ import { DomainError } from "@/core/errors";
 import { releaseReservation } from "./inventory-service";
 import { enqueueOutbox } from "./outbox-service";
 import { invalidateStorefrontForOrder } from "./storefront-invalidation";
+import {
+  ORDER_TRANSITIONS as ORDER_TRANSITION_RULES,
+  assertOrderTransition,
+  type TransitionActor,
+} from "@/domain/state-machines";
+import type { OrderStatus } from "@/domain/models/commerce";
 
-/** گذارهای مجاز ماشین وضعیت Order — بخش ۵.۱ */
-export const ORDER_TRANSITIONS: Record<string, readonly string[]> = {
-  PENDING: ["PROCESSING", "CANCELLED"],
-  PROCESSING: ["SHIPPED", "CANCELLED"],
-  SHIPPED: ["DELIVERED"],
-  DELIVERED: ["RETURN_REQUESTED"],
-  RETURN_REQUESTED: ["RETURNED"],
-  CANCELLED: [],
-  RETURNED: [],
-};
+/**
+ * BUG-04 (فاز ۲) — یک منبع حقیقت: نقشهٔ سادهٔ توپولوژی (بدون بازیگر) از همان
+ * جدول ثروتمند ORDER_TRANSITIONS دامنه مشتق می‌شود — دو جدول موازی دیگر وجود
+ * ندارد که واگرا شوند. enforce کامل با بازیگر از assertOrderTransition عبور می‌کند.
+ */
+export const ORDER_TRANSITIONS: Record<string, readonly string[]> =
+  ORDER_TRANSITION_RULES.reduce<Record<string, string[]>>((acc, r) => {
+    (acc[r.from] ??= []).push(r.to);
+    return acc;
+  }, {});
 
+/** چک توپولوژیک خالص (بدون بازیگر) — برای تست/لاگ؛ enforce واقعی: assertOrderTransition */
 export function assertTransition(from: string, to: string): void {
   const allowed = ORDER_TRANSITIONS[from] ?? [];
   if (!allowed.includes(to)) {
@@ -35,10 +42,12 @@ export function assertTransition(from: string, to: string): void {
 /**
  * لغو سفارش — رزروهای ACTIVE آزاد می‌شوند؛ اگر پرداخت PAID است refund ثبت می‌شود.
  * قانون طلایی §10.3: فراخوانی درگاه هرگز داخل tx — دو tx کوچک جدا.
+ * BUG-04 (فاز ۲): بازیگر الزامی شد — جدول گذار چند-بازیگر است و لغو PENDING
+ * هم برای customer (انصراف) و هم admin مجاز؛ چک قبلی بدون بازیگر لغو ادمین را 403 می‌کرد.
  */
 export async function cancelOrder(
   orderId: string,
-  opts: { reason: string; actorId: string | null },
+  opts: { reason: string; actorId: string | null; actor: TransitionActor },
 ): Promise<void> {
   const order = await db.order.findUnique({
     where: { id: orderId },
@@ -48,7 +57,7 @@ export async function cancelOrder(
     },
   });
   if (!order) throw new DomainError("NOT_FOUND", "سفارش یافت نشد.");
-  assertTransition(order.status, "CANCELLED");
+  assertOrderTransition(order.status, "CANCELLED", opts.actor);
 
   // ── tx ۱: لغو + آزادسازی رزرو + رخداد
   await db.$transaction(async (tx) => {
@@ -135,7 +144,7 @@ export async function shipOrder(
     select: { status: true, shippingAddress: true, code: true },
   });
   if (!order) throw new DomainError("NOT_FOUND", "سفارش یافت نشد.");
-  assertTransition(order.status, "SHIPPED");
+  assertOrderTransition(order.status, "SHIPPED", "admin");
 
   await db.$transaction(async (tx) => {
     const updated = await tx.order.updateMany({
@@ -168,17 +177,18 @@ export async function shipOrder(
  */
 export async function transitionOrder(
   orderId: string,
-  to: string,
+  to: OrderStatus,
 ): Promise<{ status: string }> {
   const order = await db.order.findUnique({
     where: { id: orderId },
     select: { status: true, code: true, items: { select: { variantId: true, quantity: true } } },
   });
   if (!order) throw new DomainError("NOT_FOUND", "سفارش یافت نشد.");
-  assertTransition(order.status, to);
+  // گذارهای این مسیر از پنل ادمین می‌آیند — بازیگر admin (BUG-04)
+  assertOrderTransition(order.status, to, "admin");
 
   if (to === "CANCELLED") {
-    await cancelOrder(orderId, { reason: "لغو توسط ادمین", actorId: null });
+    await cancelOrder(orderId, { reason: "لغو توسط ادمین", actorId: null, actor: "admin" });
     return { status: to };
   }
   if (to === "SHIPPED") {
@@ -189,7 +199,7 @@ export async function transitionOrder(
   await db.$transaction(async (tx) => {
     const updated = await tx.order.updateMany({
       where: { id: orderId, status: order.status },
-      data: { status: to as never },
+      data: { status: to }, // تایپ OrderStatus — بدون cast (BUG-11 را هم در همین تغییر رفع کرد)
     });
     if (updated.count === 0) {
       throw new DomainError("CONFLICT", "وضعیت سفارش همزمان تغییر کرده — دوباره تلاش کنید.");

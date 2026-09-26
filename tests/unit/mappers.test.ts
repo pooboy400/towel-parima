@@ -189,3 +189,46 @@ describe("mapJournalToDomain و mapReviewToDomain", () => {
     expect(r.verifiedPurchase).toBe(true);
   });
 });
+
+describe("BUG-05 (فاز ۲) — واریانت‌های همه غیرفعال → موجودی نمایشی صفر (ADR 011)", () => {
+  test("دو واریانت غیرفعال → stock=0، بدون رنگ/سایز نمایشی، قیمت 0", () => {
+    const p = mapProductToDomain(
+      makeProduct({
+        variants: [
+          { id: "vi1", productId: "p1", colorId: "white", sizeId: "bath", sku: "SKU-I1", price: 745_000, compareAtPrice: null, stock: 5, reserved: 0, isActive: false, deletedAt: null } as never,
+          { id: "vi2", productId: "p1", colorId: "cream", sizeId: "bath", sku: "SKU-I2", price: 800_000, compareAtPrice: null, stock: 3, reserved: 0, isActive: false, deletedAt: null } as never,
+        ],
+      }),
+    );
+    // قبلاً: fallback به واریانت‌های غیرفعال → stock=8 و رنگ‌ها نمایش داده می‌شد
+    expect(p.stock).toBe(0);
+    expect(p.price).toBe(0);
+    expect(p.colors).toHaveLength(0);
+    expect(p.sizes).toHaveLength(0);
+  });
+
+  test("واریانت حذف‌شده (deletedAt) هم مثل غیرفعال شمرده نمی‌شود", () => {
+    const p = mapProductToDomain(
+      makeProduct({
+        variants: [
+          { id: "vd1", productId: "p1", colorId: "white", sizeId: "bath", sku: "SKU-D1", price: 745_000, compareAtPrice: null, stock: 9, reserved: 0, isActive: true, deletedAt: new Date("2025-01-01") } as never,
+        ],
+      }),
+    );
+    expect(p.stock).toBe(0);
+  });
+
+  test("میخ: واریانت فعال + غیرفعال → فقط فعال شمرده می‌شود", () => {
+    const p = mapProductToDomain(
+      makeProduct({
+        variants: [
+          { id: "va1", productId: "p1", colorId: "white", color: { id: "white", name: "سفید", hex: "#ffffff" }, sizeId: "bath", size: { id: "bath", name: "حمام", dimensions: "70×140" }, sku: "SKU-A1", price: 700_000, compareAtPrice: null, stock: 4, reserved: 1, isActive: true, deletedAt: null } as never,
+          { id: "vi3", productId: "p1", colorId: "cream", color: { id: "cream", name: "کرم", hex: "#f5f0e1" }, sizeId: "bath", size: { id: "bath", name: "حمام", dimensions: "70×140" }, sku: "SKU-I3", price: 800_000, compareAtPrice: null, stock: 100, reserved: 0, isActive: false, deletedAt: null } as never,
+        ],
+      }),
+    );
+    expect(p.stock).toBe(3); // فقط (4−1) واریانت فعال — 100 غیرفعال نمی‌آید
+    expect(p.price).toBe(700_000);
+    expect(p.colors).toHaveLength(1); // فقط رنگ واریانت فعال
+  });
+});
